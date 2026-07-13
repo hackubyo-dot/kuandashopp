@@ -242,7 +242,7 @@ if (!emailPassRaw) {
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
+    port: 587,
     secure: true,
 
     auth: {
@@ -254,9 +254,9 @@ const transporter = nodemailer.createTransport({
         rejectUnauthorized: false
     },
 
-    connectionTimeout: 10000,
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
+    connectionTimeout: 20000,
+    greetingTimeout: 2000,
+    socketTimeout: 20000,
 
     logger: false,
     debug: false
