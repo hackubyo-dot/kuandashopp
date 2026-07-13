@@ -61,7 +61,7 @@ const salvarBackupImagem = async (filePath, fileName, tabelaOrigem = null, regis
         // Ler arquivo
         const imagemBuffer = fs.readFileSync(filePath);
         const stats = fs.statSync(filePath);
-        
+        a
         // Detectar tipo MIME
         const mimeType = getMimeType(filePath);
         
@@ -224,30 +224,71 @@ const limparBackupsAntigos = async (daysOld = 30) => {
     }
 };
 
-// ==================== CONFIGURAÇÃO DE EMAIL (CORRIGIDA) ====================
+// ==================== CONFIGURAÇÃO DE EMAIL (BLINDADA) ====================
+
+// Carrega as credenciais do ambiente
+const emailUser = process.env.EMAIL_USER || '';
+const emailPassRaw = process.env.EMAIL_PASS || '';
+const emailPass = emailPassRaw.replace(/\s+/g, ''); // Remove espaços automaticamente
+
+// Verificação das variáveis
+if (!emailUser) {
+    console.warn('⚠️ EMAIL_USER não foi configurado nas variáveis de ambiente.');
+}
+
+if (!emailPassRaw) {
+    console.warn('⚠️ EMAIL_PASS não foi configurado nas variáveis de ambiente.');
+}
+
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',  // Força o endereço do servidor
-    port: 465,               // Porta segura (SSL) que não costuma ser bloqueada
-    secure: true,            // Obrigatório para porta 465
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS.replace(/\s+/g, '') // Remove espaços da senha automaticamente
+        user: emailUser,
+        pass: emailPass
     },
+
     tls: {
-        rejectUnauthorized: false // Ajuda a evitar erros de certificado no Render
+        rejectUnauthorized: false
     },
-    connectionTimeout: 10000, // 10 segundos para conectar
-    greetingTimeout: 5000     // 5 segundos para o 'oi' do servidor
+
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000,
+
+    logger: false,
+    debug: false
 });
 
-// Teste de verificação ao iniciar
-transporter.verify(function (error, success) {
-    if (error) {
-        console.log("❌ Erro na conexão SMTP:", error.message);
-    } else {
-        console.log("✅ Servidor de Email pronto para envios!");
-    }
-});
+// ==================== TESTE DA CONEXÃO SMTP ====================
+
+if (emailUser && emailPass) {
+
+    transporter.verify((error, success) => {
+
+        if (error) {
+
+            console.error("❌ Erro na conexão SMTP");
+            console.error("Mensagem:", error.message);
+            console.error("Código:", error.code || "N/A");
+            console.error("Comando:", error.command || "N/A");
+
+        } else {
+
+            console.log("✅ Servidor SMTP conectado com sucesso!");
+            console.log("📧 Email:", emailUser);
+
+        }
+
+    });
+
+} else {
+
+    console.warn("⚠️ SMTP desativado porque EMAIL_USER ou EMAIL_PASS não estão configurados.");
+
+}
 
 // --- CONFIGURAÇÃO DO PASSPORT (GOOGLE) ---
 passport.use(new GoogleStrategy({
