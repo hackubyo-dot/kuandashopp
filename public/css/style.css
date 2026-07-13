@@ -1,0 +1,395 @@
+/* ==========================================================================
+   KUANDASHOP - ESTILOS PRINCIPAIS
+   Design System Moderno & Sofisticado
+   ========================================================================== */
+
+/* 1. VARIÁVEIS E RESET ==================================================== */
+:root {
+  /* Cores Principais - Inspirado na bandeira de Angola */
+  --ks-primary-red: #ce1126;
+  --ks-primary-yellow: #ffcd00;
+  --ks-primary-black: #000000;
+  --ks-secondary-red: #b30e21;
+  --ks-secondary-yellow: #e6b800;
+  
+  /* Sistema de Cores */
+  --ks-white: #ffffff;
+  --ks-black: #000000;
+  --ks-gray-50: #fafafa;
+  --ks-gray-100: #f5f5f5;
+  --ks-gray-200: #eeeeee;
+  --ks-gray-300: #e0e0e0;
+  --ks-gray-400: #bdbdbd;
+  --ks-gray-500: #9e9e9e;
+  --ks-gray-600: #757575;
+  --ks-gray-700: #616161;
+  --ks-gray-800: #424242;
+  --ks-gray-900: #212121;
+  
+  /* Cores Funcionais */
+  --ks-success: #10b981;
+  --ks-warning: #f59e0b;
+  --ks-error: #ef4444;
+  --ks-info: #3b82f6;
+  
+  /* Gradientes */
+  --ks-gradient-red: linear-gradient(135deg, var(--ks-primary-red), var(--ks-secondary-red));
+  --ks-gradient-yellow: linear-gradient(135deg, var(--ks-primary-yellow), var(--ks-secondary-yellow));
+  --ks-gradient-gold: linear-gradient(135deg, #ffd700, #ffcd00);
+  --ks-gradient-dark: linear-gradient(135deg, var(--ks-primary-black), var(--ks-gray-800));
+  
+  /* Tipografia */
+  --ks-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ks-font-display: 'Montserrat', var(--ks-font-family);
+  
+  /* Tamanhos de Fonte */
+  --ks-text-xs: 0.75rem;     /* 12px */
+  --ks-text-sm: 0.875rem;    /* 14px */
+  --ks-text-base: 1rem;      /* 16px */
+  --ks-text-lg: 1.125rem;    /* 18px */
+  --ks-text-xl: 1.25rem;     /* 20px */
+  --ks-text-2xl: 1.5rem;     /* 24px */
+  --ks-text-3xl: 1.875rem;   /* 30px */
+  --ks-text-4xl: 2.25rem;    /* 36px */
+  --ks-text-5xl: 3rem;       /* 48px */
+  
+  /* Espaçamento */
+  --ks-space-1: 0.25rem;     /* 4px */
+  --ks-space-2: 0.5rem;      /* 8px */
+  --ks-space-3: 0.75rem;     /* 12px */
+  --ks-space-4: 1rem;        /* 16px */
+  --ks-space-5: 1.25rem;     /* 20px */
+  --ks-space-6: 1.5rem;      /* 24px */
+  --ks-space-8: 2rem;        /* 32px */
+  --ks-space-10: 2.5rem;     /* 40px */
+  --ks-space-12: 3rem;       /* 48px */
+  
+  /* Bordas */
+  --ks-radius-sm: 0.375rem;  /* 6px */
+  --ks-radius-md: 0.5rem;    /* 8px */
+  --ks-radius-lg: 0.75rem;   /* 12px */
+  --ks-radius-xl: 1rem;      /* 16px */
+  --ks-radius-2xl: 1.5rem;   /* 24px */
+  --ks-radius-full: 9999px;
+  
+  /* Sombras */
+  --ks-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ks-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --ks-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ks-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ks-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --ks-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Transições */
+  --ks-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ks-transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ks-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 2. RESET & BASE STYLES ================================================= */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--ks-font-family);
+  font-size: var(--ks-text-base);
+  line-height: 1.5;
+  color: var(--ks-gray-800);
+  background-color: var(--ks-gray-50);
+  min-height: 100vh;
+}
+
+/* 3. LAYOUT & CONTAINERS ================================================ */
+.ks-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--ks-space-4);
+}
+
+/* 4. TIPOGRAFIA ========================================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ks-font-display);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ks-primary-black);
+  margin-bottom: var(--ks-space-4);
+}
+
+h1 {
+  font-size: var(--ks-text-5xl);
+  font-weight: 800;
+  background: var(--ks-gradient-red);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: var(--ks-text-4xl);
+  position: relative;
+  padding-bottom: var(--ks-space-4);
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--ks-gradient-red);
+  border-radius: 2px;
+}
+
+/* 5. BOTÕES ============================================================ */
+.ks-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ks-space-2);
+  padding: var(--ks-space-3) var(--ks-space-6);
+  font-weight: 600;
+  font-size: var(--ks-text-base);
+  border: none;
+  border-radius: var(--ks-radius-lg);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--ks-transition);
+}
+
+.ks-btn-primary {
+  background: var(--ks-gradient-red);
+  color: var(--ks-white);
+  box-shadow: var(--ks-shadow-md);
+}
+
+.ks-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ks-shadow-lg);
+}
+
+.ks-btn-outline {
+  background: transparent;
+  color: var(--ks-primary-red);
+  border: 2px solid var(--ks-primary-red);
+}
+
+.ks-btn-outline:hover {
+  background: var(--ks-primary-red);
+  color: var(--ks-white);
+  transform: translateY(-2px);
+  box-shadow: var(--ks-shadow-md);
+}
+
+/* 6. CARDS ============================================================ */
+.ks-card {
+  background: var(--ks-white);
+  border-radius: var(--ks-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--ks-shadow-md);
+  transition: all var(--ks-transition);
+}
+
+.ks-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--ks-shadow-2xl);
+}
+
+/* 7. FORMULÁRIOS ======================================================= */
+.ks-form-input {
+  width: 100%;
+  padding: var(--ks-space-3) var(--ks-space-4);
+  border: 2px solid var(--ks-gray-300);
+  border-radius: var(--ks-radius-lg);
+  font-size: var(--ks-text-base);
+  font-family: var(--ks-font-family);
+  background: var(--ks-white);
+  transition: all var(--ks-transition-fast);
+}
+
+.ks-form-input:focus {
+  outline: none;
+  border-color: var(--ks-primary-red);
+  box-shadow: 0 0 0 3px rgba(206, 17, 38, 0.1);
+}
+
+/* 8. ALERTAS =========================================================== */
+.ks-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ks-space-3);
+  padding: var(--ks-space-4);
+  border-radius: var(--ks-radius-lg);
+  margin-bottom: var(--ks-space-4);
+}
+
+.ks-alert-success {
+  background: linear-gradient(135deg, var(--ks-success), #34d399);
+  color: var(--ks-white);
+}
+
+.ks-alert-error {
+  background: linear-gradient(135deg, var(--ks-error), #f87171);
+  color: var(--ks-white);
+}
+
+/* 9. GRID SYSTEM ===================================================== */
+.ks-grid {
+  display: grid;
+  gap: var(--ks-space-6);
+}
+
+.ks-grid-2 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.ks-grid-3 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.ks-grid-4 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+  .ks-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .ks-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .ks-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .ks-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ks-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 10. UTILITIES ======================================================= */
+.ks-text-center { text-align: center; }
+.ks-text-left { text-align: left; }
+.ks-text-right { text-align: right; }
+
+.ks-mt-1 { margin-top: var(--ks-space-1); }
+.ks-mt-2 { margin-top: var(--ks-space-2); }
+.ks-mt-3 { margin-top: var(--ks-space-3); }
+.ks-mt-4 { margin-top: var(--ks-space-4); }
+.ks-mt-6 { margin-top: var(--ks-space-6); }
+.ks-mt-8 { margin-top: var(--ks-space-8); }
+
+.ks-mb-1 { margin-bottom: var(--ks-space-1); }
+.ks-mb-2 { margin-bottom: var(--ks-space-2); }
+.ks-mb-3 { margin-bottom: var(--ks-space-3); }
+.ks-mb-4 { margin-bottom: var(--ks-space-4); }
+.ks-mb-6 { margin-bottom: var(--ks-space-6); }
+.ks-mb-8 { margin-bottom: var(--ks-space-8); }
+
+.ks-p-1 { padding: var(--ks-space-1); }
+.ks-p-2 { padding: var(--ks-space-2); }
+.ks-p-3 { padding: var(--ks-space-3); }
+.ks-p-4 { padding: var(--ks-space-4); }
+.ks-p-6 { padding: var(--ks-space-6); }
+.ks-p-8 { padding: var(--ks-space-8); }
+
+.ks-flex { display: flex; }
+.ks-items-center { align-items: center; }
+.ks-justify-center { justify-content: center; }
+.ks-justify-between { justify-content: space-between; }
+
+.ks-gap-1 { gap: var(--ks-space-1); }
+.ks-gap-2 { gap: var(--ks-space-2); }
+.ks-gap-3 { gap: var(--ks-space-3); }
+.ks-gap-4 { gap: var(--ks-space-4); }
+.ks-gap-6 { gap: var(--ks-space-6); }
+
+.ks-rounded-lg { border-radius: var(--ks-radius-lg); }
+.ks-rounded-xl { border-radius: var(--ks-radius-xl); }
+.ks-rounded-full { border-radius: var(--ks-radius-full); }
+
+.ks-shadow-md { box-shadow: var(--ks-shadow-md); }
+.ks-shadow-lg { box-shadow: var(--ks-shadow-lg); }
+
+.ks-bg-white { background: var(--ks-white); }
+.ks-bg-gray-50 { background: var(--ks-gray-50); }
+.ks-bg-gray-100 { background: var(--ks-gray-100); }
+
+.ks-text-white { color: var(--ks-white); }
+.ks-text-black { color: var(--ks-black); }
+.ks-text-gray-600 { color: var(--ks-gray-600); }
+.ks-text-gray-700 { color: var(--ks-gray-700); }
+.ks-text-red { color: var(--ks-primary-red); }
+.ks-text-yellow { color: var(--ks-primary-yellow); }
+
+.ks-text-sm { font-size: var(--ks-text-sm); }
+.ks-text-base { font-size: var(--ks-text-base); }
+.ks-text-lg { font-size: var(--ks-text-lg); }
+.ks-text-xl { font-size: var(--ks-text-xl); }
+.ks-text-2xl { font-size: var(--ks-text-2xl); }
+
+.ks-font-medium { font-weight: 500; }
+.ks-font-semibold { font-weight: 600; }
+.ks-font-bold { font-weight: 700; }
+
+/* 11. RESPONSIVE ====================================================== */
+@media (max-width: 768px) {
+  :root {
+    --ks-text-5xl: 2.5rem;
+    --ks-text-4xl: 2rem;
+    --ks-text-3xl: 1.75rem;
+    --ks-text-2xl: 1.5rem;
+  }
+  
+  .ks-container {
+    padding: 0 var(--ks-space-2);
+  }
+}
+
+/* 12. ANIMAÇÕES ======================================================= */
+@keyframes ks-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ks-slide-up {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ks-animate-fade-in {
+  animation: ks-fade-in var(--ks-transition) ease-out;
+}
+
+.ks-animate-slide-up {
+  animation: ks-slide-up var(--ks-transition) ease-out;
+}
