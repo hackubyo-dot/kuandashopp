@@ -224,14 +224,14 @@ const limparBackupsAntigos = async (daysOld = 30) => {
     }
 };
 
-// ==================== CONFIGURAÇÃO DE EMAIL (BLINDADA) ====================
+// ==================== CONFIGURAÇÃO DE EMAIL (BLINDADA + CORREÇÃO FINAL) ====================
 
 // Carrega as credenciais do ambiente
 const emailUser = process.env.EMAIL_USER || '';
 const emailPassRaw = process.env.EMAIL_PASS || '';
 const emailPass = emailPassRaw.replace(/\s+/g, ''); // Remove espaços automaticamente
 
-// Verificação das variáveis
+// Verificação das variáveis de ambiente
 if (!emailUser) {
     console.warn('⚠️ EMAIL_USER não foi configurado nas variáveis de ambiente.');
 }
@@ -241,9 +241,15 @@ if (!emailPassRaw) {
 }
 
 const transporter = nodemailer.createTransport({
+
+    // Servidor SMTP do Gmail
     host: 'smtp.gmail.com',
+
+    // Porta STARTTLS
     port: 587,
-    secure: true,
+
+    // OBRIGATÓRIO para porta 587
+    secure: false,
 
     auth: {
         user: emailUser,
@@ -251,16 +257,48 @@ const transporter = nodemailer.createTransport({
     },
 
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
     },
 
-    connectionTimeout: 20000,
-    greetingTimeout: 2000,
-    socketTimeout: 20000,
+    // Timeouts
+    connectionTimeout: 15000, // Tempo para conectar ao servidor
+    greetingTimeout: 15000,   // Tempo para receber saudação do servidor
+    socketTimeout: 30000,     // Tempo máximo da conexão
 
+    // Logs
     logger: false,
     debug: false
+
 });
+
+// ==================== TESTE DA CONEXÃO SMTP ====================
+
+if (emailUser && emailPass) {
+
+    transporter.verify((error, success) => {
+
+        if (error) {
+
+            console.error('❌ Erro na conexão SMTP');
+            console.error('Mensagem:', error.message);
+            console.error('Código:', error.code || 'N/A');
+            console.error('Comando:', error.command || 'N/A');
+
+        } else {
+
+            console.log('✅ Servidor de Email pronto para envios!');
+            console.log(`📧 Conta utilizada: ${emailUser}`);
+
+        }
+
+    });
+
+} else {
+
+    console.warn('⚠️ SMTP desativado: EMAIL_USER ou EMAIL_PASS não configurados.');
+
+}
 
 // ==================== TESTE DA CONEXÃO SMTP ====================
 
@@ -290,47 +328,142 @@ if (emailUser && emailPass) {
 
 }
 
-// --- CONFIGURAÇÃO DO PASSPORT (GOOGLE) ---
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback",
-    proxy: true  // <--- ESSA LINHA É OBRIGATÓRIA NO RENDER
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      // 1. Verifica se usuário já existe pelo Google ID
-      let userResult = await db.query('SELECT * FROM usuarios WHERE google_id = $1', [profile.id]);
-      
-      if (userResult.rows.length > 0) {
-        return done(null, userResult.rows[0]);
-      } 
-      
-      // 2. Verifica se usuário já existe pelo E-mail (para vincular contas)
-      const email = profile.emails[0].value;
-      userResult = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+// ==================== CONFIGURAÇÃO DO PASSPORT (GOOGLE) - BLINDADA ====================
 
-      if (userResult.rows.length > 0) {
-        // Atualiza o usuário existente adicionando o Google ID e verificando o e-mail
-        const updatedUser = await db.query(
-          'UPDATE usuarios SET google_id = $1, email_verificado = true WHERE email = $2 RETURNING *',
-          [profile.id, email]
+const googleClientID = process.env.GOOGLE_CLIENT_ID || '';
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+
+if (!googleClientID) {
+    console.warn('⚠️ GOOGLE_CLIENT_ID não configurado.');
+}
+
+if (!googleClientSecret) {
+    console.warn('⚠️ GOOGLE_CLIENT_SECRET não configurado.');
+}
+
+passport.use(new GoogleStrategy(
+{
+    clientID: googleClientID,
+    clientSecret: googleClientSecret,
+
+    // IMPORTANTE PARA O RENDER (HTTPS)
+    callbackURL: "/auth/google/callback",
+    proxy: true,
+
+    // Sempre solicitar perfil e e-mail
+    scope: ['profile', 'email']
+},
+async (accessToken, refreshToken, profile, done) => {
+
+    try {
+
+        // ==================== VALIDAÇÕES ====================
+
+        if (!profile) {
+            return done(new Error("Perfil do Google não recebido."), null);
+        }
+
+        if (!profile.id) {
+            return done(new Error("Google ID não encontrado."), null);
+        }
+
+        if (!profile.emails || profile.emails.length === 0) {
+            return done(new Error("O Google não retornou um endereço de e-mail."), null);
+        }
+
+        const email = profile.emails[0].value;
+        const nome = profile.displayName || "Usuário Google";
+
+        // ==================== 1. PROCURA PELO GOOGLE ID ====================
+
+        let userResult = await db.query(
+            'SELECT * FROM usuarios WHERE google_id = $1',
+            [profile.id]
         );
-        return done(null, updatedUser.rows[0]);
-      } else {
-        // 3. Cria novo usuário
+
+        if (userResult.rows.length > 0) {
+
+            return done(null, userResult.rows[0]);
+
+        }
+
+        // ==================== 2. PROCURA PELO E-MAIL ====================
+
+        userResult = await db.query(
+            'SELECT * FROM usuarios WHERE email = $1',
+            [email]
+        );
+
+        if (userResult.rows.length > 0) {
+
+            const updatedUser = await db.query(
+
+                `UPDATE usuarios
+                 SET
+                    google_id = $1,
+                    email_verificado = TRUE
+                 WHERE email = $2
+                 RETURNING *`,
+
+                [profile.id, email]
+
+            );
+
+            console.log(`✅ Conta vinculada ao Google: ${email}`);
+
+            return done(null, updatedUser.rows[0]);
+
+        }
+
+        // ==================== 3. CRIA NOVO USUÁRIO ====================
+
         const newUser = await db.query(
-          `INSERT INTO usuarios (nome, email, google_id, tipo, email_verificado, loja_ativa) 
-           VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-          [profile.displayName, email, profile.id, 'cliente', true, true]
+
+            `INSERT INTO usuarios
+            (
+                nome,
+                email,
+                google_id,
+                tipo,
+                email_verificado,
+                loja_ativa,
+                created_at
+            )
+
+            VALUES
+            (
+                $1,
+                $2,
+                $3,
+                'cliente',
+                TRUE,
+                TRUE,
+                NOW()
+            )
+
+            RETURNING *`,
+
+            [
+                nome,
+                email,
+                profile.id
+            ]
+
         );
+
+        console.log(`✅ Novo usuário Google criado: ${email}`);
+
         return done(null, newUser.rows[0]);
-      }
+
     } catch (err) {
-      return done(err, null);
+
+        console.error("❌ Erro na autenticação Google:", err);
+
+        return done(err, null);
+
     }
-  }
-));
+
+}));
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -2447,170 +2580,225 @@ app.get('/registro', (req, res) => {
 });
 
 /* =========================================================================
-   ROTA DE REGISTRO BLINDADA (PROTOCOLO VENOM)
+   ROTA DE REGISTRO BLINDADA (PROTOCOLO VENOM - FULL INTEGRATION)
    ========================================================================= */
 app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
-  // Sanitização inicial para evitar erros de leitura
-  const nome = req.body.nome || '';
-  const email = (req.body.email || '').trim().toLowerCase();
-  const senha = req.body.senha || '';
-  const telefone = req.body.telefone || '';
-  const tipo = req.body.tipo || 'cliente';
-  const nome_loja = req.body.nome_loja || '';
-  const descricao_loja = req.body.descricao_loja || '';
-  const google_id = req.body.google_id || null;
-
-  try {
-    /* =======================
-       1. VALIDAÇÕES DE ENTRADA
-    ======================= */
-    
-    // Validar campos obrigatórios básicos
-    if (!nome || !email) {
-      if (req.file) removeProfilePicture(req.file.filename);
-      req.flash('error', 'Nome e e-mail são obrigatórios.');
-      return req.session.save(() => res.redirect('/registro?error=campos_vazios'));
-    }
-
-    // Validar Senha (apenas se não for login Google)
-    if (!google_id && senha.length < 6) {
-      if (req.file) removeProfilePicture(req.file.filename);
-      req.flash('error', 'A senha deve ter no mínimo 6 caracteres.');
-      // VENOM: Envia parâmetro na URL
-      return req.session.save(() => res.redirect('/registro?error=senha_curta'));
-    }
-
-    // Validar Vendedor
-    if (tipo === 'vendedor' && !nome_loja) {
-      if (req.file) removeProfilePicture(req.file.filename);
-      req.flash('error', 'Vendedores precisam informar o Nome da Loja.');
-      // VENOM: Envia parâmetro na URL
-      return req.session.save(() => res.redirect('/registro?error=loja_sem_nome'));
-    }
-
-    /* =======================
-       2. VERIFICAR DUPLICIDADE
-    ======================= */
-    const emailExiste = await db.query('SELECT id FROM usuarios WHERE email = $1', [email]);
-
-    if (emailExiste.rows.length > 0) {
-      if (req.file) removeProfilePicture(req.file.filename);
-      req.flash('error', 'Este endereço de e-mail já está cadastrado.');
-      // VENOM: Código crucial para o alerta vermelho no frontend
-      return req.session.save(() => res.redirect('/registro?error=email_existente'));
-    }
-
-    /* =======================
-       3. PREPARAÇÃO DE DADOS
-    ======================= */
-    const senhaHash = google_id ? null : await bcrypt.hash(senha, 10);
-    const email_verificado = !!google_id; // Se for Google, já nasce verificado
-    const tokenVerificacao = google_id ? null : crypto.randomBytes(32).toString('hex');
-    const foto_perfil = req.file ? req.file.filename : null;
-
-    // Lógica de Plano para Vendedor
-    let plano_id = null;
-    let limite_produtos = 10;
-
-    if (tipo === 'vendedor') {
-      const planoBasico = await db.query(
-        "SELECT id, limite_produtos FROM planos_vendedor WHERE nome = 'Básico' LIMIT 1"
-      );
-      if (planoBasico.rows.length > 0) {
-        plano_id = planoBasico.rows[0].id;
-        limite_produtos = planoBasico.rows[0].limite_produtos;
-      }
-    }
-
-    /* =======================
-       4. INSERÇÃO NO BANCO
-    ======================= */
-    const result = await db.query(`
-      INSERT INTO usuarios (
-        nome, email, senha, telefone, tipo, nome_loja, descricao_loja, 
-        foto_perfil, loja_ativa, plano_id, limite_produtos, 
-        email_verificado, token_verificacao, google_id
-      )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-      RETURNING id, nome, email, tipo, nome_loja, foto_perfil, plano_id, limite_produtos
-    `, [
-      nome, email, senhaHash, telefone, tipo, nome_loja, descricao_loja, 
-      foto_perfil, tipo === 'vendedor', plano_id, limite_produtos, 
-      email_verificado, tokenVerificacao, google_id
-    ]);
-
-    const newUser = result.rows[0];
-
-    // Backup da Foto (Opcional, se usar sistema híbrido)
-    if (req.file && typeof salvarBackupImagem === 'function') {
-      const filePath = path.join('public/uploads/perfil/', req.file.filename);
-      await salvarBackupImagem(filePath, req.file.filename, 'usuarios', newUser.id);
-    }
-
-    /* =======================
-       5. PÓS-REGISTRO (GOOGLE vs EMAIL)
-    ======================= */
-    
-    // CENÁRIO A: Google (Login Automático)
-    if (google_id) {
-      req.session.user = {
-        id: newUser.id,
-        nome: newUser.nome,
-        email: newUser.email,
-        tipo: newUser.tipo,
-        nome_loja: newUser.nome_loja,
-        foto_perfil: newUser.foto_perfil,
-        plano_id: newUser.plano_id,
-        limite_produtos: newUser.limite_produtos,
-        google: true
-      };
-
-      req.flash('success', 'Conta criada com Google com sucesso!');
-      const destino = newUser.tipo === 'admin' ? '/admin' : (newUser.tipo === 'vendedor' ? '/vendedor' : '/');
-      
-      return req.session.save(() => res.redirect(destino));
-    }
-
-    // CENÁRIO B: Email/Senha (Envio de Confirmação)
-    const linkConfirmacao = `${process.env.BASE_URL}/verificar-email/${tokenVerificacao}`;
-    let emailEnviado = false;
+    // Sanitização inicial para evitar erros de leitura
+    const nome = req.body.nome || '';
+    const email = (req.body.email || '').trim().toLowerCase();
+    const senha = req.body.senha || '';
+    const telefone = req.body.telefone || '';
+    const tipo = req.body.tipo || 'cliente';
+    const nome_loja = req.body.nome_loja || '';
+    const descricao_loja = req.body.descricao_loja || '';
+    const google_id = req.body.google_id || null;
 
     try {
-        await transporter.sendMail({
-          from: `"KuandaShop" <${process.env.EMAIL_USER}>`,
-          to: email,
-          subject: 'Confirme sua conta no KuandaShop',
-          html: `
-            <h2>Olá, ${nome.split(' ')[0]}!</h2>
-            <p>Bem-vindo ao KuandaShop. Clique abaixo para ativar sua conta:</p>
-            <a href="${linkConfirmacao}" style="background:#E31C25;color:white;padding:12px 24px;text-decoration:none;border-radius:4px;display:inline-block;">Confirmar Conta</a>
-          `
+        /* =======================
+           1. VALIDAÇÕES DE ENTRADA
+        ======================= */
+
+        // Validar campos obrigatórios básicos
+        if (!nome || !email) {
+            if (req.file) removeProfilePicture(req.file.filename);
+            req.flash('error', 'Nome e e-mail são obrigatórios.');
+            return req.session.save(() => res.redirect('/registro?error=campos_vazios'));
+        }
+
+        // Validar Senha (apenas se não for login Google)
+        if (!google_id && senha.length < 6) {
+            if (req.file) removeProfilePicture(req.file.filename);
+            req.flash('error', 'A senha deve ter no mínimo 6 caracteres.');
+            return req.session.save(() => res.redirect('/registro?error=senha_curta'));
+        }
+
+        // Validar Vendedor
+        if (tipo === 'vendedor' && !nome_loja) {
+            if (req.file) removeProfilePicture(req.file.filename);
+            req.flash('error', 'Vendedores precisam informar o Nome da Loja.');
+            return req.session.save(() => res.redirect('/registro?error=loja_sem_nome'));
+        }
+
+        /* =======================
+           2. VERIFICAR DUPLICIDADE
+        ======================= */
+        const emailExiste = await db.query('SELECT id FROM usuarios WHERE email = $1', [email]);
+
+        if (emailExiste.rows.length > 0) {
+            if (req.file) removeProfilePicture(req.file.filename);
+            req.flash('error', 'Este endereço de e-mail já está cadastrado.');
+            return req.session.save(() => res.redirect('/registro?error=email_existente'));
+        }
+
+        /* =======================
+           3. PREPARAÇÃO DE DADOS
+        ======================= */
+        const senhaHash = google_id ? null : await bcrypt.hash(senha, 10);
+        const email_verificado = !!google_id; // Se for Google, já nasce verificado
+        const tokenVerificacao = google_id ? null : crypto.randomBytes(32).toString('hex');
+        const foto_perfil = req.file ? req.file.filename : null;
+
+        // Lógica de Plano para Vendedor
+        let plano_id = null;
+        let limite_produtos = 10;
+
+        if (tipo === 'vendedor') {
+            const planoBasico = await db.query(
+                "SELECT id, limite_produtos FROM planos_vendedor WHERE nome = 'Básico' LIMIT 1"
+            );
+            if (planoBasico.rows.length > 0) {
+                plano_id = planoBasico.rows[0].id;
+                limite_produtos = planoBasico.rows[0].limite_produtos;
+            }
+        }
+
+        /* =======================
+           4. INSERÇÃO NO BANCO
+        ======================= */
+        const result = await db.query(`
+            INSERT INTO usuarios (
+                nome, email, senha, telefone, tipo, nome_loja, descricao_loja, 
+                foto_perfil, loja_ativa, plano_id, limite_produtos, 
+                email_verificado, token_verificacao, google_id, created_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
+            RETURNING id, nome, email, tipo, nome_loja, foto_perfil, plano_id, limite_produtos
+        `, [
+            nome, email, senhaHash, telefone, tipo, nome_loja, descricao_loja, 
+            foto_perfil, true, plano_id, limite_produtos, 
+            email_verificado, tokenVerificacao, google_id
+        ]);
+
+        const newUser = result.rows[0];
+
+        // Backup da Foto (Sistema Híbrido BYTEA)
+        if (req.file && typeof salvarBackupImagem === 'function') {
+            const filePath = path.join(__dirname, 'public/uploads/perfil/', req.file.filename);
+            if (fs.existsSync(filePath)) {
+                await salvarBackupImagem(filePath, req.file.filename, 'usuarios', newUser.id);
+            }
+        }
+
+        /* =========================================================================
+           5. PÓS-REGISTRO (GOOGLE vs EMAIL)
+           ========================================================================= */
+
+        // ========================================================================
+        // CENÁRIO A: REGISTRO COM GOOGLE (Login Automático)
+        // ========================================================================
+        if (google_id) {
+            req.session.user = {
+                id: newUser.id,
+                nome: newUser.nome,
+                email: newUser.email,
+                tipo: newUser.tipo,
+                nome_loja: newUser.nome_loja,
+                foto_perfil: newUser.foto_perfil,
+                plano_id: newUser.plano_id,
+                limite_produtos: newUser.limite_produtos,
+                google: true
+            };
+
+            req.flash('success', 'Conta criada com Google com sucesso!');
+
+            const destino =
+                newUser.tipo === 'admin'
+                    ? '/admin'
+                    : newUser.tipo === 'vendedor'
+                        ? '/vendedor'
+                        : '/';
+
+            return req.session.save(() => res.redirect(destino));
+        }
+
+        // ========================================================================
+        // CENÁRIO B: REGISTRO COM E-MAIL E SENHA (Com Fallback de Ativação)
+        // ========================================================================
+        const linkConfirmacao = `${process.env.BASE_URL}/verificar-email/${tokenVerificacao}`;
+
+        try {
+            // Verifica se o SMTP está minimamente configurado
+            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+                throw new Error("SMTP não configurado no ambiente.");
+            }
+
+            await transporter.sendMail({
+                from: `"KuandaShop" <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: "Confirme sua conta no KuandaShop",
+                html: `
+                <!DOCTYPE html>
+                <html lang="pt">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Confirmação de Conta</title>
+                </head>
+                <body style="margin:0; padding:30px; background:#f5f5f5; font-family:Arial,sans-serif;">
+                    <div style="max-width:650px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,.08);">
+                        <div style="background:#E31C25; padding:30px; text-align:center; color:white;">
+                            <h1 style="margin:0;">KuandaShop</h1>
+                        </div>
+                        <div style="padding:40px;">
+                            <h2>Olá, ${nome.split(' ')[0]} 👋</h2>
+                            <p>Sua conta foi criada com sucesso. Clique no botão abaixo para confirmar seu endereço de e-mail e ativar seu acesso.</p>
+                            <div style="text-align:center; margin:40px 0;">
+                                <a href="${linkConfirmacao}" style="background:#E31C25; color:white; text-decoration:none; padding:15px 35px; border-radius:8px; display:inline-block; font-size:16px; font-weight:bold;">Confirmar Conta</a>
+                            </div>
+                            <p>Caso o botão não funcione, copie este link:</p>
+                            <p style="word-break:break-all; color:#0066cc;">${linkConfirmacao}</p>
+                            <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
+                            <p style="font-size:13px; color:#888;">Se você não criou esta conta, ignore este e-mail.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>`
+            });
+
+            console.log("==========================================");
+            console.log("✅ E-mail enviado com sucesso para:", email);
+            console.log("==========================================");
+
+            req.flash("success", "Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.");
+
+        } catch (mailError) {
+            console.error("==========================================");
+            console.error("❌ ERRO SMTP (Fallback Ativado)");
+            console.error("Mensagem:", mailError.message);
+            console.error("==========================================");
+
+            // FALLBACK AUTOMÁTICO: Ativa a conta se o e-mail falhar para o usuário não ficar preso
+            try {
+                await db.query(
+                    `UPDATE usuarios SET email_verificado = TRUE, token_verificacao = NULL WHERE id = $1`,
+                    [newUser.id]
+                );
+                console.log("✅ Conta ativada via FALLBACK devido à falha do servidor de e-mail.");
+            } catch (dbError) {
+                console.error("Erro no fallback de banco de dados:", dbError);
+            }
+
+            req.flash("warning", "Sua conta foi criada e ATIVADA! Notamos uma instabilidade no nosso servidor de e-mail, então liberamos seu acesso automaticamente.");
+        }
+
+        // Finaliza o registro redirecionando para o login
+        return req.session.save(() => {
+            res.redirect("/login?success=conta_criada");
         });
-        emailEnviado = true;
-    } catch (mailError) {
-        console.error("⚠️ Falha ao enviar email de ativação:", mailError.message);
-        // Opcional: Ativar conta automaticamente se o email falhar em ambiente dev
-        // await db.query('UPDATE usuarios SET email_verificado = true WHERE id = $1', [newUser.id]);
+
+    } catch (error) {
+        // Limpeza de arquivo em caso de erro crítico no processo
+        if (req.file) {
+            const tempPath = path.join(__dirname, 'public/uploads/perfil/', req.file.filename);
+            if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+        }
+
+        console.error("CRASH REGISTRO:", error);
+        req.flash("error", "Ocorreu um erro interno ao criar sua conta. Tente novamente em instantes.");
+
+        return req.session.save(() => {
+            res.redirect("/registro?error=erro_interno");
+        });
     }
-
-    // Mensagem final
-    if (emailEnviado) {
-        req.flash('success', 'Conta criada com sucesso! Verifique seu e-mail para ativar.');
-    } else {
-        req.flash('warning', 'Conta criada, mas houve um erro ao enviar o e-mail. Tente fazer login.');
-    }
-
-    // VENOM: Redireciona para login com flag de sucesso para disparar o Modal/Alerta
-    return req.session.save(() => {
-        res.redirect('/login?success=conta_criada');
-    });
-
-  } catch (error) {
-    if (req.file) removeProfilePicture(req.file.filename);
-    console.error('CRASH REGISTRO:', error);
-    req.flash('error', 'Ocorreu um erro interno ao criar sua conta.');
-    return req.session.save(() => res.redirect('/registro?error=erro_interno'));
-  }
 });
 
 /* =========================================================================
