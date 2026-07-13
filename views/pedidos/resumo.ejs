@@ -1,0 +1,524 @@
+    <style>
+        .pedido-card {
+            border-radius: 15px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .pedido-card:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .pedido-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .pedido-body {
+            padding: 25px;
+            background: white;
+        }
+        
+        .pedido-footer {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .badge-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .status-pendente { background: #fff3cd; color: #856404; }
+        .status-confirmado { background: #d4edda; color: #155724; }
+        .status-pago { background: #cce5ff; color: #004085; }
+        .status-concluido { background: #d1ecf1; color: #0c5460; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+        .status-suspenso { background: #fff3cd; color: #856404; }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-whatsapp-all {
+            background: #075E54;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .btn-whatsapp-all:hover {
+            background: #054d44;
+        }
+        
+        .produto-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .produto-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .produto-item:last-child {
+            border-bottom: none;
+        }
+        
+        .produto-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .total-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 5rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <%- include('../partials/header') %>
+    
+    <div class="container py-5">
+        <!-- Mensagens Flash -->
+        <% if (messages.success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <%= messages.success %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
+        
+        <% if (messages.error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <%= messages.error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
+
+        <!-- Cabeçalho -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h1 class="h3 fw-bold mb-2">Pedido Confirmado! 🎉</h1>
+                        <p class="text-muted mb-0">Agora envie as mensagens para as lojas para confirmar sua compra</p>
+                        <small class="text-muted">
+                            <i class="fas fa-hashtag me-1"></i>ID do grupo: <%= grupoId %>
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <a href="/meus-pedidos" class="btn btn-outline-dark">
+                            <i class="fas fa-list me-2"></i>Ver Meus Pedidos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instruções e Total -->
+        <div class="row mb-5">
+            <div class="col-lg-8">
+                <div class="alert alert-info">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-info-circle fa-2x me-3 mt-1"></i>
+                        <div>
+                            <h5 class="alert-heading">Como funciona?</h5>
+                            <p class="mb-2">1. Clique no botão "Enviar WhatsApp" para cada loja</p>
+                            <p class="mb-2">2. A mensagem será aberta no WhatsApp com todos os detalhes do pedido</p>
+                            <p class="mb-0">3. Envie a mensagem e aguarde a confirmação do vendedor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="total-card">
+                    <h5 class="mb-3">Total do Pedido</h5>
+                    <h2 class="fw-bold mb-0"><%= totalGeralFormatado %> Kz</h2>
+                    <small><%= pedidos.length %> <%= pedidos.length === 1 ? 'loja' : 'lojas' %></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Pedidos -->
+        <% if (pedidos.length === 0) { %>
+        <div class="empty-state">
+            <i class="fas fa-shopping-bag empty-icon"></i>
+            <h3>Nenhum pedido encontrado</h3>
+            <p class="text-muted mb-4">Não foi possível carregar os detalhes do seu pedido.</p>
+            <a href="/" class="btn btn-dark btn-lg">
+                <i class="fas fa-home me-2"></i>Voltar para Home
+            </a>
+        </div>
+        <% } else { %>
+            <% pedidos.forEach((pedido, index) => { %>
+            <div class="pedido-card" id="pedido-<%= pedido.id %>">
+                <div class="pedido-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="fas fa-store me-2"></i>
+                                <%= pedido.nome_loja || pedido.vendedor_nome %>
+                            </h4>
+                            <small>
+                                <i class="far fa-calendar-alt me-1"></i>
+                                <%= pedido.dataFormatada %>
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge-status status-<%= pedido.status %>">
+                                <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+                                <%= pedido.status.charAt(0).toUpperCase() + pedido.status.slice(1) %>
+                            </span>
+                            <div class="fw-bold fs-4 mt-2"><%= pedido.totalFormatado %> Kz</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pedido-body">
+                    <!-- Lista de Produtos -->
+                    <h5 class="fw-bold mb-4">Produtos do Pedido:</h5>
+                    <div class="mb-4">
+                        <% pedido.produtos.forEach(produto => { %>
+                        <div class="produto-item">
+                            <% if (produto.imagem) { %>
+                            <img src="/uploads/produtos/<%= produto.imagem %>" 
+                                 alt="<%= produto.nome %>" 
+                                 class="produto-img"
+                                 onerror="this.src='https://via.placeholder.com/70?text=Produto'">
+                            <% } else { %>
+                            <div class="produto-img d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-box text-muted"></i>
+                            </div>
+                            <% } %>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1"><%= produto.nome %></h6>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">
+                                        <i class="fas fa-hashtag me-1"></i>Quantidade: <%= produto.quantidade %>x
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-tag me-1"></i>Preço: <%= formatPrice(produto.preco_unitario) %> Kz
+                                    </small>
+                                </div>
+                                <div class="mt-2 d-flex justify-content-between align-items-center">
+                                    <small>Código: <%= pedido.codigo %></small>
+                                    <strong class="text-success">Subtotal: <%= formatPrice(produto.subtotal) %> Kz</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button class="btn btn-whatsapp btn-send-whatsapp" 
+                                data-pedido-id="<%= pedido.id %>"
+                                data-vendedor="<%= pedido.nome_loja || pedido.vendedor_nome %>">
+                            <i class="fab fa-whatsapp me-2"></i>
+                            Enviar WhatsApp para <%= pedido.nome_loja || pedido.vendedor_nome %>
+                            <div class="loading-spinner"></div>
+                        </button>
+                        
+                        <% if (pedido.loja_telefone) { %>
+                        <a href="tel:<%= pedido.loja_telefone %>" 
+                           class="btn btn-outline-dark">
+                            <i class="fas fa-phone-alt me-2"></i>
+                            Ligar para Loja
+                        </a>
+                        <% } %>
+                        
+                        <a href="/meu-pedido/<%= pedido.id %>" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-2"></i>
+                            Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="pedido-footer">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-hashtag me-1"></i>
+                                Código: <strong><%= pedido.codigo %></strong>
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                Vendedor: <%= pedido.vendedor_nome %>
+                            </small>
+                            <% if (pedido.loja_telefone) { %>
+                            <br>
+                            <small class="text-muted">
+                                <i class="fas fa-phone me-1"></i>
+                                Telefone: <%= pedido.loja_telefone %>
+                            </small>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        <% } %>
+
+        <!-- Botão para Enviar TODAS as Mensagens -->
+        <% if (pedidos.length > 0) { %>
+        <div class="text-center mt-5 mb-5">
+            <button class="btn btn-whatsapp-all btn-lg px-5" id="btnSendAll">
+                <i class="fab fa-whatsapp me-2"></i>
+                Enviar TODAS as Mensagens de Uma Vez
+                <div class="loading-spinner"></div>
+            </button>
+            <p class="text-muted mt-3">
+                <small>Isto abrirá uma janela do WhatsApp para cada loja automaticamente.</small>
+            </p>
+        </div>
+        <% } %>
+
+        <!-- Navegação -->
+        <div class="text-center mt-5">
+            <a href="/meus-pedidos" class="btn btn-outline-dark btn-lg me-3">
+                <i class="fas fa-list me-2"></i>
+                Ir para Meus Pedidos
+            </a>
+            <a href="/produtos" class="btn btn-dark btn-lg">
+                <i class="fas fa-shopping-bag me-2"></i>
+                Continuar Comprando
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle me-2"></i>Sucesso!
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <h4 class="mb-3">Mensagem preparada!</h4>
+                    <p>A página do WhatsApp foi aberta em uma nova aba. Envie a mensagem para confirmar seu pedido com a loja.</p>
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Dica:</strong> Mantenha esta página aberta para acompanhar o status do seu pedido.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal">
+                        OK, entendi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Erro -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Erro
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+                    <h4 class="mb-3" id="errorTitle">Ocorreu um erro</h4>
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enviar mensagem para uma loja específica
+            document.querySelectorAll('.btn-send-whatsapp').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const btnElement = this;
+                    const pedidoId = btnElement.dataset.pedidoId;
+                    const vendedorNome = btnElement.dataset.vendedor;
+                    
+                    // Mostrar loading
+                    const spinner = btnElement.querySelector('.loading-spinner');
+                    btnElement.disabled = true;
+                    spinner.style.display = 'inline-block';
+                    
+                    try {
+                        console.log(`📱 Gerando WhatsApp para pedido ${pedidoId}...`);
+                        
+                        // Buscar dados do WhatsApp via API
+                        const response = await fetch(`/pedido/${pedidoId}/whatsapp`);
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            console.log('✅ WhatsApp gerado com sucesso');
+                            
+                            // Abrir WhatsApp em nova aba
+                            window.open(data.whatsappUrl, '_blank');
+                            
+                            // Mostrar modal de sucesso
+                            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+                            modal.show();
+                        } else {
+                            console.error('❌ Erro ao gerar WhatsApp:', data.message);
+                            showError('Erro ao gerar mensagem', data.message || 'Tente novamente mais tarde.');
+                        }
+                    } catch (error) {
+                        console.error('❌ Erro de rede:', error);
+                        showError('Erro de conexão', 'Verifique sua internet e tente novamente.');
+                    } finally {
+                        // Esconder loading
+                        btnElement.disabled = false;
+                        spinner.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Enviar TODAS as mensagens
+            document.getElementById('btnSendAll').addEventListener('click', async function() {
+                const btnElement = this;
+                const grupoId = '<%= grupoId %>';
+                
+                // Mostrar loading
+                const spinner = btnElement.querySelector('.loading-spinner');
+                btnElement.disabled = true;
+                spinner.style.display = 'inline-block';
+                
+                try {
+                    console.log(`📱 Gerando WhatsApp para grupo ${grupoId}...`);
+                    
+                    // Buscar dados de todos os pedidos
+                    const response = await fetch(`/pedido/grupo/${grupoId}/whatsapp-todos`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.pedidos.length > 0) {
+                        console.log(`✅ Encontrados ${data.pedidos.length} pedidos`);
+                        
+                        // Confirmar com o usuário
+                        let confirmMessage = `Deseja abrir ${data.pedidos.length} janela(s) do WhatsApp?\n\n`;
+                        data.pedidos.forEach((p, i) => {
+                            confirmMessage += `${i + 1}. ${p.vendedor_nome}\n`;
+                        });
+                        confirmMessage += '\nAs janelas serão abertas uma após a outra.';
+                        
+                        if (confirm(confirmMessage)) {
+                            // Abrir WhatsApp para cada vendedor com delay para evitar bloqueio
+                            for (let i = 0; i < data.pedidos.length; i++) {
+                                const p = data.pedidos[i];
+                                if (p.whatsappUrl) {
+                                    setTimeout(() => {
+                                        window.open(p.whatsappUrl, '_blank');
+                                    }, i * 500); // Delay de 500ms entre cada abertura
+                                }
+                            }
+                            
+                            // Mostrar modal de sucesso
+                            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+                            modal.show();
+                        }
+                    } else {
+                        console.error('❌ Erro ao gerar WhatsApp em massa:', data.message);
+                        showError('Erro ao gerar mensagens', data.message || 'Nenhum pedido encontrado.');
+                    }
+                } catch (error) {
+                    console.error('❌ Erro de rede:', error);
+                    showError('Erro de conexão', 'Verifique sua internet e tente novamente.');
+                } finally {
+                    // Esconder loading
+                    btnElement.disabled = false;
+                    spinner.style.display = 'none';
+                }
+            });
+            
+            // Função para mostrar erros
+            function showError(title, message) {
+                document.getElementById('errorTitle').textContent = title;
+                document.getElementById('errorMessage').textContent = message;
+                const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+                modal.show();
+            }
+            
+            // Fechar modal de sucesso automaticamente após 5 segundos
+            const successModal = document.getElementById('successModal');
+            if (successModal) {
+                successModal.addEventListener('shown.bs.modal', function() {
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(this);
+                        if (modal) modal.hide();
+                    }, 5000);
+                });
+            }
+        });
+    </script>

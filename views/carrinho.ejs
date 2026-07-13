@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meu Carrinho - KuandaShop Premium</title>
+
+    <!-- SweetAlert2 (Alertas Bonitos) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FontAwesome (Ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 (Grid System) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Outfit (Titulos) e Inter (Texto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           DESIGN SYSTEM: "LUXURY GLASS"
+           ========================================= */
+        :root {
+            --primary: #0F0F0F;
+            --accent: #D90429;         /* Vermelho Vibrante Premium */
+            --accent-gradient: linear-gradient(135deg, #D90429 0%, #8D021F 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85); /* Vidro claro */
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --backdrop: blur(12px);
+            --text-main: #2B2D42;
+            --text-muted: #8D99AE;
+            --bg-body: #EDF2F4;
+            --radius-xl: 24px;
+            --radius-md: 16px;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            /* Fundo sutil para destacar o vidro */
+            background-image: radial-gradient(at 0% 0%, rgba(217, 4, 41, 0.05) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.05) 0px, transparent 50%);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            padding-bottom: 60px;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none !important; transition: 0.3s; }
+
+        /* HEADER ELEGANTE */
+        .page-header {
+            padding: 20px 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 50px;
+            vertical-align: middle;
+            box-shadow: 0 4px 10px rgba(217, 4, 41, 0.3);
+        }
+
+        /* Botão Limpar (Vidro) */
+        .btn-glass-sm {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-glass-sm:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(217, 4, 41, 0.2);
+        }
+
+        /* =========================================
+           CARD DE PRODUTO (GLASSMORPHISM)
+           ========================================= */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop);
+            -webkit-backdrop-filter: var(--backdrop);
+            border: var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 15px; /* Compacto no mobile */
+            margin-bottom: 15px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            display: flex;
+            gap: 15px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        /* Efeito Hover Desktop */
+        @media (min-width: 992px) {
+            .glass-card { padding: 20px; gap: 25px; margin-bottom: 20px; }
+            .glass-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.95); }
+        }
+
+        /* Imagem */
+        .img-box {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+        .glass-card:hover .img-box img { transform: scale(1.1); }
+
+        /* Informações */
+        .item-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 2;
+        }
+
+        .item-vendor {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .item-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-price {
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        /* CONTROLES (QTD + DELETE) */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        /* Stepper Qtd Moderno */
+        .qty-pill {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .btn-qty {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--text-main);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.7rem;
+        }
+        .btn-qty:hover { transform: scale(1.1); background: var(--accent); }
+        .btn-qty:active { transform: scale(0.9); }
+        
+        .qty-input {
+            width: 35px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        /* Botão Remover (Absoluto no topo para mobile) */
+        .btn-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 200, 200, 0.2);
+            color: var(--accent);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 5;
+        }
+        .btn-delete:hover {
+            background: var(--accent);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        /* =========================================
+           CARD RESUMO (ESTILO BLOCO)
+           ========================================= */
+        .summary-block {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 25px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decoração de fundo no resumo */
+        .summary-block::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 100px; height: 100px;
+            background: var(--accent);
+            opacity: 0.05;
+            border-radius: 50%;
+            filter: blur(20px);
+        }
+
+        .summary-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #eee;
+        }
+        .total-label { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .total-val { font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; }
+
+        /* BOTÃO CHECKOUT GRADIENTE */
+        .btn-checkout-lg {
+            width: 100%;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            box-shadow: 0 10px 25px -5px rgba(217, 4, 41, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-checkout-lg:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px -5px rgba(217, 4, 41, 0.6);
+        }
+        .btn-checkout-lg:active { transform: scale(0.98); }
+
+        /* MOBILE SPECIFIC: MARGEM NO SUMMARY */
+        @media (max-width: 991px) {
+            .mobile-summary-container {
+                margin-top: 20px;
+                margin-bottom: 40px;
+                animation: fadeInUp 0.5s ease-out;
+            }
+            .glass-card {
+                /* Ajuste visual para mobile */
+                border-radius: 20px;
+            }
+            .img-box { width: 90px; height: 90px; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* EMPTY STATE */
+        .empty-glass {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-xl);
+            border: 1px dashed #ccc;
+        }
+        .empty-icon {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #eee 0%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-3 mt-lg-5">
+    
+    <!-- CABEÇALHO -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-shopping-bag" style="color: var(--accent);"></i>
+            Carrinho
+            <% if (carrinho.length > 0) { %>
+                <sup class="cart-badge"><%= carrinho.length %></sup>
+            <% } %>
+        </h1>
+
+        <% if (carrinho.length > 0) { %>
+            <button onclick="esvaziarCarrinho()" class="btn-glass-sm">
+                <i class="fas fa-trash-alt"></i> <span class="d-none d-sm-inline">Esvaziar</span>
+            </button>
+        <% } %>
+    </div>
+
+    <div class="row g-4">
+        
+        <!-- COLUNA ESQUERDA: LISTA -->
+        <div class="col-lg-8">
+            <% if (carrinho.length === 0) { %>
+                <!-- Empty State Luxo -->
+                <div class="empty-glass">
+                    <i class="fas fa-shopping-cart empty-icon"></i>
+                    <h2 class="fw-bold mb-3" style="color: var(--text-main);">Seu carrinho está vazio</h2>
+                    <p class="text-muted mb-4">Que tal dar uma olhada nas novidades da loja?</p>
+                    <a href="/produtos" class="btn btn-dark rounded-pill px-5 py-3 fw-bold shadow-lg" style="background: var(--primary);">
+                        Explorar Produtos
+                    </a>
+                </div>
+            <% } else { %>
+                
+                <!-- LOOP DE PRODUTOS -->
+                <div id="cart-list-area">
+                    <% 
+                        let totalCalc = 0;
+                        carrinho.forEach(item => { 
+                            const preco = parseFloat(item.preco);
+                            const qtd = parseInt(item.quantidade);
+                            totalCalc += (preco * qtd);
+                    %>
+                        <div class="glass-card">
+                            <!-- Botão Remover (Floating Top Right) -->
+                            <button onclick="removerItem('<%= item.id %>')" class="btn-delete" title="Remover">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                            <!-- Imagem -->
+                            <div class="img-box">
+                                <img src="/uploads/produtos/<%= item.imagem %>" alt="<%= item.nome %>" onerror="this.src='https://via.placeholder.com/150?text=Produto'">
+                            </div>
+
+                            <!-- Info e Controles -->
+                            <div class="item-info">
+                                <div>
+                                    <div class="item-vendor"><i class="fas fa-store"></i> <%= item.vendedor || 'KuandaShop' %></div>
+                                    <h3 class="item-title"><%= item.nome %></h3>
+                                </div>
+                                
+                                <div class="controls-row">
+                                    <div class="item-price">
+                                        <%= preco.toLocaleString('pt-AO', {minimumFractionDigits: 2}) %> <small style="font-size:0.7em;">Kz</small>
+                                    </div>
+
+                                    <!-- Stepper Quantidade -->
+                                    <div class="qty-pill">
+                                        <button class="btn-qty" onclick="atualizarQtd('<%= item.id %>', <%= qtd %>, -1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        
+                                        <input type="text" class="qty-input" value="<%= qtd %>" readonly>
+                                        
+                                        <button class="btn-qty" onclick="atualizarQtd('<%= item.id %>', <%= qtd %>, 1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <!-- 
+                   BLOCK DE CHECKOUT MOBILE 
+                   (Inserido aqui para aparecer LOGO DEPOIS da lista, no fluxo de scroll)
+                -->
+                <div class="mobile-summary-container d-lg-none">
+                    <div class="summary-block">
+                        <h4 class="summary-title"><i class="fas fa-receipt me-2"></i>Resumo do Pedido</h4>
+                        
+                        <div class="summary-row">
+                            <span>Subtotal (<%= carrinho.length %> itens)</span>
+                            <strong><%= typeof total !== 'undefined' ? parseFloat(total).toLocaleString('pt-AO', {minimumFractionDigits: 2}) : totalCalc.toLocaleString('pt-AO', {minimumFractionDigits: 2}) %> Kz</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Entrega</span>
+                            <span class="text-success"><i class="fas fa-check-circle"></i> Grátis</span>
+                        </div>
+                        
+                        <div class="total-row">
+                            <span class="total-label">Total a Pagar</span>
+                            <span class="total-val">
+                                <%= typeof total !== 'undefined' ? parseFloat(total).toLocaleString('pt-AO', {minimumFractionDigits: 2}) : totalCalc.toLocaleString('pt-AO', {minimumFractionDigits: 2}) %>
+                                <small style="font-size: 0.5em; font-weight:600;">Kz</small>
+                            </span>
+                        </div>
+
+                        <a href="/checkout" class="btn-checkout-lg">
+                            Finalizar Compra <i class="fas fa-arrow-right"></i>
+                        </a>
+                        
+                        <div class="text-center mt-3 text-muted" style="font-size: 0.8rem;">
+                            <i class="fas fa-lock me-1"></i> Checkout Seguro e Criptografado
+                        </div>
+                    </div>
+                </div>
+
+            <% } %>
+        </div>
+
+        <!-- COLUNA DIREITA: RESUMO (APENAS DESKTOP - STICKY) -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <% if (carrinho.length > 0) { %>
+            <div class="summary-block" style="position: sticky; top: 30px;">
+                <h4 class="summary-title">Resumo</h4>
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span><%= typeof total !== 'undefined' ? parseFloat(total).toLocaleString('pt-AO', {minimumFractionDigits: 2}) : totalCalc.toLocaleString('pt-AO', {minimumFractionDigits: 2}) %> Kz</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Descontos</span>
+                    <span>--</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Envio</span>
+                    <span class="text-success">Grátis</span>
+                </div>
+
+                <div class="total-row">
+                    <span class="total-label">Total</span>
+                    <span class="total-val">
+                        <%= typeof total !== 'undefined' ? parseFloat(total).toLocaleString('pt-AO', {minimumFractionDigits: 2}) : totalCalc.toLocaleString('pt-AO', {minimumFractionDigits: 2}) %> <small style="font-size:0.4em;">Kz</small>
+                    </span>
+                </div>
+
+                <a href="/checkout" class="btn-checkout-lg">
+                    Ir para Pagamento <i class="fas fa-credit-card ms-2"></i>
+                </a>
+
+                <div class="mt-4 pt-3 border-top text-center text-muted">
+                    <p class="mb-2 small">Aceitamos</p>
+                    <div class="fs-3">
+                        <i class="fab fa-cc-visa mx-1"></i>
+                        <i class="fab fa-cc-mastercard mx-1"></i>
+                        <i class="fab fa-cc-paypal mx-1"></i>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+    </div>
+</div>
+
+<!-- JAVASCRIPT COMPLETO SEM OMISSÕES -->
+<script>
+    // Configuração do Toast para alertas não intrusivos
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
+    // 1. Função Remover Item
+    async function removerItem(id) {
+        const result = await Swal.fire({
+            title: 'Remover produto?',
+            text: "Deseja realmente retirar este item do carrinho?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#D90429', // Cor Accent
+            cancelButtonColor: '#2B2D42', // Cor Texto
+            confirmButtonText: 'Sim, remover',
+            cancelButtonText: 'Cancelar',
+            background: '#fff',
+            borderRadius: '20px',
+            customClass: {
+                popup: 'rounded-4 shadow-lg'
+            }
+        });
+
+        if (result.isConfirmed) {
+            // Loading state bonito
+            Swal.fire({
+                title: 'Atualizando...',
+                html: 'Removendo item do carrinho',
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                background: 'rgba(255,255,255,0.95)',
+                backdrop: 'rgba(0,0,0,0.1)',
+                showConfirmButton: false
+            });
+
+            try {
+                const response = await fetch('/carrinho/remover', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ produto_id: id })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Pequeno delay para a animação de loading ser percebida
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    Swal.fire('Erro', data.message || 'Não foi possível remover', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                Swal.fire('Erro', 'Falha na conexão com o servidor', 'error');
+            }
+        }
+    }
+
+    // 2. Função Esvaziar Carrinho
+    async function esvaziarCarrinho() {
+        const result = await Swal.fire({
+            title: 'Limpar tudo?',
+            text: "Todos os itens serão removidos do seu carrinho.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#D90429',
+            cancelButtonColor: '#2B2D42',
+            confirmButtonText: 'Sim, limpar',
+            cancelButtonText: 'Manter itens',
+            background: '#fff',
+            borderRadius: '20px'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Loading
+                Swal.fire({
+                    title: 'Limpando...',
+                    didOpen: () => Swal.showLoading(),
+                    showConfirmButton: false,
+                    background: 'rgba(255,255,255,0.9)'
+                });
+
+                await fetch('/carrinho/limpar', { 
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'} 
+                });
+                
+                // Sucesso com Toast antes de reload
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Carrinho limpo com sucesso'
+                });
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 800);
+
+            } catch (e) {
+                console.error(e);
+                Swal.fire('Erro', 'Ocorreu um erro ao limpar o carrinho', 'error');
+            }
+        }
+    }
+
+    // 3. Função Atualizar Quantidade
+    async function atualizarQtd(id, currentQty, change) {
+        const newQty = parseInt(currentQty) + change;
+        
+        // Impede quantidade menor que 1
+        if (newQty < 1) return;
+
+        // Feedback visual sutil (cursor de espera)
+        document.body.style.cursor = 'wait';
+
+        try {
+            const response = await fetch('/carrinho/atualizar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    produto_id: id, 
+                    quantidade: newQty 
+                })
+            });
+
+            const data = await response.json();
+            
+            if(data.success) {
+                // Reload rápido
+                window.location.reload();
+            } else {
+                document.body.style.cursor = 'default';
+                // Alerta suave se atingir limite de estoque
+                Toast.fire({
+                    icon: 'warning',
+                    title: data.message || 'Quantidade indisponível no estoque'
+                });
+            }
+        } catch (error) {
+            document.body.style.cursor = 'default';
+            console.error(error);
+            Toast.fire({
+                icon: 'error',
+                title: 'Erro de conexão'
+            });
+        }
+    }
+</script>
+</body>
+</html>

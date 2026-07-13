@@ -1,0 +1,421 @@
+
+  <style>
+    /* =========================================
+       KUANDA INVENTORY SYSTEM - MOBILE MATRIX
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --card-radius: 20px;
+      --bg-soft: #F9FAFB;
+    }
+
+    body { background-color: var(--bg-soft); }
+
+    /* 1. HEADER E RESUMO */
+    .inventory-header {
+      display: flex; justify-content: space-between; align-items: end;
+      margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
+    }
+    .page-title {
+      font-weight: 800; color: var(--k-black); margin: 0; font-size: 2rem;
+      letter-spacing: -1px;
+    }
+    .page-subtitle { color: #666; margin: 0; font-size: 0.95rem; }
+
+    .btn-create {
+      background: var(--k-black); color: white; border: none;
+      padding: 12px 30px; border-radius: 50px; font-weight: 700;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s;
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .btn-create:hover { transform: translateY(-3px); background: #333; color: white; }
+
+    /* Summary Pills (Scrollable on Mobile) */
+    .summary-pills { 
+        display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 30px;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+    .summary-pills::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+    .s-pill {
+      background: white; padding: 10px 20px; border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.05); font-weight: 600; font-size: 0.85rem;
+      white-space: nowrap; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02); flex-shrink: 0;
+    }
+    .s-pill strong { font-size: 1rem; color: var(--k-black); }
+
+    /* 2. GRID DE PRODUTOS */
+    .inventory-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    /* CARD DE PRODUTO (DESKTOP BASE) */
+    .prod-manage-card {
+      background: white; border-radius: var(--card-radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03);
+      overflow: hidden; position: relative; transition: all 0.3s ease;
+      display: flex; flex-direction: column; height: 100%;
+    }
+    .prod-manage-card:hover {
+      transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+
+    /* Imagem */
+    .pm-img-box {
+      position: relative; height: 220px; background: #f4f4f4; overflow: hidden;
+    }
+    .pm-img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;
+    }
+    .prod-manage-card:hover .pm-img { transform: scale(1.08); }
+
+    /* Badges Flutuantes */
+    .status-badge {
+      position: absolute; top: 15px; right: 15px;
+      padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 800;
+      text-transform: uppercase; z-index: 2; backdrop-filter: blur(5px);
+    }
+    .st-active { background: rgba(232, 253, 240, 0.9); color: #10B981; border: 1px solid #10B981; }
+    .st-inactive { background: rgba(254, 242, 242, 0.9); color: #EF4444; border: 1px solid #EF4444; }
+    
+    .vip-badge {
+      position: absolute; top: 15px; left: 15px;
+      background: linear-gradient(135deg, #FFD700, #FFA000); color: black;
+      padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.7rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 2;
+    }
+
+    .promo-badge {
+      position: absolute; bottom: 15px; left: 15px;
+      background: var(--k-red); color: white; padding: 4px 10px;
+      border-radius: 6px; font-weight: 700; font-size: 0.7rem; z-index: 2;
+    }
+
+    /* Corpo */
+    .pm-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    
+    .pm-cat { font-size: 0.7rem; text-transform: uppercase; color: #999; font-weight: 700; margin-bottom: 5px; }
+    .pm-title {
+      font-size: 1.1rem; font-weight: 700; color: var(--k-black); margin-bottom: 10px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .pm-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
+    .pm-price { font-size: 1.2rem; font-weight: 800; color: var(--k-black); }
+    .pm-old { font-size: 0.85rem; text-decoration: line-through; color: #ccc; }
+
+    /* Stats Grid Interno */
+    .pm-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      background: #F8F9FA; padding: 12px; border-radius: 12px; margin-bottom: 20px;
+    }
+    .stat-mini { text-align: center; }
+    .stat-label { font-size: 0.65rem; text-transform: uppercase; color: #888; font-weight: 600; display: block; }
+    .stat-val { font-weight: 700; font-size: 0.9rem; color: #444; }
+    .val-danger { color: #EF4444; } .val-success { color: #10B981; } .val-warn { color: #F59E0B; }
+
+    /* Footer de Ações */
+    .pm-footer {
+      border-top: 1px solid #f0f0f0; padding: 15px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: white;
+    }
+    
+    .action-group { display: flex; gap: 8px; width: 100%; }
+    
+    .btn-icon {
+      width: 35px; height: 35px; border-radius: 10px; border: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.2s; cursor: pointer; color: #555; text-decoration: none;
+    }
+    .btn-view { background: #E3F2FD; color: #1976D2; }
+    .btn-edit { background: #F3F4F6; color: #333; }
+    .btn-vip { background: #FFF8E1; color: #F57F17; }
+    .btn-del { background: #FFEBEE; color: #C62828; }
+    
+    .btn-icon:hover { transform: scale(1.1); filter: brightness(0.95); }
+
+    /* Empty State */
+    .empty-inventory {
+      text-align: center; padding: 80px 20px;
+      background: white; border-radius: var(--card-radius);
+      border: 2px dashed #eee;
+    }
+    .empty-icon { font-size: 4rem; color: #eee; margin-bottom: 20px; }
+
+    /* Animations */
+    .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* =========================================
+       MOBILE OPTIMIZATIONS (MATRIX 3x3)
+       ========================================= */
+    @media (max-width: 991px) {
+        /* Grid 3 Colunas Apertado */
+        .inventory-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        /* Card Reset para Miniatura */
+        .prod-manage-card {
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: none;
+        }
+
+        /* Imagem Quadrada */
+        .pm-img-box {
+            height: auto;
+            aspect-ratio: 1/1;
+        }
+
+        /* Badge Status vira "Dot" */
+        .status-badge {
+            top: 6px; right: 6px; padding: 0; width: 10px; height: 10px;
+            border-radius: 50%; font-size: 0; border: 1px solid white;
+        }
+        .st-active { background: #10B981; }
+        .st-inactive { background: #EF4444; }
+
+        /* Badges Menores */
+        .vip-badge, .promo-badge {
+            font-size: 0.5rem; padding: 2px 4px; border-radius: 4px;
+            top: auto; bottom: 4px; left: 4px;
+        }
+        .promo-badge { bottom: 4px; left: 4px; } /* Override position */
+
+        /* Corpo Compacto */
+        .pm-body { padding: 8px; }
+        .pm-cat { display: none; }
+        .pm-title {
+            font-size: 0.7rem; line-height: 1.1; margin-bottom: 4px;
+            height: 2.2em; /* 2 linhas */
+        }
+        
+        .pm-price-row { margin-bottom: 4px; gap: 2px; }
+        .pm-price { font-size: 0.85rem; }
+        .pm-old { display: none; }
+
+        /* Esconder Stats Detalhados */
+        .pm-stats { display: none; }
+
+        /* Footer Simplificado (Só Editar) */
+        .pm-footer {
+            padding: 0 8px 8px 8px;
+            border: none;
+        }
+        
+        /* Mostrar apenas botão Editar esticado */
+        .action-group { width: 100%; }
+        .btn-view, .btn-vip, .btn-del { display: none; } /* Esconde extras */
+        .btn-edit {
+            width: 100%; height: 28px; font-size: 0.8rem;
+            background: #f0f0f0; border-radius: 6px;
+        }
+        .btn-edit i { font-size: 0.7rem; }
+        
+        /* Header Compacto */
+        .page-title { font-size: 1.5rem; }
+        .btn-create span { display: none; } /* Só ícone no botão criar */
+        .btn-create { padding: 10px; border-radius: 50%; width: 40px; height: 40px; justify-content: center; }
+        .btn-create i { margin: 0; }
+    }
+  </style>
+
+
+<div class="container py-4">
+  
+  <!-- 1. HEADER DO INVENTÁRIO -->
+  <div class="inventory-header fade-up">
+    <div>
+      <h2 class="page-title"><i class="fas fa-boxes me-2 text-warning"></i>Meus Produtos</h2>
+      <p class="page-subtitle">Gerencie seu catálogo.</p>
+    </div>
+    <a href="/vendedor/produto/novo" class="btn-create" title="Novo Produto">
+      <i class="fas fa-plus"></i> <span>Novo Produto</span>
+    </a>
+  </div>
+
+  <% if (produtos.length === 0) { %>
+    <!-- EMPTY STATE -->
+    <div class="empty-inventory fade-up" style="animation-delay: 0.1s;">
+      <i class="fas fa-box-open empty-icon"></i>
+      <h3 class="fw-bold text-muted">Seu estoque está vazio</h3>
+      <p class="text-muted mb-4">Comece a vender adicionando seu primeiro produto ao KuandaShop.</p>
+      <a href="/vendedor/produto/novo" class="btn btn-outline-dark rounded-pill px-5 fw-bold">
+        Adicionar Primeiro Produto
+      </a>
+    </div>
+  <% } else { %>
+    
+    <!-- 2. RESUMO (SCROLLABLE ON MOBILE) -->
+    <% 
+      const total = produtos.length;
+      const ativos = produtos.filter(p => p.ativo).length;
+      const baixoEstoque = produtos.filter(p => p.estoque < 5).length;
+      const vips = produtos.filter(p => p.vip).length;
+    %>
+    <div class="summary-pills fade-up" style="animation-delay: 0.1s;">
+        <div class="s-pill"><i class="fas fa-layer-group text-primary"></i> <span>Total: <strong><%= total %></strong></span></div>
+        <div class="s-pill"><i class="fas fa-check-circle text-success"></i> <span>Ativos: <strong><%= ativos %></strong></span></div>
+        <% if(baixoEstoque > 0) { %>
+            <div class="s-pill border-danger"><i class="fas fa-exclamation-triangle text-danger"></i> <span>Baixo Estoque: <strong class="text-danger"><%= baixoEstoque %></strong></span></div>
+        <% } %>
+        <div class="s-pill"><i class="fas fa-crown text-warning"></i> <span>VIPs: <strong><%= vips %></strong></span></div>
+    </div>
+
+    <!-- 3. GRID DE PRODUTOS (3x3 MOBILE / GRID DESKTOP) -->
+    <div class="inventory-grid">
+      <% produtos.forEach((produto, index) => { %>
+        <div class="prod-manage-card fade-up" style="animation-delay: <%= index * 0.05 + 0.2 %>s;">
+          
+          <!-- Imagem e Badges -->
+          <a href="/vendedor/produto/<%= produto.id %>/editar" class="pm-img-box d-block">
+            <% 
+            let img = '';
+            if(produto.imagem1) img = '/uploads/produtos/' + produto.imagem1;
+            else if(produto.imagem2) img = '/uploads/produtos/' + produto.imagem2;
+            %>
+            <% if (img) { %>
+                <img src="<%= img %>" class="pm-img" alt="<%= produto.nome %>" loading="lazy">
+            <% } else { %>
+                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fas fa-image fa-2x"></i></div>
+            <% } %>
+
+            <!-- Status (Dot no mobile, Badge no desktop) -->
+            <div class="status-badge <%= produto.ativo ? 'st-active' : 'st-inactive' %>">
+                <%= produto.ativo ? 'Ativo' : 'Inativo' %>
+            </div>
+
+            <!-- VIP Badge -->
+            <% if (produto.vip) { %>
+                <div class="vip-badge"><i class="fas fa-crown me-1"></i> VIP</div>
+            <% } %>
+
+            <!-- Promo Badge (só se não for VIP pra não poluir mobile) -->
+            <% if (produto.preco_promocional > 0 && !produto.vip) { %>
+                <div class="promo-badge">OFERTA</div>
+            <% } %>
+          </a>
+
+          <!-- Corpo -->
+          <div class="pm-body">
+            <span class="pm-cat"><%= produto.categoria_nome || 'Geral' %></span>
+            <a href="/vendedor/produto/<%= produto.id %>/editar" class="text-decoration-none">
+                <h5 class="pm-title"><%= produto.nome %></h5>
+            </a>
+
+            <!-- Preço -->
+            <div class="pm-price-row">
+                <% 
+                const preco = Number(produto.preco) || 0;
+                const promo = Number(produto.preco_promocional) || 0;
+                %>
+                <% if (promo > 0) { %>
+                    <span class="pm-price text-success"><%= promo.toLocaleString('pt-AO') %></span>
+                    <span class="pm-old"><%= preco.toLocaleString('pt-AO') %></span>
+                <% } else { %>
+                    <span class="pm-price"><%= preco.toLocaleString('pt-AO') %></span>
+                <% } %>
+            </div>
+
+            <!-- Stats (Desktop Only) -->
+            <div class="pm-stats">
+                <div class="stat-mini">
+                    <span class="stat-label">Estoque</span>
+                    <% 
+                    let stockClass = 'val-success';
+                    if(produto.estoque == 0) stockClass = 'val-danger';
+                    else if(produto.estoque < 5) stockClass = 'val-warn';
+                    %>
+                    <span class="stat-val <%= stockClass %>"><%= produto.estoque %></span>
+                </div>
+                <div class="stat-mini" style="border-left: 1px solid #eee;">
+                    <span class="stat-label">Nota</span>
+                    <span class="stat-val text-warning">
+                        <%= parseFloat(produto.media_classificacao || 0).toFixed(1) %>
+                    </span>
+                </div>
+            </div>
+          </div>
+
+          <!-- Ações (Desktop: Full / Mobile: Only Edit) -->
+          <div class="pm-footer">
+            <div class="action-group">
+                <!-- Botão Editar (Sempre visível e destacado no mobile) -->
+                <a href="/vendedor/produto/<%= produto.id %>/editar" class="btn-icon btn-edit" title="Editar">
+                    <i class="fas fa-pen"></i>
+                </a>
+
+                <!-- Estes somem no mobile via CSS -->
+                <a href="/produto/<%= produto.id %>" target="_blank" class="btn-icon btn-view" title="Ver no Site">
+                    <i class="fas fa-eye"></i>
+                </a>
+                
+                <% if (!produto.vip) { %>
+                    <form action="/vendedor/produto/<%= produto.id %>/solicitar-vip" method="POST" class="d-inline vip-form m-0">
+                        <button type="submit" class="btn-icon btn-vip" title="Solicitar VIP">
+                            <i class="fas fa-crown"></i>
+                        </button>
+                    </form>
+                <% } %>
+                
+                <form action="/vendedor/produto/<%= produto.id %>?_method=DELETE" method="POST" class="delete-form d-inline m-0">
+                    <button type="submit" class="btn-icon btn-del" title="Excluir">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </div>
+          </div>
+
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+</div>
+
+<script>
+  // 1. Animação de Entrada
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animation = 'fadeInUp 0.5s ease forwards';
+        observer.unobserve(entry.target);
+      }
+    });
+  });
+
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity = '0';
+    observer.observe(el);
+  });
+
+  // 2. Confirmação de Exclusão
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (!confirm('Tem certeza? Isso removerá o produto da sua loja.')) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  // 3. Confirmação VIP
+  document.querySelectorAll('.vip-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (!confirm('Deseja solicitar destaque VIP para este produto?')) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  // Keyframes Style
+  const style = document.createElement('style');
+  style.textContent = `@keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }`;
+  document.head.appendChild(style);
+</script>

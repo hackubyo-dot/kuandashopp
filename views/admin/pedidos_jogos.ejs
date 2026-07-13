@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <style>
+        /* ESTILO CLEAN ADMIN */
+        body { background-color: #f8fafc; }
+        
+        .page-header {
+            background: white; padding: 25px 30px; border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .table-card {
+            background: white; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #f1f5f9; color: #64748b; font-weight: 700; text-transform: uppercase;
+            font-size: 0.75rem; letter-spacing: 0.5px; padding: 15px 20px; border: none;
+        }
+        
+        .table td { padding: 20px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+        .table tr:last-child td { border-bottom: none; }
+
+        /* User Info */
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 40px; height: 40px; background: #e0e7ff; color: #4f46e5;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem;
+        }
+        
+        /* Game Info */
+        .game-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #fff1f2; color: #e11d48; padding: 6px 12px;
+            border-radius: 8px; font-weight: 700; font-size: 0.85rem;
+        }
+        .game-thumb {
+            width: 30px; height: 40px; object-fit: cover; border-radius: 4px;
+        }
+
+        /* Buttons */
+        .btn-icon {
+            width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 8px; border: none; transition: 0.2s; cursor: pointer; color: white;
+        }
+        .btn-accept { background: #10b981; }
+        .btn-accept:hover { background: #059669; transform: translateY(-2px); }
+        
+        .btn-deny { background: #ef4444; }
+        .btn-deny:hover { background: #dc2626; transform: translateY(-2px); }
+
+        .whatsapp-link { color: #25D366; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+        .whatsapp-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h2 class="fw-bold m-0 text-dark"><i class="fas fa-gamepad text-primary me-2"></i>Pedidos de Jogos</h2>
+            <p class="text-muted m-0 small">Confirme os pagamentos para liberar os downloads.</p>
+        </div>
+        <div class="bg-primary bg-opacity-10 text-primary px-4 py-2 rounded-3 fw-bold">
+            <%= pedidos.length %> Pendentes
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Jogo Solicitado</th>
+                        <th>Valor (Kz)</th>
+                        <th>Data</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (pedidos && pedidos.length > 0) { %>
+                        <% pedidos.forEach(p => { %>
+                            <tr>
+                                <!-- Cliente -->
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar"><%= p.usuario_nome.charAt(0).toUpperCase() %></div>
+                                        <div style="line-height: 1.2;">
+                                            <div class="fw-bold text-dark"><%= p.usuario_nome %></div>
+                                            <div class="small text-muted"><%= p.email %></div>
+                                            <% if(p.telefone) { %>
+                                                <a href="https://wa.me/<%= p.telefone.replace(/\D/g,'') %>" target="_blank" class="whatsapp-link">
+                                                    <i class="fab fa-whatsapp"></i> <%= p.telefone %>
+                                                </a>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Jogo -->
+                                <td>
+                                    <div class="game-badge">
+                                        <% if(p.capa) { %>
+                                            <img src="/uploads/games/<%= p.capa %>" class="game-thumb">
+                                        <% } else { %>
+                                            <i class="fas fa-gamepad"></i>
+                                        <% } %>
+                                        <%= p.jogo_titulo %>
+                                    </div>
+                                </td>
+
+                                <!-- Valor -->
+                                <td>
+                                    <span class="fw-bold text-success fs-6">
+                                        <%= parseFloat(p.preco).toLocaleString('pt-AO', {style: 'currency', currency: 'AOA'}) %>
+                                    </span>
+                                </td>
+
+                                <!-- Data -->
+                                <td>
+                                    <span class="fw-bold text-dark"><%= new Date(p.created_at).toLocaleDateString() %></span><br>
+                                    <small class="text-muted"><%= new Date(p.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></small>
+                                </td>
+
+                                <!-- Botões -->
+                                <td class="text-end">
+                                    <form action="/admin/pedidos-jogos/<%= p.id %>/aprovar" method="POST" class="d-inline">
+                                        <button type="submit" class="btn-icon btn-accept" title="Liberar Acesso">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    
+                                    <form action="/admin/pedidos-jogos/<%= p.id %>/rejeitar" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza? Isso removerá o pedido.');">
+                                        <button type="submit" class="btn-icon btn-deny" title="Rejeitar Pedido">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-check-circle fa-3x mb-3 text-light"></i>
+                                    <p>Nenhum pedido de jogo pendente no momento.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

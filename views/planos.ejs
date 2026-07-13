@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Planos Premium - Kuanda' %></title>
+    
+    <!-- Fontes e Ícones -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           KUANDA PREMIUM SYSTEM (THEME VARIABLES)
+           ========================================= */
+        :root {
+            /* Light Mode (Padrão) */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-hero: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #4f46e5;
+            --accent: #E31C25;
+            --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 40px -12px rgba(0,0,0,0.1);
+            --toggle-bg: #1e293b;
+            --toggle-icon: #fbbf24;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hero: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --primary: #6366f1;
+            --accent: #ef4444;
+            --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.3);
+            --shadow-hover: 0 20px 40px -12px rgba(0,0,0,0.5);
+            --toggle-bg: #f8fafc;
+            --toggle-icon: #0f172a;
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* --- HERO SECTION (VITRINE) --- */
+        .plans-hero {
+            position: relative;
+            padding: 80px 20px 40px;
+            text-align: center;
+            background: var(--bg-hero);
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        /* Marquee (Carrossel Infinito de Fundo) */
+        .marquee-wrapper {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.05; /* Bem suave */
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        }
+
+        .marquee-track {
+            display: flex; gap: 20px;
+            animation: scroll 60s linear infinite;
+            width: max-content;
+        }
+
+        .showcase-card {
+            width: 140px; height: 200px;
+            border-radius: 12px;
+            background-size: cover; background-position: center;
+            filter: grayscale(100%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Conteúdo Hero */
+        .hero-content { position: relative; z-index: 2; max-width: 700px; margin: 0 auto; }
+
+        .badge-pill {
+            display: inline-block;
+            background: var(--primary); color: white;
+            padding: 6px 16px; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .hero-title {
+            font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 15px;
+            color: var(--text-main); letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px;
+        }
+
+        /* Botões de Troca (Tabs) */
+        .switcher {
+            display: inline-flex; background: var(--bg-body); padding: 5px;
+            border-radius: 50px; border: 1px solid var(--border);
+            position: relative; z-index: 10;
+        }
+        .switch-btn {
+            padding: 12px 30px; border-radius: 40px; border: none;
+            background: transparent; color: var(--text-muted);
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px; font-size: 0.95rem;
+        }
+        .switch-btn:hover { color: var(--primary); }
+        
+        .switch-btn.active {
+            background: var(--bg-card); color: var(--text-main);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: var(--primary);
+        }
+
+        /* --- CARDS SECTION --- */
+        .container-cards {
+            max-width: 1200px; margin: 0 auto; padding: 50px 20px 100px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* DESIGN DO CARD */
+        .plan-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 35px 25px;
+            position: relative;
+            display: flex; flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--theme);
+        }
+
+        /* Definição de Temas (Cores) */
+        .theme-blue { --theme: #4f46e5; --bg-icon: rgba(79, 70, 229, 0.1); }
+        .theme-red { --theme: #ef4444; --bg-icon: rgba(239, 68, 68, 0.1); }
+        .theme-teal { --theme: #0d9488; --bg-icon: rgba(13, 148, 136, 0.1); }
+        .theme-gold { --theme: #d97706; --bg-icon: rgba(217, 119, 6, 0.1); }
+
+        /* Badge Popular */
+        .popular-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--theme); color: white;
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+            padding: 5px 12px; border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Ícone */
+        .icon-box {
+            width: 55px; height: 55px;
+            background: var(--bg-icon); color: var(--theme);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin-bottom: 20px; transition: 0.4s;
+        }
+        .plan-card:hover .icon-box { background: var(--theme); color: white; transform: rotate(-10deg) scale(1.1); }
+
+        /* Títulos e Preços */
+        .plan-name { font-size: 1.4rem; font-weight: 800; margin: 0 0 5px; color: var(--text-main); }
+        .plan-price { font-size: 2.2rem; font-weight: 900; color: var(--text-main); display: flex; align-items: baseline; gap: 4px; }
+        .plan-price span { font-size: 1rem; color: var(--text-muted); font-weight: 600; }
+
+        .separator { height: 1px; background: var(--border); margin: 20px 0; width: 100%; }
+
+        /* Lista de Recursos */
+        .features { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+        .features li {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted); font-weight: 500;
+        }
+        .features li i { color: var(--theme); font-size: 0.9rem; flex-shrink: 0; }
+
+        /* Botão de Ação */
+        .btn-action {
+            margin-top: 25px; width: 100%; padding: 16px;
+            border-radius: 14px; border: 2px solid var(--border);
+            background: transparent; color: var(--text-main);
+            font-weight: 800; cursor: pointer; transition: 0.3s;
+            font-size: 1rem; text-decoration: none; display: block; text-align: center;
+        }
+        .plan-card:hover .btn-action {
+            background: var(--theme); color: white; border-color: var(--theme);
+            box-shadow: 0 8px 20px -6px var(--theme); transform: translateY(-2px);
+        }
+
+        /* BOTÃO FLUTUANTE DARK MODE */
+        .theme-toggle {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            background: var(--toggle-bg);
+            color: var(--toggle-icon);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer; z-index: 1000;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+        }
+        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+
+        /* =========================================================
+           RESPONSIVIDADE: MATRIZ 2x2 MINIATURIZADA (Mobile)
+           ========================================================= */
+        @media (max-width: 768px) {
+            .plans-hero { padding: 60px 15px 30px; }
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 0.9rem; margin-bottom: 20px; }
+            
+            .container-cards { padding: 20px 15px 100px; }
+
+            /* O Segredo da Matriz 2x2 no Mobile */
+            .grid-layout {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 2 Colunas Forçadas */
+                gap: 12px; /* Espaço apertado */
+            }
+
+            .plan-card {
+                padding: 20px 10px; 
+                border-radius: 16px;
+                min-height: auto;
+                align-items: center; text-align: center;
+            }
+
+            /* Miniaturização dos Elementos */
+            .icon-box { width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 10px; border-radius: 10px; }
+            .plan-name { font-size: 0.9rem; margin-bottom: 0; line-height: 1.2; }
+            .plan-price { font-size: 1.2rem; flex-direction: column; gap: 0; line-height: 1.1; margin-top: 5px; }
+            .plan-price span { font-size: 0.6rem; }
+            
+            .separator { margin: 10px 0; opacity: 0.5; }
+            
+            /* OCULTAR LISTA DE RECURSOS NO MOBILE (Para caber no 2x2) */
+            .features { display: none; }
+            
+            .popular-badge { top: 8px; right: 8px; padding: 2px 6px; font-size: 0.5rem; border-radius: 4px; }
+
+            .btn-action {
+                margin-top: 5px;
+                padding: 8px;
+                font-size: 0.75rem;
+                border-radius: 8px;
+                border-width: 1px;
+                height: auto;
+                width: 100%;
+            }
+
+            .theme-toggle { width: 50px; height: 50px; bottom: 20px; right: 20px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- MARQUEE BACKGROUND (EFEITO VISUAL) -->
+<div class="marquee-wrapper">
+    <div class="marquee-track">
+        <!-- Renderiza imagens de showcase se existirem, senão placeholders -->
+        <% if (typeof showcase !== 'undefined' && showcase.length > 0) { %>
+            <% for(let i=0; i<4; i++) { %> 
+                <% showcase.forEach(item => { %>
+                    <div class="showcase-card" style="background-image: url('<%= item.img %>');"></div>
+                <% }) %>
+            <% } %>
+        <% } else { %>
+            <!-- Fallback se não houver showcase -->
+            <% for(let i=0; i<10; i++) { %>
+                <div class="showcase-card" style="background-color: #ddd;"></div>
+            <% } %>
+        <% } %>
+    </div>
+</div>
+
+<!-- HERO SECTION -->
+<header class="plans-hero">
+    <div class="hero-content">
+        <span class="badge-pill">Planos Premium</span>
+        <h1 class="hero-title">Escolha seu Poder</h1>
+        <p class="hero-subtitle">Assinaturas flexíveis para vendedores e amantes de jogos.</p>
+
+        <div class="switcher">
+            <button class="switch-btn active" onclick="showTab('vendedor', this)">
+                <i class="fas fa-store"></i> <span class="d-none d-sm-inline">Vendedores</span>
+            </button>
+            <button class="switch-btn" onclick="showTab('entretenimento', this)">
+                <i class="fas fa-gamepad"></i> <span class="d-none d-sm-inline">Diversão</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- CARDS SECTION -->
+<section class="container-cards">
+    
+    <!-- TAB: VENDEDORES -->
+    <div id="tab-vendedor" class="grid-layout">
+        <% if (typeof planosVendedor !== 'undefined' && planosVendedor.length > 0) { %>
+            <% planosVendedor.forEach(plano => { %>
+                <div class="plan-card theme-blue">
+                    <% if(plano.nome === 'Pro' || plano.nome === 'Elite') { %>
+                        <span class="popular-badge">Mais Vendido</span>
+                    <% } %>
+                    
+                    <div class="icon-box"><i class="fas fa-shop"></i></div>
+                    <h3 class="plan-name"><%= plano.nome %></h3>
+                    <div class="plan-price">
+                        <%= parseFloat(plano.preco_mensal) > 0 ? parseFloat(plano.preco_mensal).toLocaleString('pt-AO') : 'Grátis' %>
+                        <span><%= parseFloat(plano.preco_mensal) > 0 ? 'Kz/mês' : '' %></span>
+                    </div>
+                    
+                    <div class="separator"></div>
+                    
+                    <ul class="features">
+                        <li><i class="fas fa-box-open"></i> <%= plano.limite_produtos %> Produtos Ativos</li>
+                        <li><i class="<%= plano.permite_destaque ? 'fas fa-check-circle' : 'fas fa-times-circle' %>"></i> Destaque na Home</li>
+                        <li><i class="<%= plano.permite_vip ? 'fas fa-check-circle' : 'fas fa-times-circle' %>"></i> Selo de Vendedor VIP</li>
+                        <li><i class="fas fa-headset"></i> Suporte Prioritário</li>
+                    </ul>
+
+                    <a href="https://wa.me/244456923789?text=<%= encodeURIComponent(
+                        `Olá Kuanda! 👋
+Quero assinar o plano de Vendedor: *${plano.nome}*
+Valor: ${parseFloat(plano.preco_mensal).toLocaleString()} Kz
+MEU ID: ${typeof user !== 'undefined' && user ? user.id : 'Visitante'}
+
+Como faço o pagamento?`) %>"
+                       target="_blank"
+                       class="btn-action">
+                        Começar Agora
+                    </a>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">
+                Nenhum plano de vendedor disponível no momento.
+            </div>
+        <% } %>
+    </div>
+
+    <!-- TAB: ENTRETENIMENTO (GAMER / CINE / COMBO) -->
+    <div id="tab-entretenimento" class="grid-layout" style="display: none;">
+        
+        <!-- Plano Gamer -->
+        <div class="plan-card theme-red">
+            <span class="popular-badge">Game</span>
+            <div class="icon-box"><i class="fas fa-gamepad"></i></div>
+            <h3 class="plan-name">Gamer Pass</h3>
+            <div class="plan-price">5.000 <span>Kz/mês</span></div>
+
+            <div class="separator"></div>
+
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> Acesso a Todos os Jogos</li>
+                <li><i class="fas fa-download"></i> Downloads Ilimitados</li>
+                <li><i class="fas fa-server"></i> Servidor de Alta Velocidade</li>
+                <li><i class="fas fa-bolt"></i> Sem Anúncios</li>
+            </ul>
+
+            <a href="https://wa.me/244974120856?text=<%= encodeURIComponent(
+`Olá Kuanda! 👋
+Quero assinar o *Gamer Pass*.
+Valor: 3.000 Kz
+ID: ${typeof user !== 'undefined' && user ? user.id : 'Visitante'}`) %>"
+               target="_blank" class="btn-action">
+                Assinar Gamer
+            </a>
+        </div>
+
+        <!-- Plano Cine -->
+        <div class="plan-card theme-teal">
+            <div class="icon-box"><i class="fas fa-film"></i></div>
+            <h3 class="plan-name">Cine Club</h3>
+            <div class="plan-price">5.000 <span>Kz/mês</span></div>
+
+            <div class="separator"></div>
+
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> Filmes & Séries Completos</li>
+                <li><i class="fas fa-video"></i> Qualidade 4K Ultra HD</li>
+                <li><i class="fas fa-download"></i> Assistir Offline</li>
+                <li><i class="fas fa-globe"></i> Áudio Dual (PT/EN)</li>
+            </ul>
+
+            <a href="https://wa.me/244974120856?text=<%= encodeURIComponent(
+`Olá Kuanda! 👋
+Quero assinar o *Cine Club*.
+Valor: 2.000 Kz
+ID: ${typeof user !== 'undefined' && user ? user.id : 'Visitante'}`) %>"
+               target="_blank" class="btn-action">
+                Assinar Cine
+            </a>
+        </div>
+
+        <!-- Plano Combo Ultimate -->
+        <div class="plan-card theme-gold" style="border-color: #d97706;">
+            <span class="popular-badge" style="background: #d97706;">Ultimate</span>
+
+            <div class="icon-box" style="color: #d97706; background: rgba(217, 119, 6, 0.1);">
+                <i class="fas fa-crown"></i>
+            </div>
+
+            <h3 class="plan-name" style="color: #b45309;">Combo Full</h3>
+            <div class="plan-price" style="color: #b45309;">9.000 <span>Kz/mês</span></div>
+
+            <div class="separator"></div>
+
+            <ul class="features">
+                <li><i class="fas fa-star" style="color: #d97706;"></i> Jogos + Cinema (Tudo)</li>
+                <li><i class="fas fa-check-circle"></i> Acesso Prioritário</li>
+                <li><i class="fas fa-piggy-bank"></i> Economize 1000 Kz</li>
+                <li><i class="fas fa-gem"></i> Suporte VIP 24/7</li>
+            </ul>
+
+            <a href="https://wa.me/244974120856?text=<%= encodeURIComponent(
+`Olá Kuanda! 👋
+Quero o *COMBO FULL (Ultimate)*.
+Valor: 4.500 Kz
+ID: ${typeof user !== 'undefined' && user ? user.id : 'Visitante'}`) %>"
+               target="_blank" 
+               class="btn-action"
+               style="background: #d97706; color: white; border-color: #d97706;">
+                Quero Tudo
+            </a>
+        </div>
+    </div>
+
+</section>
+
+<!-- SCRIPTS DE INTERAÇÃO -->
+<script>
+    // 1. Alternar Tabs (Vendedor / Entretenimento)
+    function showTab(tabName, btn) {
+        // Remove classe ativa de todos
+        document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
+        // Adiciona ao clicado
+        btn.classList.add('active');
+
+        const vendedorGrid = document.getElementById('tab-vendedor');
+        const entGrid = document.getElementById('tab-entretenimento');
+
+        // Efeito simples de fade
+        if(tabName === 'vendedor') {
+            entGrid.style.display = 'none';
+            vendedorGrid.style.display = 'grid';
+            vendedorGrid.style.animation = 'fadeIn 0.5s ease';
+        } else {
+            vendedorGrid.style.display = 'none';
+            entGrid.style.display = 'grid';
+            entGrid.style.animation = 'fadeIn 0.5s ease';
+        }
+    }
+
+    // 2. Alternar Dark Mode (Simples e Eficiente)
+    function toggleTheme() {
+        const html = document.documentElement;
+        const btnIcon = document.querySelector('.theme-toggle i');
+        
+        if (html.getAttribute('data-theme') === 'dark') {
+            html.removeAttribute('data-theme');
+            btnIcon.classList.remove('fa-sun');
+            btnIcon.classList.add('fa-moon');
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.setAttribute('data-theme', 'dark');
+            btnIcon.classList.remove('fa-moon');
+            btnIcon.classList.add('fa-sun');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // 3. Carregar Tema Salvo ao Iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        const btnIcon = document.querySelector('.theme-toggle i');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btnIcon.classList.remove('fa-moon');
+            btnIcon.classList.add('fa-sun');
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,438 @@
+
+  <style>
+    /* =========================================
+       KUANDA DISCOVERY - PRODUCTS PAGE
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --card-radius: 20px;
+      --shadow-soft: 0 10px 40px rgba(0,0,0,0.05);
+    }
+
+    /* 1. HEADER DA PÁGINA */
+    .page-header {
+      margin-bottom: 30px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title {
+      font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin: 0;
+      background: linear-gradient(90deg, var(--k-black), #444);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .results-count {
+      font-size: 0.9rem; font-weight: 600; color: #888;
+      background: #f0f0f0; padding: 5px 12px; border-radius: 20px;
+    }
+
+    /* 2. SIDEBAR DE FILTROS (STICKY) */
+    .filter-sidebar {
+      background: white; border-radius: 24px; padding: 25px;
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-soft);
+      position: sticky; top: 100px; z-index: 10;
+    }
+    
+    .filter-group { margin-bottom: 20px; }
+    .filter-label {
+      font-size: 0.75rem; font-weight: 700; color: #999;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;
+    }
+    
+    .custom-field {
+      width: 100%; padding: 12px 15px; border-radius: 12px;
+      background: #F8F9FA; border: 1px solid transparent;
+      font-weight: 600; font-size: 0.95rem; color: var(--k-black);
+      transition: all 0.2s; outline: none;
+    }
+    .custom-field:focus {
+      background: white; border-color: var(--k-black); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    .search-wrapper { position: relative; }
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none; }
+
+    /* 3. GRID DE PRODUTOS */
+    .products-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Desktop Responsivo */
+      gap: 20px;
+    }
+
+    /* CARD DE PRODUTO PREMIUM */
+    .prod-card {
+      background: white; border-radius: 20px; overflow: hidden;
+      border: 1px solid #f0f0f0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative; display: flex; flex-direction: column; height: 100%;
+    }
+    .prod-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: transparent;
+    }
+
+    /* Imagem */
+    .prod-img-wrap {
+      position: relative; padding-top: 100%; /* Quadrado Perfeito */
+      background: #f8f9fa; overflow: hidden;
+    }
+    .prod-img {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; transition: transform 0.6s ease;
+    }
+    .prod-card:hover .prod-img { transform: scale(1.08); }
+
+    /* Badges */
+    .badge-float {
+      position: absolute; top: 10px; z-index: 2;
+      padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .badge-vip { left: 10px; background: #000; color: #FFD700; border: 1px solid #FFD700; }
+    .badge-sale { right: 10px; background: var(--k-red); color: white; }
+
+    /* Conteúdo do Card */
+    .prod-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+    
+    .prod-vendor { font-size: 0.75rem; color: #888; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+    .prod-vendor i { color: var(--k-black); }
+    
+    .prod-title {
+      font-size: 1rem; font-weight: 700; color: var(--k-black); margin-bottom: 8px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      text-decoration: none; line-height: 1.3;
+    }
+    .prod-title:hover { color: var(--k-red); }
+
+    .prod-rating { font-size: 0.7rem; color: #FFC107; margin-bottom: 10px; display: flex; align-items: center; gap: 2px; }
+    
+    .prod-price-box { margin-top: auto; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+    .prod-price { font-size: 1.1rem; font-weight: 800; color: var(--k-black); }
+    .prod-old-price { font-size: 0.8rem; text-decoration: line-through; color: #ccc; }
+    .economy-tag { font-size: 0.6rem; color: #10B981; font-weight: 700; background: #E8FDF0; padding: 2px 6px; border-radius: 4px; }
+
+    /* Botão Adicionar */
+    .btn-add-cart {
+      width: 100%; padding: 10px; border-radius: 12px;
+      background: var(--k-black); color: white; font-weight: 600; border: none;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: 0.2s; font-size: 0.9rem;
+    }
+    .btn-add-cart:hover { background: #333; transform: scale(1.02); }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      background: white; border-radius: 24px; border: 2px dashed #eee;
+    }
+    .empty-icon { font-size: 3rem; color: #eee; margin-bottom: 20px; }
+
+    /* =========================================
+       MOBILE OPTIMIZATIONS (MATRIX 3x3)
+       ========================================= */
+    @media (max-width: 991px) {
+      .page-header { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+      .page-title { font-size: 1.5rem; }
+      
+      .filter-sidebar { margin-bottom: 30px; padding: 20px; } /* Sidebar vira bloco normal no mobile */
+      
+      /* A MÁGICA 3x3 */
+      .products-grid-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      /* Card Miniatura Mobile */
+      .prod-card { border-radius: 12px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+      .prod-body { padding: 8px; }
+      
+      .prod-vendor, .prod-rating { display: none; } /* Esconde info secundária */
+      
+      .prod-title {
+        font-size: 0.7rem; line-height: 1.1; margin-bottom: 4px;
+        height: 2.2em; /* Altura fixa */
+      }
+      
+      .prod-price-box { margin-bottom: 6px; gap: 2px; }
+      .prod-price { font-size: 0.8rem; }
+      .prod-old-price, .economy-tag { display: none; } /* Apenas preço final */
+      
+      /* Botão Vira Ícone Redondo */
+      .btn-add-cart {
+        width: 28px; height: 28px; border-radius: 50%; padding: 0;
+        position: absolute; bottom: 6px; right: 6px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        background: var(--k-black); z-index: 5;
+      }
+      .btn-add-cart span { display: none; } /* Esconde texto */
+      .btn-add-cart i { font-size: 0.75rem; margin: 0; }
+      
+      /* Badges Menores */
+      .badge-float { font-size: 0.5rem; padding: 2px 5px; top: 5px; }
+      .badge-vip { left: 5px; } .badge-sale { right: 5px; }
+    }
+  </style>
+
+<div class="container py-4 pb-5">
+  
+  <!-- Header -->
+  <div class="page-header fade-in">
+    <h1 class="page-title">Explorar Produtos</h1>
+    <span class="results-count"><%= produtos.length %> resultados</span>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Sidebar de Filtros -->
+    <div class="col-lg-3">
+      <div class="filter-sidebar fade-in" style="animation-delay: 0.1s;">
+        <h5 class="fw-bold mb-4"><i class="fas fa-sliders-h me-2"></i>Filtros</h5>
+        
+        <form method="GET" action="/produtos" id="filterForm">
+          
+          <!-- Busca -->
+          <div class="filter-group">
+            <label class="filter-label" for="busca">Buscar</label>
+            <div class="search-wrapper">
+              <input type="text" class="custom-field" id="busca" name="busca" 
+                     value="<%= filtros.busca || '' %>" placeholder="Ex: iPhone, Tênis...">
+              <i class="fas fa-search search-icon"></i>
+            </div>
+          </div>
+
+          <!-- Categoria -->
+          <div class="filter-group">
+            <label class="filter-label" for="categoria">Categoria</label>
+            <select class="custom-field" id="categoria" name="categoria" onchange="this.form.submit()">
+              <option value="">Todas</option>
+              <% categorias.forEach(cat => { %>
+                <option value="<%= cat.id %>" <%= filtros.categoria == cat.id ? 'selected' : '' %>>
+                  <%= cat.nome %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <!-- Ordenação -->
+          <div class="filter-group">
+            <label class="filter-label" for="ordenar">Ordenar</label>
+            <select class="custom-field" id="ordenar" name="ordenar" onchange="this.form.submit()">
+              <option value="" <%= !filtros.ordenar ? 'selected' : '' %>>Recentes</option>
+              <option value="preco_asc" <%= filtros.ordenar === 'preco_asc' ? 'selected' : '' %>>Menor Preço</option>
+              <option value="preco_desc" <%= filtros.ordenar === 'preco_desc' ? 'selected' : '' %>>Maior Preço</option>
+              <option value="nome" <%= filtros.ordenar === 'nome' ? 'selected' : '' %>>Nome (A-Z)</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold py-2 mt-2">
+            Aplicar Filtros
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Grid de Resultados -->
+    <div class="col-lg-9">
+      
+      <% if (produtos.length === 0) { %>
+        <!-- Empty State -->
+        <div class="empty-state fade-in">
+          <i class="fas fa-search empty-icon"></i>
+          <h4 class="fw-bold text-muted">Nada encontrado</h4>
+          <p class="text-muted mb-4">Tente usar palavras-chave diferentes ou remova os filtros.</p>
+          <a href="/produtos" class="btn btn-outline-dark rounded-pill px-4">Limpar Filtros</a>
+        </div>
+      <% } else { %>
+        
+        <!-- Grid de Produtos -->
+        <div class="products-grid-container">
+          <% produtos.forEach((produto, index) => { 
+             const preco = Number(produto.preco) || 0;
+             const promo = Number(produto.preco_promocional) || 0;
+             const temPromo = promo > 0;
+             const economia = temPromo ? Math.round(((preco - promo) / preco) * 100) : 0;
+          %>
+            <div class="prod-card fade-in" style="animation-delay: <%= index * 0.05 %>s;">
+              
+              <!-- Badges -->
+              <% if (produto.vip) { %>
+                <span class="badge-float badge-vip">VIP</span>
+              <% } %>
+              
+              <% if (temPromo) { %>
+                <span class="badge-float badge-sale">-<%= economia %>%</span>
+              <% } %>
+
+              <!-- Imagem -->
+              <a href="/produto/<%= produto.id %>" class="prod-img-wrap">
+                <% if (produto.imagem1) { %>
+                  <img src="/uploads/produtos/<%= produto.imagem1 %>" 
+                       alt="<%= produto.nome %>" 
+                       class="prod-img" loading="lazy">
+                <% } else { %>
+                  <div class="prod-img d-flex align-items-center justify-content-center bg-light text-muted">
+                    <i class="fas fa-image fa-2x"></i>
+                  </div>
+                <% } %>
+              </a>
+
+              <!-- Corpo -->
+              <div class="prod-body">
+                
+                <!-- Vendor -->
+                <a href="/loja/<%= produto.vendedor_id %>" class="prod-vendor text-decoration-none">
+                  <i class="fas fa-store"></i> <%= produto.nome_loja || 'Loja' %>
+                </a>
+
+                <!-- Título -->
+                <a href="/produto/<%= produto.id %>" class="prod-title" title="<%= produto.nome %>">
+                  <%= produto.nome %>
+                </a>
+
+                <!-- Rating -->
+                <% if (produto.media_classificacao) { %>
+                  <div class="prod-rating">
+                    <% const stars = Math.round(Number(produto.media_classificacao)); %>
+                    <% for(let i=0; i<5; i++) { %>
+                       <i class="<%= i < stars ? 'fas' : 'far' %> fa-star"></i>
+                    <% } %>
+                    <span class="text-muted ms-1">(<%= produto.total_avaliacoes %>)</span>
+                  </div>
+                <% } %>
+
+                <!-- Preço -->
+                <div class="prod-price-box">
+                  <span class="prod-price"><%= (temPromo ? promo : preco).toLocaleString('pt-AO') %> Kz</span>
+                  <% if (temPromo) { %>
+                    <span class="prod-old-price"><%= preco.toLocaleString('pt-AO') %></span>
+                  <% } %>
+                </div>
+
+                <!-- Botão Add -->
+                <button class="btn-add-cart" 
+                        onclick="addToCart(<%= produto.id %>, '<%= produto.nome.replace(/'/g, "\\'") %>', <%= temPromo ? promo : preco %>)">
+                  <i class="fas fa-shopping-bag"></i>
+                  <span>Adicionar</span>
+                </button>
+
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Scripts Lógicos (Mantendo a funcionalidade existente)
+  
+  // 1. Busca no Enter
+  const buscaInput = document.getElementById('busca');
+  if (buscaInput) {
+    buscaInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('filterForm').submit();
+      }
+    });
+  }
+
+  // 2. Animação de Entrada (Intersection Observer)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    observer.observe(el);
+  });
+
+  // 3. Função Adicionar ao Carrinho (Com Feedback Visual Premium)
+  function addToCart(produtoId, produtoNome) {
+    const btn = event.target.closest('button');
+    const originalContent = btn.innerHTML;
+    
+    // Estado Loading
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+    
+    fetch('/carrinho/adicionar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `produto_id=${produtoId}&quantidade=1`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Sucesso: Botão Verde
+        btn.style.backgroundColor = '#10B981';
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        
+        // Atualiza Badges Globalmente
+        if(window.CartManager) window.CartManager.updateCount();
+        
+        // Show Global Toast
+        showGlobalToast(produtoNome, 'success');
+        
+        // Reset Botão
+        setTimeout(() => {
+          btn.style.backgroundColor = '';
+          btn.innerHTML = originalContent;
+          btn.disabled = false;
+        }, 1500);
+      } else {
+        // Erro
+        showGlobalToast(data.message || 'Erro ao adicionar', 'error');
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      showGlobalToast('Erro de conexão', 'error');
+      btn.innerHTML = originalContent;
+      btn.disabled = false;
+    });
+  }
+
+  // Toast Helper
+  function showGlobalToast(msg, type) {
+    const container = document.querySelector('.toast-container') || document.body;
+    const div = document.createElement('div');
+    const color = type === 'success' ? '#10B981' : '#EF4444';
+    
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        background: ${color}; color: white; padding: 12px 20px;
+        border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        font-weight: 600; display: flex; align-items: center; gap: 10px;
+        animation: slideInToast 0.3s ease forwards;
+    `;
+    div.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+    
+    container.appendChild(div);
+    setTimeout(() => {
+        div.style.animation = 'fadeOutToast 0.3s ease forwards';
+        setTimeout(() => div.remove(), 300);
+    }, 3000);
+  }
+
+  // Styles dinâmicos para Toast Animation
+  const styleSheet = document.createElement("style");
+  styleSheet.innerText = `
+    @keyframes slideInToast { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-10px); } }
+  `;
+  document.head.appendChild(styleSheet);
+</script>

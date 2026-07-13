@@ -1,0 +1,335 @@
+
+  <style>
+    /* =========================================
+       KUANDA BANNER MANAGER CSS
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --card-radius: 20px;
+      --bg-soft: #F9FAFB;
+    }
+
+    body { background-color: var(--bg-soft); }
+
+    /* 1. HEADER */
+    .manager-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 40px; flex-wrap: wrap; gap: 20px;
+    }
+    .page-title {
+      font-weight: 800; color: var(--k-black); margin: 0; font-size: 2rem;
+      letter-spacing: -1px; display: flex; align-items: center; gap: 12px;
+    }
+    .badge-count {
+      background: #eee; color: #666; font-size: 0.9rem; padding: 5px 12px;
+      border-radius: 20px; font-weight: 700;
+    }
+
+    .header-actions { display: flex; gap: 10px; }
+    
+    .btn-create {
+      background: var(--k-black); color: white; border: none;
+      padding: 12px 25px; border-radius: 50px; font-weight: 700;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s;
+      text-decoration: none; display: flex; align-items: center; gap: 8px;
+    }
+    .btn-create:hover { transform: translateY(-3px); background: #333; color: white; }
+    
+    .btn-back {
+      background: white; border: 1px solid #ddd; color: #555;
+      padding: 12px 20px; border-radius: 50px; font-weight: 600;
+      transition: 0.3s; text-decoration: none;
+    }
+    .btn-back:hover { background: #f5f5f5; color: var(--k-black); }
+
+    /* 2. GRID DE BANNERS */
+    .banners-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .banner-card {
+      background: white; border-radius: var(--card-radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03);
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: all 0.3s ease; position: relative;
+    }
+    .banner-card:hover {
+      transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+
+    /* Imagem (Preview) */
+    .banner-preview {
+      height: 200px; width: 100%; position: relative; overflow: hidden;
+      background: #f0f0f0;
+    }
+    .banner-preview img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;
+    }
+    .banner-card:hover .banner-preview img { transform: scale(1.05); }
+
+    /* Badges Sobrepostos */
+    .order-tag {
+      position: absolute; top: 15px; left: 15px;
+      background: rgba(0,0,0,0.7); color: white; backdrop-filter: blur(5px);
+      padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 0.75rem;
+      z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .status-pill {
+      position: absolute; top: 15px; right: 15px;
+      padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800;
+      text-transform: uppercase; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .st-active { background: #E8F5E9; color: #2E7D32; border: 1px solid #2E7D32; }
+    .st-inactive { background: #FFEBEE; color: #C62828; border: 1px solid #C62828; }
+
+    /* Corpo */
+    .banner-body { padding: 20px; flex-grow: 1; }
+    .banner-title {
+      font-size: 1.1rem; font-weight: 800; color: var(--k-black); margin-bottom: 8px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    
+    .banner-link {
+      font-size: 0.85rem; color: #666; margin-bottom: 15px;
+      display: flex; align-items: center; gap: 6px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .banner-link i { color: #aaa; }
+    .banner-link a { color: #666; text-decoration: none; transition: 0.2s; }
+    .banner-link a:hover { color: var(--k-red); }
+
+    .banner-meta { font-size: 0.75rem; color: #999; font-weight: 500; }
+
+    /* Footer de Ações */
+    .banner-footer {
+      padding: 15px 20px; border-top: 1px solid #f0f0f0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #FAFAFA;
+    }
+
+    .action-btn {
+      width: 38px; height: 38px; border-radius: 10px; border: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.2s; cursor: pointer; color: #555; text-decoration: none;
+    }
+    
+    .btn-toggle { background: white; border: 1px solid #ddd; }
+    .btn-toggle:hover { background: #333; color: white; border-color: #333; }
+    .btn-toggle.active-state { color: #2E7D32; border-color: #2E7D32; }
+    .btn-toggle.active-state:hover { background: #C62828; color: white; border-color: #C62828; } /* Hover vira desativar */
+
+    .btn-edit { background: #E3F2FD; color: #1976D2; }
+    .btn-edit:hover { background: #1976D2; color: white; }
+    
+    .btn-del { background: #FFEBEE; color: #C62828; }
+    .btn-del:hover { background: #C62828; color: white; }
+
+    /* Empty State */
+    .empty-banners {
+      text-align: center; padding: 80px 20px;
+      background: white; border-radius: var(--card-radius); border: 2px dashed #eee;
+    }
+    .empty-icon { font-size: 4rem; color: #eee; margin-bottom: 20px; }
+
+    /* Animations */
+    .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+<div class="container py-4">
+  
+  <!-- 1. HEADER -->
+  <div class="manager-header fade-up">
+    <h2 class="page-title">
+        <i class="fas fa-images text-warning"></i> Gerenciar Banners
+        <span class="badge-count"><%= banners.length %></span>
+    </h2>
+    <div class="header-actions">
+      <a href="/admin" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </a>
+      <a href="/admin/banners/novo" class="btn-create">
+        <i class="fas fa-plus"></i> Novo Banner
+      </a>
+    </div>
+  </div>
+
+  <% if (banners.length === 0) { %>
+    <!-- EMPTY STATE -->
+    <div class="empty-banners fade-up" style="animation-delay: 0.1s;">
+        <i class="far fa-images empty-icon"></i>
+        <h3 class="fw-bold text-muted">Galeria Vazia</h3>
+        <p class="text-muted mb-4">Adicione banners para destacar promoções na página inicial.</p>
+        <a href="/admin/banners/novo" class="btn-create d-inline-flex">
+            Criar Primeiro Banner
+        </a>
+    </div>
+  <% } else { %>
+    
+    <!-- GRID DE BANNERS -->
+    <div class="banners-grid">
+      <% banners.forEach((banner, index) => { %>
+        <div class="banner-card fade-up" style="animation-delay: <%= index * 0.1 %>s;">
+            
+            <!-- Imagem e Badges -->
+            <div class="banner-preview">
+                <img src="/uploads/banners/<%= banner.imagem %>" alt="<%= banner.titulo %>" onerror="this.src='https://via.placeholder.com/400x200?text=Erro+Imagem'">
+                
+                <div class="order-tag"><i class="fas fa-sort-numeric-down"></i> <%= banner.ordem %></div>
+                
+                <div class="status-pill <%= banner.ativo ? 'st-active' : 'st-inactive' %>" id="badge-<%= banner.id %>">
+                    <%= banner.ativo ? 'Ativo' : 'Inativo' %>
+                </div>
+            </div>
+
+            <!-- Corpo -->
+            <div class="banner-body">
+                <h5 class="banner-title" title="<%= banner.titulo %>"><%= banner.titulo || 'Sem Título' %></h5>
+                
+                <% if (banner.link) { %>
+                    <div class="banner-link" title="<%= banner.link %>">
+                        <i class="fas fa-link"></i>
+                        <a href="<%= banner.link %>" target="_blank"><%= banner.link %></a>
+                    </div>
+                <% } else { %>
+                    <div class="banner-link text-muted"><i class="fas fa-unlink"></i> Sem link</div>
+                <% } %>
+
+                <div class="banner-meta">
+                    <i class="far fa-calendar-alt me-1"></i> 
+                    <%= new Date(banner.created_at).toLocaleDateString('pt-BR') %>
+                </div>
+            </div>
+
+            <!-- Footer Ações -->
+            <div class="banner-footer">
+                <!-- Toggle Status -->
+                <form action="/admin/banners/<%= banner.id %>/toggle-status" method="POST" class="status-form m-0" data-id="<%= banner.id %>">
+                    <button type="submit" class="action-btn btn-toggle <%= banner.ativo ? 'active-state' : '' %>" 
+                            title="<%= banner.ativo ? 'Desativar' : 'Ativar' %>">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </form>
+
+                <div class="d-flex gap-2">
+                    <a href="/admin/banners/<%= banner.id %>/editar" class="action-btn btn-edit" title="Editar">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    
+                    <form action="/admin/banners/<%= banner.id %>/excluir" method="POST" class="delete-form m-0">
+                        <button type="submit" class="action-btn btn-del" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+</div>
+
+<script>
+  // 1. Lógica de Toggle Status com AJAX e Feedback Visual
+  document.querySelectorAll('.status-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const btn = this.querySelector('button');
+      const id = this.getAttribute('data-id');
+      const badge = document.getElementById(`badge-${id}`);
+      
+      // Animação de carregamento
+      const originalIcon = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ _method: 'POST' }) // Compatibilidade
+        });
+
+        if (response.ok) {
+          // Inverter visualmente o estado
+          const isNowActive = !btn.classList.contains('active-state');
+          
+          if (isNowActive) {
+            btn.classList.add('active-state');
+            btn.title = 'Desativar';
+            badge.className = 'status-pill st-active';
+            badge.textContent = 'Ativo';
+            showToast('Banner ativado com sucesso!', 'success');
+          } else {
+            btn.classList.remove('active-state');
+            btn.title = 'Ativar';
+            badge.className = 'status-pill st-inactive';
+            badge.textContent = 'Inativo';
+            showToast('Banner desativado.', 'warning');
+          }
+        } else {
+          throw new Error('Falha na resposta');
+        }
+      } catch (error) {
+        console.error(error);
+        showToast('Erro ao alterar status.', 'error');
+      } finally {
+        btn.innerHTML = '<i class="fas fa-power-off"></i>';
+        btn.disabled = false;
+      }
+    });
+  });
+
+  // 2. Confirmação de Exclusão
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (!confirm('Tem certeza absoluta? O banner será removido permanentemente.')) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  // 3. Sistema de Toast (Notificações)
+  function showToast(msg, type) {
+    // Cores
+    const colors = {
+        'success': '#10B981', // Verde
+        'warning': '#F59E0B', // Laranja
+        'error': '#EF4444'    // Vermelho
+    };
+    const color = colors[type] || '#333';
+
+    // Criar elemento
+    const div = document.createElement('div');
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        background: ${color}; color: white; padding: 12px 25px;
+        border-radius: 12px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease;
+    `;
+    div.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-times-circle':'fa-info-circle'}"></i> ${msg}`;
+    
+    document.body.appendChild(div);
+    
+    // Remover após 3s
+    setTimeout(() => {
+        div.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => div.remove(), 300);
+    }, 3000);
+  }
+
+  // Keyframes
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideOut { from{transform:translateX(0);opacity:1} to{transform:translateX(100%);opacity:0} }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  `;
+  document.head.appendChild(style);
+</script>

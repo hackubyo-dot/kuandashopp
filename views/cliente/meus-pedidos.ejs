@@ -1,0 +1,302 @@
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+        --app-bg: #F2F4F7;
+        --app-surface: #ffffff;
+        --app-accent: #007AFF;
+        --app-text: #1C1C1E;
+        --app-text-dim: #8E8E93;
+        --app-radius: 28px;
+        --app-shadow: 0 12px 30px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    /* Reset Global do App */
+    .app-viewport {
+        background-color: var(--app-bg);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--app-text);
+        min-height: 100vh;
+        padding-bottom: 60px;
+        overflow-x: hidden;
+    }
+
+    .app-viewport a { text-decoration: none !important; color: inherit; transition: 0.3s; }
+
+    /* 1. APP LAUNCHER HEADER */
+    .app-launcher {
+        padding: 50px 20px 30px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .launcher-icon-main {
+        width: 85px;
+        height: 85px;
+        background: var(--app-surface);
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--app-shadow);
+        margin-bottom: 15px;
+        border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .app-title {
+        font-weight: 800;
+        font-size: 2rem;
+        letter-spacing: -1px;
+        margin-bottom: 5px;
+    }
+
+    /* 2. BANNER CAROUSEL INTEGRADO */
+    .hero-container {
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        padding: 0 20px;
+    }
+
+    .hero-carousel-wrap {
+        border-radius: var(--app-radius);
+        overflow: hidden;
+        box-shadow: var(--app-shadow);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .hero-img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* 3. GRID DE PEDIDOS MATRIZ 3x3 */
+    .orders-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .section-label {
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        padding-left: 5px;
+        display: block;
+    }
+
+    .order-card-lux {
+        background: var(--app-surface);
+        border-radius: var(--app-radius);
+        padding: 24px;
+        border: 1px solid rgba(0,0,0,0.02);
+        box-shadow: var(--app-shadow);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .order-card-lux:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+    }
+
+    .shop-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .shop-logo-3d {
+        width: 48px;
+        height: 48px;
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+    }
+
+    .shop-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+    }
+
+    .status-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-bottom: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .st-pendente { background: #FFF9E6; color: #D97706; }
+    .st-confirmado { background: #E0F2FE; color: #0284C7; }
+    .st-entregue { background: #F0FDF4; color: #16A34A; }
+    .st-cancelado { background: #FEF2F2; color: #DC2626; }
+
+    .price-value {
+        font-weight: 900;
+        font-size: 1.4rem;
+        margin-top: auto;
+        color: var(--app-text);
+        letter-spacing: -0.5px;
+    }
+
+    .btn-app-action {
+        margin-top: 15px;
+        background: #F2F2F7;
+        padding: 14px;
+        border-radius: 18px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--app-text);
+    }
+
+    .btn-app-action:hover {
+        background: var(--app-accent);
+        color: white;
+    }
+
+    /* 4. RESPONSIVIDADE MOBILE 3X3 MATRIZ */
+    @media (max-width: 768px) {
+        .hero-img { height: 180px; }
+        .app-launcher { padding: 40px 10px 20px; }
+        .app-title { font-size: 1.5rem; }
+        .launcher-icon-main { width: 65px; height: 65px; border-radius: 20px; }
+        .launcher-icon-main img { width: 40px; }
+
+        .orders-grid-matriz {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 10px !important;
+        }
+
+        .order-card-lux {
+            padding: 12px 8px;
+            border-radius: 20px;
+            min-height: 220px;
+            text-align: center;
+        }
+
+        .shop-brand { flex-direction: column; gap: 6px; }
+        .shop-logo-3d { width: 35px; height: 35px; }
+        .shop-name { font-size: 0.65rem; white-space: normal; line-height: 1.2; height: 32px; overflow: hidden; }
+
+        .status-badge { font-size: 0.5rem; padding: 4px 2px; width: 100%; border-radius: 8px; }
+        .price-value { font-size: 0.85rem; }
+        .btn-app-action { font-size: 0.6rem; padding: 8px 2px; border-radius: 12px; }
+    }
+</style>
+
+<div class="app-viewport">
+
+    <div class="hero-container">
+  <div class="hero-carousel-wrap">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+      <div class="carousel-inner">
+
+        <!-- BANNER 1 -->
+        <div class="carousel-item active" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/filme/14" target="_blank">
+            <img
+              src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767361160596-862867324.webp"
+              class="hero-img w-100"
+              alt="Banner 1"
+            >
+          </a>
+        </div>
+
+        <!-- BANNER 2 -->
+        <div class="carousel-item" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/game/12" target="_blank">
+            <img
+              src="https://i.ytimg.com/vi/J-EHvQ7HgUM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBw-3r8GaFvFTtsTsq3n85_K2d8rQ"
+              class="hero-img w-100"
+              alt="Banner 2"
+            >
+          </a>
+        </div>
+
+        <!-- BANNER 3 -->
+        <div class="carousel-item" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/produto/7" target="_blank">
+            <img
+              src="/images/site.jpg"
+              class="hero-img w-100"
+              alt="Banner 3"
+            >
+          </a>
+        </div>
+
+        <!-- BANNER 4 -->
+        <div class="carousel-item" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/filme/2" target="_blank">
+            <img
+              src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767379440078-175525311.jpeg"
+              class="hero-img w-100"
+              alt="Banner 4"
+            >
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    <main class="orders-section">
+        <span class="section-label">Histórico Recente</span>
+
+        <% if (pedidos.length === 0) { %>
+            <div class="text-center py-5 bg-white rounded-5 shadow-sm">
+                <img src="https://img.icons8.com/3d-fluency/188/empty-box.png" width="120" alt="">
+                <h4 class="fw-800 mt-4">Tudo limpo por aqui</h4>
+                <p class="text-muted">Você ainda não possui pedidos registrados.</p>
+                <a href="/produtos" class="btn btn-primary rounded-pill px-5 py-3 mt-3 fw-bold">Começar agora</a>
+            </div>
+        <% } else { %>
+            <div class="row orders-grid-matriz g-4">
+                <% pedidos.forEach(pedido => { %>
+                    <div class="col-md-4 col-lg-3">
+                        <div class="order-card-lux">
+                            <div class="shop-brand">
+                                <img src="https://img.icons8.com/3d-fluency/94/shop.png" class="shop-logo-3d" alt="Loja">
+                                <span class="shop-name"><%= pedido.nome_loja %></span>
+                            </div>
+
+                            <% 
+                                let statusClass = 'st-pendente';
+                                if(pedido.status === 'confirmado') statusClass = 'st-confirmado';
+                                if(pedido.status === 'entregue') statusClass = 'st-entregue';
+                                if(pedido.status === 'cancelado') statusClass = 'st-cancelado';
+                            %>
+                            <div>
+                                <span class="status-badge <%= statusClass %>"><%= pedido.status %></span>
+                            </div>
+
+                            <div class="price-value">
+                                <%= parseFloat(pedido.total).toLocaleString() %> <small style="font-size: 0.7rem; opacity: 0.5;">Kz</small>
+                            </div>
+
+                            <a href="/meu-pedido/<%= pedido.id %>" class="btn-app-action">
+                                GERENCIAR
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

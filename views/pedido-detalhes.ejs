@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido #<%= pedido.codigo || pedido.id %> | KuandaShop</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.png">
+  <link rel="shortcut icon" href="/image/png" type="/images/logo.png">
+
+
+    <style>
+        :root {
+            --bg: #F2F4F7;
+            --surface: #FFFFFF;
+            --text-main: #1A1A1B;
+            --text-dim: #8E8E93;
+            --radius-app: 24px;
+            --shadow-app: 0 12px 30px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            --success: #34C759;
+            --accent: #E31C25;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            padding-bottom: 80px;
+        }
+
+        a { text-decoration: none !important; color: inherit; }
+
+        /* HEADER */
+        .app-launcher-header { padding: 30px 0 20px; text-align: center; }
+        .launcher-icon {
+            width: 60px; height: 60px; background: var(--surface); border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-app); margin: 0 auto 15px; transition: transform 0.2s;
+        }
+        .launcher-icon:active { transform: scale(0.95); }
+
+        /* CAROUSEL */
+        .hero-container { max-width: 1200px; margin: 0 auto 25px; padding: 0 15px; }
+        .hero-carousel-wrap {
+            border-radius: var(--radius-app); overflow: hidden;
+            box-shadow: var(--shadow-app); border: 2px solid white;
+        }
+        .hero-img { width: 100%; height: 200px; object-fit: cover; }
+        @media(min-width: 768px) { .hero-img { height: 320px; } }
+
+        /* TRACKING */
+        .track-card {
+            background: var(--surface); border-radius: var(--radius-app);
+            padding: 25px; box-shadow: var(--shadow-app); margin-bottom: 20px;
+        }
+        .pro-track { display: flex; justify-content: space-between; position: relative; margin-top: 20px; }
+        .pro-track::before {
+            content: ''; position: absolute; top: 20px; left: 10%; width: 80%; height: 2px;
+            background: #E2E8F0; z-index: 1;
+        }
+        .track-item { position: relative; z-index: 2; text-align: center; width: 25%; }
+        .track-dot {
+            width: 40px; height: 40px; background: white; border: 3px solid #E2E8F0;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 8px; color: #CBD5E1; transition: 0.3s;
+        }
+        .track-item.active .track-dot { border-color: var(--success); background: #DCFCE7; color: var(--success); }
+        .track-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); }
+        .track-item.active .track-label { color: var(--text-main); }
+
+        /* ITENS GRID (MOBILE) & TABLE (DESKTOP) */
+        .glass-card {
+            background: var(--surface); border-radius: var(--radius-app);
+            box-shadow: var(--shadow-app); overflow: hidden; margin-bottom: 20px;
+        }
+        .card-title-bar {
+            padding: 15px 20px; background: #FAFAFA; border-bottom: 1px solid #F1F5F9;
+            font-weight: 800; display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+        }
+
+        /* Mobile Matrix 3x3 */
+        .items-matrix-mobile {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px;
+        }
+        .item-tile {
+            background: #F8FAFC; padding: 8px; border-radius: 16px;
+            text-align: center; border: 1px solid #F1F5F9;
+        }
+        .tile-img {
+            width: 100%; aspect-ratio: 1/1; object-fit: cover;
+            border-radius: 10px; margin-bottom: 6px; background: white;
+        }
+        .tile-name {
+            font-size: 0.65rem; font-weight: 700; display: block;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tile-price { font-size: 0.7rem; font-weight: 800; color: var(--accent); }
+
+        /* Desktop Table */
+        .desktop-table { display: none; }
+        @media(min-width: 768px) {
+            .items-matrix-mobile { display: none; }
+            .desktop-table { display: block; }
+        }
+
+        /* INFO PANELS */
+        .info-panel {
+            background: white; border-radius: var(--radius-app); padding: 20px;
+            margin-bottom: 15px; box-shadow: var(--shadow-app);
+        }
+        .btn-whatsapp {
+            background: #25D366; color: white; width: 100%; padding: 12px;
+            border-radius: 50px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); transition: 0.3s;
+        }
+        .btn-whatsapp:hover { background: #1ebc57; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER -->
+    <header class="app-launcher-header">
+        <a href="/">
+            <div class="launcher-icon">
+                <i class="fas fa-home fa-lg text-dark"></i>
+            </div>
+        </a>
+        <h4 class="fw-800 m-0">Pedido #<%= pedido.codigo || pedido.id %></h4>
+        <small class="text-muted fw-600">Detalhes da Transação</small>
+    </header>
+
+    <!-- 2. CAROUSEL -->
+    <div class="hero-container">
+        <div class="hero-carousel-wrap">
+            <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active" data-bs-interval="4000">
+                        <img src="/images/site.jpg" class="hero-img" alt="Banner" onerror="this.src='https://placehold.co/800x400?text=KuandaShop'">
+                    </div>
+                    <div class="carousel-item" data-bs-interval="4000">
+                        <img src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767361160596-862867324.webp" class="hero-img" alt="Banner 2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row g-4">
+            
+            <!-- COLUNA ESQUERDA (RASTREIO E ITENS) -->
+            <div class="col-lg-8">
+                
+                <!-- RASTREAMENTO -->
+                <% if (pedido.status !== 'cancelado') { %>
+                    <div class="track-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-uppercase fw-800 text-muted small">Status</span>
+                            <span class="badge bg-dark rounded-pill"><%= pedido.status.toUpperCase() %></span>
+                        </div>
+                        
+                        <% 
+                            let s1='', s2='', s3='', s4='';
+                            const st = pedido.status;
+                            if(['pendente', 'confirmado', 'enviado', 'entregue'].includes(st)) s1='active';
+                            if(['confirmado', 'enviado', 'entregue'].includes(st)) s2='active';
+                            if(['enviado', 'entregue'].includes(st)) s3='active';
+                            if(['entregue'].includes(st)) s4='active';
+                        %>
+                        <div class="pro-track">
+                            <div class="track-item <%= s1 %>">
+                                <div class="track-dot"><i class="fas fa-file-alt"></i></div>
+                                <span class="track-label">Pedido</span>
+                            </div>
+                            <div class="track-item <%= s2 %>">
+                                <div class="track-dot"><i class="fas fa-box-open"></i></div>
+                                <span class="track-label">Preparo</span>
+                            </div>
+                            <div class="track-item <%= s3 %>">
+                                <div class="track-dot"><i class="fas fa-truck"></i></div>
+                                <span class="track-label">Caminho</span>
+                            </div>
+                            <div class="track-item <%= s4 %>">
+                                <div class="track-dot"><i class="fas fa-flag-checkered"></i></div>
+                                <span class="track-label">Entregue</span>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="alert alert-danger fw-bold text-center rounded-4 shadow-sm mb-4">
+                        <i class="fas fa-times-circle me-2"></i> Este pedido foi cancelado.
+                    </div>
+                <% } %>
+
+                <!-- LISTA DE ITENS -->
+                <div class="glass-card">
+                    <div class="card-title-bar">
+                        <i class="fas fa-shopping-basket text-primary"></i> Itens do Pedido
+                    </div>
+
+                    <!-- Matriz Mobile (3x3) -->
+                    <div class="items-matrix-mobile">
+                        <% itens.forEach(item => { %>
+                            <div class="item-tile">
+                                <img src="/uploads/produtos/<%= item.imagem1 %>" class="tile-img" onerror="this.src='https://placehold.co/150?text=Produto'">
+                                <span class="tile-name"><%= item.produto_nome %></span>
+                                <span class="tile-price"><%= parseFloat(item.preco_unitario).toLocaleString() %> Kz</span>
+                                <small class="d-block text-muted" style="font-size: 0.6rem;">x<%= item.quantidade %></small>
+                            </div>
+                        <% }) %>
+                    </div>
+
+                    <!-- Tabela Desktop -->
+                    <div class="desktop-table table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="text-uppercase small fw-bold text-muted">
+                                    <th class="ps-4 py-3">Produto</th>
+                                    <th class="text-center">Qtd</th>
+                                    <th class="text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% itens.forEach(item => { %>
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <img src="/uploads/produtos/<%= item.imagem1 %>" width="50" height="50" class="rounded-3 border object-fit-cover" onerror="this.src='https://placehold.co/50'">
+                                                <div class="fw-700 text-dark"><%= item.produto_nome %></div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center fw-700">x<%= item.quantidade %></td>
+                                        <td class="text-end pe-4 fw-800 text-danger">
+                                            <%= (item.preco_unitario * item.quantidade).toLocaleString() %> Kz
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="p-4 bg-dark text-white d-flex justify-content-between align-items-center">
+                        <span class="opacity-75 small text-uppercase fw-bold">Total Geral</span>
+                        <h4 class="mb-0 fw-900"><%= parseFloat(pedido.total).toLocaleString() %> Kz</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUNA DIREITA (INFORMAÇÕES) -->
+            <div class="col-lg-4">
+                
+                <!-- Vendedor -->
+                <div class="info-panel text-center">
+                    <small class="text-uppercase fw-800 text-muted mb-3 d-block">Vendido por</small>
+                    
+                    <div class="mx-auto mb-3" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 3px solid #f8f9fa;">
+                        <img src="<%= pedido.loja_foto ? '/uploads/perfil/' + pedido.loja_foto : 'https://img.icons8.com/3d-fluency/94/shop.png' %>" 
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    
+                    <h5 class="fw-800 mb-1"><%= pedido.nome_loja || 'Loja Kuanda' %></h5>
+                    <div class="badge bg-light text-dark mb-3 border">Vendedor Verificado</div>
+                    
+                    <% if (pedido.vendedor_telefone) { %>
+                        <a href="https://wa.me/<%= pedido.vendedor_telefone.replace(/\D/g, '') %>?text=Olá, estou entrando em contato sobre o pedido #<%= pedido.codigo || pedido.id %>" 
+                           target="_blank" class="btn-whatsapp">
+                            <i class="fab fa-whatsapp fs-5"></i> Falar no WhatsApp
+                        </a>
+                    <% } %>
+                </div>
+
+                <!-- Endereço -->
+                <div class="info-panel">
+                    <small class="text-uppercase fw-800 text-muted mb-3 d-block">Entrega em</small>
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="bg-light rounded-circle p-2 text-danger">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <div class="fw-700 text-dark" style="font-size: 0.9rem; line-height: 1.4;">
+                                <%= pedido.endereco_entrega || 'Endereço não informado' %>
+                            </div>
+                            <% if(pedido.ponto_referencia) { %>
+                                <small class="text-muted d-block mt-1">Ref: <%= pedido.ponto_referencia %></small>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <% if (pedido.status === 'pendente') { %>
+                    <div class="text-center mt-3">
+                        <form action="/pedido/<%= pedido.id %>/cancelar" method="POST" onsubmit="return confirm('Tem certeza que deseja cancelar este pedido?');">
+                            <button type="submit" class="btn btn-link text-danger text-decoration-none fw-700 small">
+                                <i class="fas fa-trash-alt me-1"></i> Cancelar Pedido
+                            </button>
+                        </form>
+                    </div>
+                <% } %>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

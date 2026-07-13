@@ -1,0 +1,395 @@
+<style>
+  /* ==========================================
+     ESTILOS MODERNOS - GERENCIADOR DE FILMES
+     ========================================== */
+  :root {
+    --card-radius: 12px;
+    --transition-speed: 0.3s;
+    --shadow-soft: 0 5px 15px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Container e Títulos */
+  .page-header {
+    background: #fff;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 2rem;
+    border-left: 5px solid #0d6efd;
+  }
+
+  /* Grid Responsivo (Miniaturizado no Mobile) */
+  .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas no mobile (mini) */
+    gap: 15px;
+  }
+
+  @media (min-width: 768px) {
+    .movie-grid {
+      grid-template-columns: repeat(3, 1fr); /* 3 no tablet */
+      gap: 20px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .movie-grid {
+      grid-template-columns: repeat(4, 1fr); /* 4 no desktop */
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .movie-grid {
+      grid-template-columns: repeat(5, 1fr); /* 5 em telas grandes */
+    }
+  }
+
+  /* Card do Filme */
+  .movie-card {
+    border: none;
+    border-radius: var(--card-radius);
+    background: #fff;
+    transition: all var(--transition-speed) ease;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Área do Poster (Aspect Ratio 2:3) */
+  .poster-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 150%; /* Aspect Ratio 2:3 (padrão de cinema) */
+    background: #f0f2f5;
+    overflow: hidden;
+  }
+
+  .poster-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .movie-card:hover .poster-img {
+    transform: scale(1.05);
+  }
+
+  /* Badges Flutuantes */
+  .floating-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .glass-badge {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  /* Corpo do Card */
+  .card-content {
+    padding: 12px;
+  }
+
+  .movie-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .movie-info {
+    font-size: 0.75rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* Botões de Ação */
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 5px;
+    margin-top: auto;
+  }
+
+  .btn-mini {
+    padding: 6px 0;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  /* Ajustes para Mobile */
+  @media (max-width: 576px) {
+    .movie-title { font-size: 0.9rem; }
+    .action-buttons { grid-template-columns: 1fr; } /* Botões empilhados ou layout adaptado */
+    .btn-icon { width: 100%; margin-top: 2px; }
+  }
+</style>
+
+<div class="container py-4">
+  
+  <!-- Header Moderno -->
+  <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h2 class="mb-0 fw-bold text-dark">
+        <i class="fas fa-clapperboard text-primary me-2"></i>Catálogo de Filmes
+      </h2>
+      <p class="text-muted mb-0 small">Gerencie os títulos disponíveis na plataforma</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/admin" class="btn btn-light border">
+        <i class="fas fa-arrow-left me-2"></i>Voltar
+      </a>
+      <a href="/admin/filmes/novo" class="btn btn-primary shadow-sm">
+        <i class="fas fa-plus me-2"></i>Novo Filme
+      </a>
+    </div>
+  </div>
+
+  <!-- Lista de Filmes -->
+  <% if (filmes.length === 0) { %>
+    <!-- Empty State Moderno -->
+    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+      <div class="mb-3">
+        <div class="bg-light d-inline-block rounded-circle p-4">
+          <i class="fas fa-film fa-3x text-secondary"></i>
+        </div>
+      </div>
+      <h4 class="fw-bold text-dark">Nenhum filme encontrado</h4>
+      <p class="text-muted">Comece adicionando novos títulos ao seu catálogo.</p>
+      <a href="/admin/filmes/novo" class="btn btn-primary px-4 rounded-pill mt-2">
+        Adicionar Filme Agora
+      </a>
+    </div>
+  <% } else { %>
+    
+    <!-- Grid Moderno (2 colunas mobile / 5 colunas desktop) -->
+    <div class="movie-grid">
+      <% filmes.forEach(filme => { %>
+        <!-- Wrapper mantendo a classe 'card' para compatibilidade com o script original -->
+        <div class="movie-card card h-100">
+          
+          <!-- Área do Poster -->
+          <div class="poster-wrapper">
+            <% if (filme.poster) { %>
+              <img src="/uploads/filmes/<%= filme.poster %>" 
+                   alt="<%= filme.titulo %>"
+                   class="poster-img">
+            <% } else { %>
+              <div class="w-100 h-100 bg-dark d-flex align-items-center justify-content-center position-absolute top-0">
+                <i class="fas fa-film fa-2x text-secondary"></i>
+              </div>
+            <% } %>
+
+            <!-- Badges Sobrepostos -->
+            <div class="floating-badges w-100 px-2 pt-2">
+              <!-- Badge Classificação -->
+              <% if (filme.classificacao) { %>
+                <span class="glass-badge bg-warning text-dark border-0">
+                  <%= filme.classificacao %>
+                </span>
+              <% } else { %>
+                 <span></span> <!-- Spacer -->
+              <% } %>
+
+              <!-- Badge Status (Compatível com Script AJAX) -->
+              <span class="badge <%= filme.ativo ? 'bg-success' : 'bg-danger' %> shadow-sm status-badge">
+                <%= filme.ativo ? 'Ativo' : 'Inativo' %>
+              </span>
+            </div>
+          </div>
+          
+          <!-- Conteúdo -->
+          <div class="card-content d-flex flex-column flex-grow-1">
+            <h5 class="movie-title" title="<%= filme.titulo %>">
+              <%= filme.titulo %>
+            </h5>
+            
+            <div class="movie-info">
+              <span><i class="far fa-calendar-alt me-1"></i><%= filme.data_lancamento ? new Date(filme.data_lancamento).getFullYear() : 'N/A' %></span>
+              
+              <% if (filme.trailer_url) { %>
+                <span class="ms-auto">
+                  <a href="<%= filme.trailer_url %>" target="_blank" class="text-danger text-decoration-none small">
+                    <i class="fab fa-youtube"></i> Trailer
+                  </a>
+                </span>
+              <% } %>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div class="action-buttons">
+              <!-- Botão Status (Formulário AJAX) -->
+              <form action="/admin/filmes/<%= filme.id %>/toggle-status" method="POST" class="w-100">
+                <button type="submit" 
+                        class="btn btn-sm btn-mini w-100 <%= filme.ativo ? 'btn-outline-danger' : 'btn-outline-success' %>"
+                        onclick="return confirm('Alterar status de visibilidade do filme?')">
+                  <i class="fas fa-power-off me-1"></i>
+                  <span class="d-none d-sm-inline"><%= filme.ativo ? 'Desativar' : 'Ativar' %></span>
+                  <span class="d-inline d-sm-none"><%= filme.ativo ? 'Off' : 'On' %></span>
+                </button>
+              </form>
+              
+              <!-- Botão Editar -->
+              <a href="/admin/filmes/<%= filme.id %>/editar" class="btn btn-sm btn-light border btn-icon text-primary" title="Editar">
+                <i class="fas fa-pen"></i>
+              </a>
+              
+              <!-- Botão Excluir -->
+              <form action="/admin/filmes/<%= filme.id %>/excluir" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-light border btn-icon text-danger"
+                        title="Excluir"
+                        onclick="return confirm('Tem certeza que deseja excluir este filme permanentemente?')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<!-- Mantive o script original intacto para garantir funcionamento do AJAX -->
+<script>
+  // Handle toggle status with AJAX
+  document.querySelectorAll('form[action*="toggle-status"]').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const button = this.querySelector('button');
+      // Encontrar o badge dentro do card pai
+      const card = this.closest('.card');
+      const badge = card.querySelector('.status-badge') || card.querySelector('.badge.bg-success, .badge.bg-danger');
+      
+      const isCurrentlyActive = button.classList.contains('btn-outline-danger');
+      const newStatus = !isCurrentlyActive;
+      
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ _method: 'POST' })
+        });
+        
+        if (response.ok) {
+          // Update button appearance
+          button.classList.remove(isCurrentlyActive ? 'btn-outline-danger' : 'btn-outline-success');
+          button.classList.add(newStatus ? 'btn-outline-danger' : 'btn-outline-success');
+          
+          // Texto responsivo do botão
+          const textDesktop = newStatus ? 'Desativar' : 'Ativar';
+          const textMobile = newStatus ? 'Off' : 'On';
+          
+          button.innerHTML = `
+            <i class="fas fa-power-off me-1"></i>
+            <span class="d-none d-sm-inline">${textDesktop}</span>
+            <span class="d-inline d-sm-none">${textMobile}</span>
+          `;
+          
+          // Update status badge
+          if (badge) {
+            badge.classList.remove(isCurrentlyActive ? 'bg-success' : 'bg-danger');
+            badge.classList.add(newStatus ? 'bg-success' : 'bg-danger');
+            badge.textContent = newStatus ? 'Ativo' : 'Inativo';
+          }
+          
+          // Show success message
+          showToast(`Filme ${newStatus ? 'ativado' : 'desativado'} com sucesso!`, 'success');
+        } else {
+          throw new Error('Erro ao alterar status');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('Erro ao alterar status do filme', 'danger');
+      }
+    });
+  });
+
+  // Show toast notification
+  function showToast(message, type) {
+    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+    
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+      <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    `;
+    
+    toastContainer.innerHTML += toastHtml;
+    const toastElement = document.getElementById(toastId);
+    // Verifica se bootstrap está disponível globalmente, caso contrário usa fallback simples
+    if (typeof bootstrap !== 'undefined') {
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    } else {
+        // Fallback simples se Bootstrap JS não estiver carregado
+        toastElement.classList.add('show');
+        setTimeout(() => toastElement.remove(), 3000);
+    }
+    
+    // Remove toast after hiding
+    toastElement.addEventListener('hidden.bs.toast', function () {
+      this.remove();
+    });
+  }
+
+  function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    return container;
+  }
+</script>

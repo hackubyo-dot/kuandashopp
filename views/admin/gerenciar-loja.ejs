@@ -1,0 +1,297 @@
+<!--
+    ARQUIVO: views/admin/gerenciar-loja.ejs
+    Página individual para gerenciar a assinatura de uma loja específica.
+-->
+
+<style>
+    /* Estilos específicos para esta página de gerenciamento */
+    :root {
+        --ks-primary: #E11D48;
+        --ks-dark: #0F172A;
+        --ks-gray: #64748B;
+        --ks-bg: #F8FAFC;
+        --ks-card-bg: #FFFFFF;
+        --ks-border: #E2E8F0;
+        --ks-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        --ks-radius: 12px;
+    }
+
+    /* Container de segurança para destravar a navbar */
+    .admin-page-wrapper {
+        position: relative;
+        z-index: 1;
+        padding-top: 20px;
+        padding-bottom: 60px;
+    }
+
+    /* HEADER & NAVEGAÇÃO */
+    .page-header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+    .btn-nav-action {
+        text-decoration: none !important; 
+        color: var(--ks-gray); 
+        font-weight: 600; 
+        font-size: 0.9rem;
+        display: inline-flex; 
+        align-items: center; 
+        gap: 8px; 
+        transition: 0.2s;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid var(--ks-border);
+        box-shadow: var(--ks-shadow);
+    }
+    .btn-nav-action:hover { color: var(--ks-primary); transform: translateY(-2px); border-color: #CBD5E1; }
+
+    /* CARD DE INFORMAÇÕES */
+    .info-card {
+        background: var(--ks-card-bg); 
+        border-radius: var(--ks-radius); 
+        padding: 32px;
+        box-shadow: var(--ks-shadow); 
+        border: 1px solid var(--ks-border); 
+        height: 100%;
+    }
+
+    .card-header-custom {
+        display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+        border-bottom: 1px solid var(--ks-border); padding-bottom: 16px;
+    }
+    .card-title-custom { font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--ks-dark); }
+
+    /* PERFIL DA LOJA */
+    .profile-cover { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .profile-avatar {
+        width: 90px; height: 90px; border-radius: 16px; object-fit: cover; 
+        background: #f1f5f9; margin-bottom: 16px; border: 4px solid white; 
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .profile-placeholder {
+        width: 90px; height: 90px; border-radius: 16px; 
+        background: var(--ks-dark); color: white; display: flex; 
+        align-items: center; justify-content: center; font-size: 2rem; 
+        font-weight: 700; margin-bottom: 16px;
+    }
+
+    /* LINHAS DE DADOS */
+    .data-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 14px 0; border-bottom: 1px solid #F1F5F9;
+    }
+    .data-row:last-child { border-bottom: none; }
+    .data-label { color: var(--ks-gray); font-size: 0.9rem; font-weight: 500; }
+    .data-value { font-weight: 600; color: var(--ks-dark); }
+
+    /* SELETOR DE PLANO */
+    .plan-radio-group { display: flex; flex-direction: column; gap: 12px; }
+    .plan-radio-item {
+        display: flex; align-items: center; padding: 16px; 
+        border: 2px solid var(--ks-border);
+        border-radius: 12px; cursor: pointer; transition: 0.2s ease-out; 
+        position: relative; background: #FAFAFA;
+    }
+    .plan-radio-item:hover { transform: scale(1.02); border-color: #CBD5E1; background: white; }
+    .plan-radio-item.active { border-color: var(--ks-primary); background: #FFF1F2; transform: scale(1.02); }
+    .plan-radio-item input[type="radio"] { display: none; }
+    
+    .plan-info { flex: 1; margin-left: 16px; }
+    .p-name { display: block; font-weight: 700; font-size: 1rem; color: var(--ks-dark); }
+    .p-details { font-size: 0.85rem; color: var(--ks-gray); font-weight: 500; }
+    .p-price { font-weight: 700; color: var(--ks-dark); font-size: 1.05rem; }
+
+    /* INDICADOR DO RADIO BUTTON */
+    .check-circle {
+        width: 22px; height: 22px; border-radius: 50%; border: 2px solid #CBD5E1; 
+        position: relative; flex-shrink: 0; transition: 0.2s;
+    }
+    .plan-radio-item.active .check-circle { border-color: var(--ks-primary); }
+    .plan-radio-item.active .check-circle::after {
+        content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 12px; height: 12px; background: var(--ks-primary); border-radius: 50%;
+    }
+
+    /* BOTÕES */
+    .btn-save {
+        background: var(--ks-dark); color: white; width: 100%; padding: 16px; 
+        border-radius: 12px; font-weight: 700; border: none; font-size: 0.95rem; 
+        margin-top: 24px; transition: 0.3s;
+    }
+    .btn-save:hover { background: #1E293B; transform: translateY(-2px); }
+
+    /* ALERTA INFORMATIVO */
+    .alert-custom {
+        background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF; 
+        padding: 16px; border-radius: 12px; margin-bottom: 24px; 
+        display: flex; gap: 12px; align-items: start;
+    }
+    
+    .badge-status {
+        padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    }
+    .badge-active { background: #DCFCE7; color: #166534; }
+    .badge-inactive { background: #FEE2E2; color: #991B1B; }
+
+</style>
+
+<div class="admin-page-wrapper">
+    <div class="container">
+        
+        <!-- NAVEGAÇÃO SUPERIOR -->
+        <div class="page-header-actions">
+            <a href="/admin/planos" class="btn-nav-action">
+                <i class="fas fa-arrow-left"></i> Voltar para Gestão de Planos
+            </a>
+            <a href="/admin" class="btn-nav-action">
+                <i class="fas fa-tachometer-alt"></i> Painel Principal
+            </a>
+        </div>
+
+        <!-- MENSAGENS DE FEEDBACK -->
+        <% if (messages.success) { %>
+            <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-3">
+                <i class="fas fa-check-circle fs-5"></i>
+                <span class="fw-medium"><%= messages.success %></span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (messages.error) { %>
+            <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-3">
+                <i class="fas fa-exclamation-circle fs-5"></i>
+                <span class="fw-medium"><%= messages.error %></span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <div class="row g-4">
+            <!-- COLUNA 1: PERFIL DO VENDEDOR -->
+            <div class="col-lg-4">
+                <div class="info-card">
+                    <div class="card-header-custom">
+                        <i class="fas fa-store text-danger"></i>
+                        <h3 class="card-title-custom">Perfil da Loja</h3>
+                    </div>
+
+                    <div class="profile-cover">
+                        <% if(vendedor.foto_perfil) { %>
+                            <img src="/uploads/perfil/<%= vendedor.foto_perfil %>" class="profile-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="profile-placeholder" style="display: none;"><%= (vendedor.nome_loja || 'L').charAt(0).toUpperCase() %></div>
+                        <% } else { %>
+                            <div class="profile-placeholder"><%= (vendedor.nome_loja || 'L').charAt(0).toUpperCase() %></div>
+                        <% } %>
+                        
+                        <h4 class="fw-bold m-0 text-dark"><%= vendedor.nome_loja || 'Loja Sem Nome' %></h4>
+                        <span class="text-muted small fw-bold mb-2">ID: #<%= vendedor.id %></span>
+                        
+                        <% if(vendedor.loja_ativa) { %>
+                            <span class="badge-status badge-active">Loja Ativa</span>
+                        <% } else { %>
+                            <span class="badge-status badge-inactive">Loja Inativa</span>
+                        <% } %>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top border-light">
+                        <div class="data-row">
+                            <span class="data-label">Responsável</span>
+                            <span class="data-value"><%= vendedor.nome %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Email</span>
+                            <span class="data-value small"><%= vendedor.email %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Telefone</span>
+                            <span class="data-value"><%= vendedor.telefone || '-' %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Desde</span>
+                            <span class="data-value"><%= new Date(vendedor.created_at).toLocaleDateString('pt-BR') %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUNA 2: GERENCIAR ASSINATURA -->
+            <div class="col-lg-8">
+                <div class="info-card">
+                    <div class="card-header-custom">
+                        <i class="fas fa-box-open text-danger"></i>
+                        <h3 class="card-title-custom">Assinatura e Limites</h3>
+                    </div>
+
+                    <!-- INFO ATUAL DO PLANO -->
+                    <div class="alert-custom">
+                        <i class="fas fa-info-circle mt-1 fs-5"></i>
+                        <div>
+                            <h6 class="fw-bold m-0 mb-1 text-dark">Plano Atual: <%= planoAtual ? planoAtual.nome : 'Nenhum Plano' %></h6>
+                            <p class="m-0 small opacity-75 text-dark fw-medium">
+                                Esta loja pode cadastrar até <strong><%= vendedor.limite_produtos || 0 %></strong> produtos.
+                                <% if(!planoAtual) { %>
+                                    <br><span class="text-danger fw-bold">⚠️ É necessário atribuir um plano.</span>
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FORMULÁRIO DE MUDANÇA -->
+                    <form action="/admin/vendedor/<%= vendedor.id %>/mudar-plano" method="POST">
+                        <h5 class="fw-bold small text-uppercase text-muted mb-3">Alterar Plano para:</h5>
+                        
+                        <div class="plan-radio-group">
+                            <% if (planos.length === 0) { %>
+                                <div class="text-center p-4 border rounded bg-light">
+                                    <i class="fas fa-exclamation-triangle text-warning mb-2"></i>
+                                    <p class="mb-1 fw-bold">Nenhum plano cadastrado.</p>
+                                    <a href="/admin/planos/novo" class="small fw-bold">Criar o primeiro plano agora</a>
+                                </div>
+                            <% } else { %>
+                                <% planos.forEach(p => { %>
+                                    <% const isCurrent = (planoAtual && planoAtual.id === p.id); %>
+                                    
+                                    <label class="plan-radio-item <%= isCurrent ? 'active' : '' %>" onclick="selectPlan(this)">
+                                        <input type="radio" name="novo_plano_id" value="<%= p.id %>" <%= isCurrent ? 'checked' : '' %>>
+                                        <div class="check-circle"></div>
+                                        <div class="plan-info">
+                                            <span class="p-name"><%= p.nome %></span>
+                                            <div class="p-details d-flex gap-3 flex-wrap">
+                                                <span><i class="fas fa-box me-1"></i><%= p.limite_produtos %> Produtos</span>
+                                                <% if(p.permite_vip) { %>
+                                                    <span class="text-success"><i class="fas fa-check-circle me-1"></i>VIP</span>
+                                                <% } %>
+                                                <% if(p.permite_destaque) { %>
+                                                    <span class="text-primary"><i class="fas fa-star me-1"></i>Destaque</span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="p-price">
+                                            <%= parseFloat(p.preco_mensal) > 0 ? parseFloat(p.preco_mensal).toLocaleString('pt-AO') + ' Kz' : 'Grátis' %>
+                                        </div>
+                                    </label>
+                                <% }) %>
+                            <% } %>
+                        </div>
+
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save me-2"></i> Salvar e Atualizar Limites
+                        </button>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para adicionar classe 'active' ao item selecionado
+    function selectPlan(element) {
+        document.querySelectorAll('.plan-radio-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        const radio = element.querySelector('input[type="radio"]');
+        if(radio) radio.checked = true;
+    }
+</script>

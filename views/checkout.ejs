@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Premium Experience</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-secondary: #6B7280;
+            --primary: #000000;
+            --accent: #E11D48; /* Tom de vermelho mais sofisticado */
+            --border: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 40px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 80px;
+        }
+
+        /* Layout */
+        .app-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Títulos */
+        .page-header { margin-bottom: 32px; }
+        .page-title { 
+            font-weight: 800; 
+            font-size: 1.75rem; 
+            letter-spacing: -0.025em; 
+            margin: 0;
+        }
+        .step-indicator {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        /* Cards Miniaturizados */
+        .card-mini {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .card-mini:hover {
+            border-color: #D1D5DB;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        /* Inputs Clean */
+        .input-clean {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: all 0.2s;
+            background: #FAFAFA;
+        }
+
+        .input-clean:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #FFF;
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+        }
+
+        /* Payment Selection */
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .pay-option {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .pay-option input { display: none; }
+
+        .pay-design {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pay-design span { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+
+        .pay-option input:checked + .pay-design {
+            border-color: var(--primary);
+            background: #FDFDFD;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .pay-option input:checked + .pay-design span { color: var(--primary); }
+
+        /* Items List - Compact Matrix */
+        .vendor-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .vendor-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .item-row:last-child { border-bottom: none; }
+
+        .item-name { font-size: 0.85rem; font-weight: 600; margin: 0; }
+        .item-qty { font-size: 0.75rem; color: var(--text-secondary); }
+        .item-price { font-size: 0.85rem; font-weight: 700; }
+
+        /* Resumo (Sidebar) */
+        .summary-box {
+            background: #FFF;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .total-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+        .total-val { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+
+        .btn-confirm {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-confirm:hover {
+            background: #222;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .app-container { margin: 20px auto; }
+            .pay-grid { grid-template-columns: 1fr; }
+            .summary-box { margin-top: 24px; position: static; }
+        }
+
+        /* Miniatures Matrix 3x3 (Opcional para Grid de itens) */
+        .item-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .item-mini-card {
+            background: #FAFAFA;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .item-mini-card h6 { font-size: 0.7rem; margin: 5px 0; font-weight: 700; height: 20px; overflow: hidden; }
+        .item-mini-card span { font-size: 0.75rem; font-weight: 800; color: var(--accent); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="page-header">
+            <span class="step-indicator">Finalização</span>
+            <h1 class="page-title">Carrinho de Compras</h1>
+        </header>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <form id="form-checkout">
+                    
+                    <div class="card-mini">
+                        <div class="card-title">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Entrega
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="input-clean" name="endereco" rows="2" placeholder="Endereço completo (Rua, nº, Bairro)" required></textarea>
+                        </div>
+                        <div>
+                            <input type="text" class="input-clean" name="observacoes" placeholder="Ponto de referência">
+                        </div>
+                    </div>
+
+                    <div class="card-mini">
+                        <div class="card-title">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            Pagamento
+                        </div>
+                        <div class="pay-grid">
+                            <label class="pay-option">
+                                <input type="radio" name="metodo_pagamento" value="Transferencia" checked>
+                                <div class="pay-design">
+                                    <img src="https://img.icons8.com/fluency/32/bank.png" alt="">
+                                    <span>Transferência</span>
+                                </div>
+                            </label>
+                            <label class="pay-option">
+                                <input type="radio" name="metodo_pagamento" value="Numerario">
+                                <div class="pay-design">
+                                    <img src="https://img.icons8.com/fluency/32/money.png" alt="">
+                                    <span>Pagar na Entrega</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card-mini">
+                        <div class="card-title">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                            Resumo dos Artigos
+                        </div>
+
+                        <% pedidosPorVendedor.forEach(grupo => { %>
+                            <div class="vendor-section">
+                                <span class="vendor-tag"><%= grupo.vendedor_nome %></span>
+                                
+                                <% grupo.itens.forEach(item => { %>
+                                    <div class="item-row">
+                                        <div>
+                                            <p class="item-name"><%= item.nome %></p>
+                                            <span class="item-qty">Quantidade: <%= item.quantidade %></span>
+                                        </div>
+                                        <div class="item-price">
+                                            <%= (item.preco * item.quantidade).toLocaleString() %> Kz
+                                        </div>
+                                    </div>
+                                <% }) %>
+
+                                </div>
+                        <% }) %>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="summary-box">
+                    <div class="total-row">
+                        <span class="total-label">Total do Pedido</span>
+                        <span class="total-val"><%= totalGeral.toLocaleString() %> <small style="font-size: 0.9rem">Kz</small></span>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary)">Total de Itens</span>
+                            <span style="font-size: 0.8rem; font-weight: 600"><%= totalItens %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary)">Frete</span>
+                            <span style="font-size: 0.8rem; font-weight: 600; color: #10B981">Grátis</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary)">Previsão</span>
+                            <span style="font-size: 0.8rem; font-weight: 600">24-48 horas</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="finalizarCompra()" class="btn-confirm">
+                        Confirmar Pedido
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7"></path></svg>
+                    </button>
+
+                    <p class="text-center mt-3 mb-0">
+                        <a href="/carrinho" style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-decoration: none;">Voltar ao carrinho</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function finalizarCompra() {
+            const form = document.getElementById('form-checkout');
+            const endereco = form.querySelector('[name="endereco"]').value;
+
+            if (!endereco) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Endereço necessário',
+                    text: 'Por favor, preencha o campo de entrega.',
+                    confirmButtonColor: '#000'
+                });
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            Swal.fire({
+                title: 'Processando...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading() }
+            });
+
+            try {
+                const response = await fetch('/finalizar-compra', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Tudo pronto!',
+                        text: 'Seu pedido foi recebido.',
+                        confirmButtonText: 'Ver Pedidos',
+                        confirmButtonColor: '#000'
+                    }).then(() => {
+                        window.location.href = '/meus-pedidos';
+                    });
+                } else {
+                    Swal.fire('Erro', result.message || 'Falha ao processar.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Erro', 'Falha na comunicação com o servidor.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

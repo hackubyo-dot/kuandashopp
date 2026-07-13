@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-ao">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - KuandaShop</title>
+    
+    <!-- Fontes e Ícones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.png">
+
+    <style>
+        :root {
+            --primary: #E31C25;
+            --primary-dark: #b9151c;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --bg-input: #F9FAFB;
+            --focus-ring: rgba(227, 28, 37, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* === LADO ESQUERDO (VISUAL) === */
+        .brand-section {
+            flex: 0 0 40%;
+            background: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px;
+            color: white;
+            overflow: hidden;
+            position: fixed; /* Fixa a imagem enquanto o form rola */
+            height: 100vh;
+            left: 0; top: 0;
+        }
+
+        .brand-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://i.redd.it/cirtijmhp1381.png');
+            background-size: cover; background-position: center;
+            opacity: 0.5; z-index: 1;
+        }
+        
+        .brand-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(227,28,37,0.2) 100%);
+            z-index: 2;
+        }
+
+        .brand-content { position: relative; z-index: 3; }
+        .brand-title { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 15px; }
+        .brand-text { font-size: 1.1rem; opacity: 0.9; line-height: 1.6; max-width: 400px; }
+
+        /* === LADO DIREITO (FORMULÁRIO SCROLLÁVEL) === */
+        .form-section {
+            margin-left: 40%; /* Compensa o lado fixo */
+            flex: 1;
+            padding: 60px 80px;
+            min-height: 100vh;
+            background: white;
+        }
+
+        .form-header h2 { font-size: 2rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .form-header p { color: var(--text-muted); margin-top: 5px; margin-bottom: 40px; }
+
+        /* Grid de Inputs */
+        .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .col-half { flex: 1; }
+
+        /* Inputs Modernos */
+        .input-group { position: relative; margin-bottom: 0; }
+        .input-field {
+            width: 100%; height: 52px; padding: 0 16px;
+            border: 2px solid var(--border); border-radius: 12px;
+            background: var(--bg-input); font-size: 0.95rem; font-weight: 500;
+            color: var(--text-main); outline: none; transition: 0.2s; font-family: inherit;
+        }
+        .input-field:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px var(--focus-ring); }
+        
+        /* Select Customizado */
+        select.input-field { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto; }
+
+        /* Labels Superiores */
+        .label-top { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Área de Upload Elegante */
+        .upload-wrapper {
+            border: 2px dashed var(--border); border-radius: 16px;
+            padding: 20px; text-align: center; cursor: pointer;
+            transition: 0.2s; position: relative; background: var(--bg-input);
+        }
+        .upload-wrapper:hover { border-color: var(--primary); background: #fff5f5; }
+        .preview-img {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: none; margin: 0 auto 10px;
+        }
+        .upload-placeholder i { font-size: 1.5rem; color: var(--text-muted); margin-bottom: 8px; }
+
+        /* Vendor Fields (Hidden by default) */
+        .vendor-fields {
+            max-height: 0; overflow: hidden; opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fff9f9; border-radius: 16px;
+        }
+        .vendor-fields.active { max-height: 500px; opacity: 1; padding: 20px; border: 1px solid rgba(227, 28, 37, 0.2); margin-top: 20px; margin-bottom: 20px; }
+
+        /* Botão */
+        .btn-submit {
+            width: 100%; height: 56px; background: var(--text-main); color: white;
+            border: none; border-radius: 12px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s; margin-top: 30px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-submit:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(227, 28, 37, 0.2); }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .brand-section { display: none; }
+            .form-section { margin-left: 0; padding: 40px 20px; }
+            .form-row { flex-direction: column; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Lado Esquerdo (Fixo) -->
+    <div class="brand-section">
+        <div class="brand-bg"></div>
+        <div class="brand-overlay"></div>
+        <div class="brand-content">
+            <h1 class="brand-title">Junte-se à Revolução.</h1>
+            <p class="brand-text">Crie sua conta no KuandaShop para comprar os melhores produtos ou comece a vender para todo o país hoje mesmo.</p>
+        </div>
+    </div>
+
+    <!-- Lado Direito (Scrollável) -->
+    <div class="form-section">
+        <div class="form-header">
+            <h2>Criar Conta</h2>
+            <p>Preencha os dados abaixo para começar.</p>
+        </div>
+
+        <form action="/registro" method="POST" enctype="multipart/form-data" id="registerForm">
+            
+            <!-- Linha 1: Nome e Email -->
+            <div class="form-row">
+                <div class="col-half">
+                    <label class="label-top">Nome Completo</label>
+                    <input type="text" class="input-field" name="nome" placeholder="Ex: João da Silva" required>
+                </div>
+                <div class="col-half">
+                    <label class="label-top">Endereço de E-mail</label>
+                    <input type="email" class="input-field" name="email" id="email" placeholder="seu@email.com" required>
+                </div>
+            </div>
+
+            <!-- Linha 2: Senha e Telefone -->
+            <div class="form-row">
+                <div class="col-half">
+                    <label class="label-top">Crie uma Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" class="input-field" name="senha" id="senha" placeholder="Mínimo 6 caracteres" required>
+                        <i class="far fa-eye" id="togglePass" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6B7280; cursor: pointer;"></i>
+                    </div>
+                </div>
+                <div class="col-half">
+                    <label class="label-top">Telefone (WhatsApp)</label>
+                    <input type="tel" class="input-field" name="telefone" placeholder="+244 9..." required>
+                </div>
+            </div>
+
+            <!-- Tipo de Conta -->
+            <div style="margin-bottom: 20px;">
+                <label class="label-top">Objetivo na Plataforma</label>
+                <select name="tipo" id="tipoSelect" class="input-field" required>
+                    <option value="" disabled selected>Selecione uma opção...</option>
+                    <option value="cliente">Quero Comprar (Cliente)</option>
+                    <option value="vendedor">Quero Vender (Vendedor)</option>
+                </select>
+            </div>
+
+            <!-- Campos de Vendedor (Escondidos) -->
+            <div class="vendor-fields" id="vendorFields">
+                <h4 style="font-size: 1rem; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-store"></i> Informações da Loja
+                </h4>
+                <div class="form-row">
+                    <div class="col-half">
+                        <label class="label-top">Nome da Loja</label>
+                        <input type="text" class="input-field" name="nome_loja" id="nome_loja" placeholder="Ex: Tech Angola">
+                    </div>
+                </div>
+                <div>
+                    <label class="label-top">Descrição Curta</label>
+                    <input type="text" class="input-field" name="descricao_loja" placeholder="O que você vende?">
+                </div>
+            </div>
+
+            <!-- Upload Foto -->
+            <div style="margin-top: 20px;">
+                <label class="label-top">Foto de Perfil (Opcional)</label>
+                <div class="upload-wrapper" onclick="document.getElementById('foto_perfil').click()">
+                    <img id="preview" class="preview-img" alt="Preview">
+                    <div class="upload-placeholder" id="placeholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Toque para selecionar uma foto</p>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">JPG ou PNG (Max 5MB)</small>
+                    </div>
+                    <input type="file" id="foto_perfil" name="foto_perfil" hidden accept="image/*">
+                </div>
+            </div>
+
+            <!-- Termos -->
+            <div style="margin-top: 25px; display: flex; align-items: flex-start; gap: 10px;">
+                <input type="checkbox" required style="margin-top: 4px; accent-color: var(--primary);">
+                <span style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                    Ao criar conta, você concorda com nossos <a href="#" style="color: var(--primary); font-weight: 700;">Termos de Serviço</a> e <a href="#" style="color: var(--primary); font-weight: 700;">Política de Privacidade</a>.
+                </span>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span>Criar Minha Conta</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <div style="text-align: center; margin-top: 30px; font-size: 0.9rem; color: var(--text-muted);">
+                Já tem uma conta? <a href="/login" style="color: var(--text-main); font-weight: 700;">Fazer Login</a>
+            </div>
+
+        </form>
+    </div>
+
+   <!-- MANTENHA O SWEETALERT CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- PROTOCOLO VENOM PARA REGISTRO ---
+
+    // 1. Mapeamento de Erros (Código URL -> Texto Bonito)
+    const errorMap = {
+        'email_existente': 'Este endereço de e-mail já está sendo usado. Tente fazer login.',
+        'senha_curta': 'A senha é muito fraca. Digite no mínimo 6 caracteres.',
+        'campos_vazios': 'Por favor, preencha todos os campos obrigatórios.',
+        'loja_sem_nome': 'Para vender, você precisa dar um nome à sua loja.',
+        'erro_interno': 'Ocorreu um erro no servidor. Tente novamente.'
+    };
+
+    // 2. Captura segura do Backend (Flash)
+    let serverMessages = {};
+    try {
+        serverMessages = <%- JSON.stringify(locals.messages || messages || {}) %>;
+    } catch (e) { console.log('Modo fallback ativado'); }
+
+    // 3. Captura da URL (URL Params)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlError = urlParams.get('error');
+
+    // --- LÓGICA DE DISPARO ---
+    const Toast = Swal.mixin({
+        toast: true, position: 'top-end', showConfirmButton: false,
+        timer: 6000, timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
+    let disparou = false;
+
+    // CENÁRIO 1: Erro via URL (Prioridade Máxima - Venom)
+    if (urlError) {
+        let titulo = 'Atenção';
+        let texto = errorMap[urlError] || 'Verifique seus dados e tente novamente.';
+        
+        // Personaliza ícone/título base no erro
+        if (urlError === 'email_existente') {
+            titulo = 'E-mail Indisponível';
+            highlightField('email');
+        } else if (urlError === 'senha_curta') {
+            titulo = 'Senha Curta';
+            highlightField('senha');
+        }
+
+        Toast.fire({ icon: 'error', title: titulo, text: texto });
+        disparou = true;
+    }
+
+    // CENÁRIO 2: Erro via Flash (Servidor)
+    else if (serverMessages.error && serverMessages.error.length > 0) {
+        Toast.fire({ icon: 'error', title: 'Ops!', text: serverMessages.error[0] });
+        
+        // Tenta adivinhar qual campo pintar de vermelho baseado no texto
+        const txt = serverMessages.error[0].toLowerCase();
+        if(txt.includes('email')) highlightField('email');
+        if(txt.includes('senha')) highlightField('senha');
+        disparou = true;
+    }
+
+    // Limpa a URL para ficar bonita
+    if (urlError) {
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: newUrl}, '', newUrl);
+    }
+
+    // --- FUNÇÕES VISUAIS E UTILITÁRIOS ---
+
+    // 1. Destacar Campo com Erro
+    function highlightField(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.style.borderColor = '#E31C25';
+            input.style.backgroundColor = '#FEF2F2';
+            // Animação de "Não"
+            input.animate([
+                { transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, 
+                { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
+            ], { duration: 400 });
+            
+            input.addEventListener('input', function() {
+                this.style.borderColor = ''; this.style.backgroundColor = '';
+            }, { once: true });
+        }
+    }
+
+    // 2. Lógica Visual de Vendedor (Seu código original mantido)
+    const tipoSelect = document.getElementById('tipoSelect');
+    const vendorFields = document.getElementById('vendorFields');
+    const nomeLoja = document.getElementById('nome_loja');
+
+    if(tipoSelect) {
+        tipoSelect.addEventListener('change', function() {
+            if (this.value === 'vendedor') {
+                vendorFields.classList.add('active');
+                nomeLoja.required = true;
+            } else {
+                vendorFields.classList.remove('active');
+                nomeLoja.required = false;
+            }
+        });
+    }
+
+    // 3. Preview de Imagem (Seu código original mantido)
+    const fileInput = document.getElementById('foto_perfil');
+    const preview = document.getElementById('preview');
+    const placeholder = document.getElementById('placeholder');
+
+    if(fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // 4. Toggle Senha
+    const togglePass = document.getElementById('togglePass');
+    const senhaInput = document.getElementById('senha');
+    if(togglePass) {
+        togglePass.addEventListener('click', function() {
+            const type = senhaInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            senhaInput.setAttribute('type', type);
+            this.className = type === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+        });
+    }
+
+    // 5. Loading no Botão
+    const form = document.getElementById('registerForm');
+    if(form) {
+        form.addEventListener('submit', function(e) {
+            // Validação Front-end rápida antes de enviar
+            const pass = document.getElementById('senha').value;
+            if(pass.length < 6) {
+                e.preventDefault();
+                Toast.fire({ icon: 'warning', title: 'Senha Curta', text: 'A senha precisa ter no mínimo 6 caracteres.' });
+                highlightField('senha');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Criando Conta...';
+            btn.style.opacity = '0.8';
+            btn.disabled = true;
+        });
+    }
+});
+</script>
+
+</body>
+</html>

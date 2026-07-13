@@ -1,0 +1,586 @@
+<style>
+    /* =========================================
+       KUANDA LIGHT STUDIO (CLEAN & DEPTH)
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #111827;
+      --k-gray-soft: #F9FAFB;
+      --k-gray-border: #E5E7EB;
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+      --shadow-float: 0 20px 40px -5px rgba(0, 0, 0, 0.08);
+      --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+    }
+
+    body { background-color: #F3F4F6; color: var(--k-black); font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Container Principal */
+    .editor-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-float);
+      margin-top: 30px;
+      overflow: hidden;
+      border: 1px solid white;
+    }
+
+    /* Header */
+    .editor-header {
+      padding: 30px 40px;
+      border-bottom: 1px solid var(--k-gray-border);
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+    }
+    
+    .page-title {
+      font-weight: 800; font-size: 1.5rem; margin: 0;
+      color: var(--k-black); display: flex; align-items: center; gap: 12px;
+    }
+    .icon-box {
+      width: 40px; height: 40px; border-radius: 12px; background: #FFF1F2;
+      color: var(--k-red); display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .btn-back {
+      color: #6B7280; font-weight: 600; text-decoration: none;
+      padding: 10px 20px; border-radius: 30px; background: #F3F4F6;
+      transition: 0.2s; font-size: 0.9rem; display: inline-flex; align-items: center;
+    }
+    .btn-back:hover { background: #E5E7EB; color: var(--k-black); }
+
+    /* Layout do Formulário */
+    .editor-body {
+      display: grid; grid-template-columns: 1.2fr 0.8fr;
+    }
+    
+    .form-section { padding: 40px; }
+    .preview-section {
+      background: #FAFAFA; border-left: 1px solid var(--k-gray-border);
+      padding: 40px; display: flex; flex-direction: column; align-items: center;
+      position: sticky; top: 0; height: fit-content; min-height: 100vh;
+    }
+
+    /* Inputs */
+    .form-group { margin-bottom: 25px; }
+    
+    .input-label {
+      font-size: 0.75rem; font-weight: 700; color: #6B7280;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;
+    }
+    
+    .custom-input, .custom-select {
+      width: 100%; padding: 14px 18px; border-radius: var(--radius-lg);
+      background: #FFFFFF; border: 1px solid var(--k-gray-border);
+      color: var(--k-black); font-weight: 600; outline: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-soft);
+      font-size: 0.95rem;
+    }
+    .custom-input:focus, .custom-select:focus {
+      border-color: var(--k-red); box-shadow: 0 0 0 4px rgba(227, 28, 37, 0.05);
+      transform: translateY(-1px);
+    }
+    .custom-input::placeholder { color: #9CA3AF; font-weight: 400; }
+    
+    .textarea-custom { resize: vertical; min-height: 120px; line-height: 1.6; }
+
+    /* Upload Zone (Poster) */
+    .poster-upload {
+      width: 100%; height: 280px;
+      background: #FFFFFF; border: 2px dashed #E5E7EB; border-radius: var(--radius-lg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+    }
+    .poster-upload:hover { border-color: var(--k-red); background: #FFF5F5; }
+    
+    .upload-content { text-align: center; pointer-events: none; }
+    .upload-icon { font-size: 3rem; color: #E5E7EB; margin-bottom: 15px; transition: 0.3s; }
+    .poster-upload:hover .upload-icon { color: var(--k-red); transform: scale(1.1); }
+    .upload-hint { font-size: 0.85rem; color: #6B7280; font-weight: 500; }
+
+    .upload-preview-img {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; z-index: 2; background: white;
+    }
+    .upload-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 3;
+      display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s;
+    }
+    .poster-upload:hover .upload-overlay { opacity: 1; }
+    .btn-change {
+      background: white; color: black; padding: 8px 16px; border-radius: 20px;
+      font-weight: 700; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Banner Upload Style */
+    .banner-upload-wrapper {
+        position: relative;
+        height: 100px;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1px solid var(--k-gray-border);
+        background: #F9FAFB;
+    }
+    .banner-preview-bg {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+    .banner-input-trigger {
+        position: absolute; inset: 0; 
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,0.7); cursor: pointer;
+        opacity: 0.8; transition: 0.2s;
+    }
+    .banner-input-trigger:hover { opacity: 1; background: rgba(255,255,255,0.9); }
+
+    /* Classificação */
+    .rating-wrapper {
+      display: flex; gap: 10px; background: #FFFFFF; padding: 10px;
+      border-radius: 16px; border: 1px solid var(--k-gray-border); width: fit-content; flex-wrap: wrap;
+    }
+    .rating-option { display: none; }
+    .rating-tile {
+      width: 36px; height: 36px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85rem; transition: 0.2s;
+      color: #9CA3AF; background: #F3F4F6;
+    }
+    .rating-option:checked + .rating-tile { transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.15); color: white; }
+    /* Cores das classificações */
+    .rating-option[value="L"]:checked + .rating-tile { background: #00B050; }
+    .rating-option[value="10"]:checked + .rating-tile { background: #0066FF; }
+    .rating-option[value="12"]:checked + .rating-tile { background: #FFC107; color: black; }
+    .rating-option[value="14"]:checked + .rating-tile { background: #FF6600; }
+    .rating-option[value="16"]:checked + .rating-tile { background: #FF0000; }
+    .rating-option[value="18"]:checked + .rating-tile { background: #000000; }
+
+    /* Switch iOS */
+    .switch-container {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #FFFFFF; padding: 15px 20px; border-radius: var(--radius-lg);
+      border: 1px solid var(--k-gray-border); box-shadow: var(--shadow-soft);
+    }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E5E7EB; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    input:checked + .slider { background-color: var(--k-red); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* Links Container Styles */
+    .links-container-box {
+        background: var(--k-gray-soft); border-radius: var(--radius-lg);
+        padding: 20px; border: 1px solid var(--k-gray-border);
+    }
+    .link-row {
+        background: white; padding: 10px; border-radius: 12px;
+        box-shadow: var(--shadow-soft); margin-bottom: 10px;
+        border: 1px solid var(--k-gray-border);
+        display: flex; align-items: center; gap: 10px;
+    }
+    .btn-add-link {
+        background: var(--k-black); color: white; border: none;
+        padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.8rem;
+        cursor: pointer; transition: 0.2s;
+    }
+    .btn-add-link:hover { background: #374151; }
+    .btn-remove-link {
+        background: #FEE2E2; color: #DC2626; border: none;
+        width: 36px; height: 36px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .btn-remove-link:hover { background: #FECACA; }
+
+    /* CARD PREVIEW */
+    .preview-label {
+      font-size: 0.75rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; text-align: center; width: 100%;
+    }
+    
+    .movie-card-clean {
+      width: 280px; background: white; border-radius: 20px; overflow: hidden;
+      box-shadow: 0 30px 60px -10px rgba(0,0,0,0.15);
+      position: relative; transition: 0.3s;
+    }
+    
+    .mc-poster {
+      width: 100%; aspect-ratio: 2/3; background: #E5E7EB; position: relative;
+    }
+    .mc-poster img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .mc-info { padding: 20px; position: relative; }
+    
+    .mc-title {
+      font-size: 1.3rem; font-weight: 800; color: var(--k-black);
+      margin-bottom: 8px; line-height: 1.2;
+    }
+    
+    .mc-meta {
+      display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #6B7280; font-weight: 600;
+    }
+    
+    .mc-rating {
+      padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 0.7rem; color: white; background: #9CA3AF;
+    }
+
+    .mc-action {
+      margin-top: 15px; width: 100%; padding: 12px; border-radius: 12px;
+      background: #F3F4F6; color: var(--k-black); font-weight: 700; border: none; font-size: 0.9rem;
+    }
+
+    /* Botão Principal Salvar */
+    .btn-save {
+      width: 100%; background: var(--k-red); color: white; border: none;
+      padding: 16px; border-radius: 50px; font-weight: 700; font-size: 1rem;
+      margin-top: 30px; cursor: pointer; transition: 0.3s;
+      box-shadow: 0 10px 25px rgba(227, 28, 37, 0.25);
+    }
+    .btn-save:hover { background: #b01018; transform: translateY(-3px); box-shadow: 0 15px 35px rgba(227, 28, 37, 0.35); }
+
+    /* Responsivo */
+    @media (max-width: 991px) {
+      .editor-body { grid-template-columns: 1fr; }
+      .form-section { border-right: none; border-bottom: 1px solid #eee; }
+      .preview-section { order: -1; padding: 40px 20px; min-height: auto; position: static; }
+      .movie-card-clean { width: 100%; max-width: 300px; }
+      .link-row { flex-direction: column; align-items: stretch; }
+      .btn-remove-link { width: 100%; margin-top: 5px; }
+    }
+</style>
+
+<div class="container pb-5">
+  
+  <div class="editor-card">
+    
+    <!-- HEADER -->
+    <div class="editor-header">
+      <h2 class="page-title">
+        <div class="icon-box"><i class="fas fa-clapperboard"></i></div>
+        <%= filme ? 'Editar Título' : 'Novo Título' %>
+      </h2>
+      <a href="/admin/filmes" class="btn-back"><i class="fas fa-arrow-left me-2"></i>Voltar</a>
+    </div>
+
+    <!-- FORMULÁRIO ÚNICO E COMPLETO -->
+    <form action="<%= filme ? '/admin/filmes/' + filme.id + '?_method=PUT' : '/admin/filmes' %>" 
+          method="POST" 
+          enctype="multipart/form-data" 
+          class="editor-body">
+      
+      <!-- COLUNA ESQUERDA: CAMPOS -->
+      <div class="form-section">
+        
+        <div class="row g-4">
+            
+            <!-- Linha 1: Título e Tipo -->
+            <div class="col-md-8">
+                <div class="form-group mb-0">
+                    <label class="input-label">Título Oficial</label>
+                    <input type="text" class="custom-input" id="titulo" name="titulo" 
+                           value="<%= filme ? filme.titulo : '' %>" 
+                           placeholder="Ex: Gladiador II" required oninput="updatePreview()">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group mb-0">
+                    <label class="input-label">Tipo</label>
+                    <select name="tipo" class="custom-input custom-select" onchange="updatePreview()">
+                        <option value="filme" <%= (filme && filme.tipo === 'filme') ? 'selected' : '' %>>Filme</option>
+                        <option value="serie" <%= (filme && filme.tipo === 'serie') ? 'selected' : '' %>>Série</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Linha 2: Trailer, Data e Preço -->
+            <div class="col-md-5">
+                <div class="form-group mb-0">
+                    <label class="input-label">Trailer (YouTube)</label>
+                    <input type="url" class="custom-input" name="trailer_url" 
+                           value="<%= filme ? filme.trailer_url : '' %>" 
+                           placeholder="https://youtube.com/...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group mb-0">
+                    <label class="input-label">Lançamento</label>
+                    <input type="date" class="custom-input" id="data" name="data_lancamento" 
+                           value="<%= filme && filme.data_lancamento ? new Date(filme.data_lancamento).toISOString().split('T')[0] : '' %>" 
+                           onchange="updatePreview()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group mb-0">
+                    <label class="input-label">Preço (Kz)</label>
+                    <input type="number" step="0.01" class="custom-input" name="preco" 
+                           value="<%= filme ? filme.preco : '0.00' %>" placeholder="0.00">
+                </div>
+            </div>
+
+            <!-- Linha 3: Banner (Horizontal) -->
+            <div class="col-12">
+                <div class="form-group mb-0">
+                    <label class="input-label">Banner Horizontal (Opcional)</label>
+                    <div class="banner-upload-wrapper">
+                        <% if(filme && filme.banner) { %>
+                            <img src="/uploads/filmes/<%= filme.banner %>" class="banner-preview-bg" id="bannerPreview">
+                        <% } else { %>
+                            <img src="" class="banner-preview-bg" id="bannerPreview" style="display:none">
+                        <% } %>
+                        <label class="banner-input-trigger">
+                            <input type="file" name="banner" accept="image/*" style="display:none" onchange="previewBanner(this)">
+                            <div class="text-center">
+                                <i class="fas fa-image mb-1"></i><br>
+                                <span class="small fw-bold">Clique para enviar Banner</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linha 4: Classificação -->
+            <div class="col-12">
+                <div class="form-group mb-0">
+                    <label class="input-label">Classificação Indicativa</label>
+                    <div class="rating-wrapper">
+                        <% ['L', '10', '12', '14', '16', '18'].forEach(rate => { %>
+                            <label>
+                                <input type="radio" name="classificacao" value="<%= rate %>" class="rating-option" 
+                                       <%= (filme && filme.classificacao == rate) ? 'checked' : '' %> onchange="updatePreview()">
+                                <div class="rating-tile"><%= rate %></div>
+                            </label>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linha 5: Sinopse -->
+            <div class="col-12">
+                <div class="form-group mb-0">
+                    <label class="input-label">Sinopse</label>
+                    <textarea class="custom-input textarea-custom" name="sinopse" placeholder="Escreva sobre o filme..."><%= filme ? filme.sinopse : '' %></textarea>
+                </div>
+            </div>
+
+            <!-- Linha 6: Links Dinâmicos (Download/Stream) -->
+            <div class="col-12">
+                <div class="form-group mb-0">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="input-label mb-0">Links de Acesso</label>
+                        <button type="button" class="btn-add-link" onclick="addLink()">
+                            <i class="fas fa-plus me-1"></i> Adicionar
+                        </button>
+                    </div>
+                    
+                    <div class="links-container-box" id="links-container">
+                        <% if (typeof links !== 'undefined' && links.length > 0) { %>
+                            <% links.forEach((link) => { %>
+                                <div class="link-row">
+                                    <div style="flex: 1;">
+                                        <input type="text" name="labels[]" class="custom-input" style="padding: 8px 12px; font-size: 0.85rem;" placeholder="Nome (Ex: Dublado)" value="<%= link.label %>" required>
+                                    </div>
+                                    <div style="flex: 2;">
+                                        <input type="url" name="urls[]" class="custom-input" style="padding: 8px 12px; font-size: 0.85rem;" placeholder="URL do Arquivo" value="<%= link.url %>" required>
+                                    </div>
+                                    <button type="button" class="btn-remove-link" onclick="removeLink(this)"><i class="fas fa-times"></i></button>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                             <div class="text-muted text-center py-2 small" id="no-links-msg">Nenhum link adicionado.</div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linha 7: Status -->
+            <div class="col-12 mt-2">
+                <div class="switch-container">
+                    <div>
+                        <span class="d-block fw-bold text-dark">Status de Publicação</span>
+                        <span class="small text-muted" id="statusText"><%= (filme && filme.ativo) ? 'Visível no site' : 'Oculto (Rascunho)' %></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="ativo" id="ativoSwitch" <%= (!filme || filme.ativo) ? 'checked' : '' %> onchange="toggleStatus()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-save">
+            <i class="fas fa-check me-2"></i> <%= filme ? 'Salvar Alterações' : 'Adicionar Título' %>
+        </button>
+
+      </div>
+
+      <!-- COLUNA DIREITA: PREVIEW -->
+      <div class="preview-section">
+          
+          <div class="preview-label">Visualização do Card</div>
+          
+          <div class="movie-card-clean">
+              
+              <!-- Pôster / Upload -->
+              <div class="mc-poster poster-upload" onclick="document.getElementById('posterInput').click()">
+                  
+                  <% if (filme && filme.poster) { %>
+                      <img id="prevImg" class="upload-preview-img" src="/uploads/filmes/<%= filme.poster %>">
+                      <div class="upload-overlay">
+                          <span class="btn-change"><i class="fas fa-camera"></i> Trocar</span>
+                      </div>
+                  <% } else { %>
+                      <img id="prevImg" class="upload-preview-img" style="display:none;">
+                      <div class="upload-content">
+                          <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                          <div class="text-dark fw-bold">Carregar Pôster</div>
+                          <div class="upload-hint">Vertical</div>
+                      </div>
+                  <% } %>
+                  
+                  <input type="file" id="posterInput" name="poster" accept="image/*" style="display:none" onchange="previewPoster(this)" <%= filme ? '' : 'required' %>>
+              </div>
+
+              <!-- Informações Simuladas -->
+              <div class="mc-info">
+                  <div class="mc-title" id="prevTitle"><%= filme ? filme.titulo : 'Título do Filme' %></div>
+                  <div class="mc-meta">
+                      <span class="mc-rating" id="prevRating" style="background:#9CA3AF">L</span>
+                      <span id="prevYear"><%= filme && filme.data_lancamento ? new Date(filme.data_lancamento).getFullYear() : '2025' %></span>
+                      <span>• <span id="prevType"><%= (filme && filme.tipo === 'serie') ? 'Série' : 'Filme' %></span></span>
+                  </div>
+                  <button class="mc-action" type="button">Assistir Trailer</button>
+              </div>
+
+          </div>
+
+          <p class="text-muted small mt-4 text-center" style="max-width: 250px;">
+              <i class="fas fa-info-circle me-1"></i> Esta é uma prévia. Clique na imagem acima para fazer upload do Pôster Vertical.
+          </p>
+
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- SCRIPTS DE FUNCIONAMENTO -->
+<script>
+  // 1. Preview do POSTER (Vertical)
+  function previewPoster(input) {
+    const file = input.files[0];
+    if (file) {
+        if(file.size > 5 * 1024 * 1024) {
+            alert('Imagem muito grande (Max 5MB)'); input.value = ''; return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('prevImg');
+            const uploadContent = document.querySelector('.upload-content');
+            
+            img.src = e.target.result;
+            img.style.display = 'block';
+            if(uploadContent) uploadContent.style.opacity = '0';
+            
+            // Adiciona overlay se necessário
+            const parent = document.querySelector('.poster-upload');
+            if(!parent.querySelector('.upload-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'upload-overlay';
+                overlay.innerHTML = '<span class="btn-change"><i class="fas fa-camera"></i> Trocar</span>';
+                parent.appendChild(overlay);
+            }
+        }
+        reader.readAsDataURL(file);
+    }
+  }
+
+  // 2. Preview do BANNER (Horizontal)
+  function previewBanner(input) {
+      const file = input.files[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              const img = document.getElementById('bannerPreview');
+              img.src = e.target.result;
+              img.style.display = 'block';
+          }
+          reader.readAsDataURL(file);
+      }
+  }
+
+  // 3. Atualização em Tempo Real (Preview Card)
+  function updatePreview() {
+    // Título
+    const title = document.getElementById('titulo').value;
+    document.getElementById('prevTitle').textContent = title || 'Título do Filme';
+
+    // Ano
+    const dateVal = document.getElementById('data').value;
+    if(dateVal) {
+        document.getElementById('prevYear').textContent = new Date(dateVal).getFullYear();
+    }
+
+    // Tipo
+    const tipoSelect = document.querySelector('select[name="tipo"]');
+    document.getElementById('prevType').textContent = tipoSelect.value === 'serie' ? 'Série' : 'Filme';
+
+    // Badge de Classificação (Cores)
+    const rating = document.querySelector('input[name="classificacao"]:checked');
+    if(rating) {
+        const badge = document.getElementById('prevRating');
+        badge.textContent = rating.value;
+        
+        const colors = {
+            'L': '#00B050',
+            '10': '#0066FF',
+            '12': '#FFC107',
+            '14': '#FF6600',
+            '16': '#FF0000',
+            '18': '#000000'
+        };
+        
+        badge.style.background = colors[rating.value] || '#9CA3AF';
+        badge.style.color = rating.value === '12' ? 'black' : 'white';
+        badge.style.border = rating.value === '18' ? '1px solid black' : 'none';
+    }
+  }
+
+  // 4. Switch Text
+  function toggleStatus() {
+    const isChecked = document.getElementById('ativoSwitch').checked;
+    const label = document.getElementById('statusText');
+    label.textContent = isChecked ? 'Visível no site' : 'Oculto (Rascunho)';
+    label.className = isChecked ? 'small text-success fw-bold' : 'small text-muted';
+  }
+
+  // 5. Gerenciamento de Links
+  function addLink() {
+      const container = document.getElementById('links-container');
+      const msg = document.getElementById('no-links-msg');
+      if(msg) msg.remove();
+
+      const div = document.createElement('div');
+      div.className = 'link-row';
+      div.innerHTML = `
+        <div style="flex: 1;">
+            <input type="text" name="labels[]" class="custom-input" style="padding: 8px 12px; font-size: 0.85rem;" placeholder="Nome (Ex: 720p)" required>
+        </div>
+        <div style="flex: 2;">
+            <input type="url" name="urls[]" class="custom-input" style="padding: 8px 12px; font-size: 0.85rem;" placeholder="https://..." required>
+        </div>
+        <button type="button" class="btn-remove-link" onclick="removeLink(this)"><i class="fas fa-times"></i></button>
+      `;
+      container.appendChild(div);
+  }
+
+  function removeLink(btn) {
+      btn.closest('.link-row').remove();
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    updatePreview();
+    toggleStatus();
+  });
+</script>

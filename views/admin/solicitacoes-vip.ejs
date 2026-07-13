@@ -1,0 +1,278 @@
+
+  <style>
+    /* =========================================
+       KUANDA VIP CENTER CSS
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --k-gold: #FFC107;
+      --k-green: #10B981;
+      --bg-soft: #F9FAFB;
+      --card-radius: 20px;
+    }
+
+    body { background-color: var(--bg-soft); }
+
+    /* 1. HEADER */
+    .vip-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 40px; flex-wrap: wrap; gap: 20px;
+    }
+    .page-title {
+      font-weight: 800; color: var(--k-black); margin: 0; font-size: 2rem;
+      letter-spacing: -1px; display: flex; align-items: center; gap: 12px;
+    }
+    .badge-count {
+      background: var(--k-gold); color: black; font-size: 0.9rem; padding: 5px 12px;
+      border-radius: 20px; font-weight: 800;
+    }
+
+    .btn-back {
+      background: white; border: 1px solid #ddd; color: #555;
+      padding: 12px 20px; border-radius: 50px; font-weight: 600;
+      transition: 0.3s; text-decoration: none;
+    }
+    .btn-back:hover { background: #f5f5f5; color: var(--k-black); }
+
+    /* 2. PROCESSO DE APROVAÇÃO (GUIDE) */
+    .process-guide {
+      background: white; border-radius: 16px; padding: 20px;
+      margin-bottom: 40px; display: flex; justify-content: space-around;
+      border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+      flex-wrap: wrap; gap: 20px;
+    }
+    .guide-step { display: flex; align-items: center; gap: 15px; opacity: 0.8; }
+    .step-num {
+      width: 30px; height: 30px; border-radius: 50%; background: #F3F4F6;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.8rem; color: #888;
+    }
+    .step-text h6 { font-weight: 700; margin: 0; font-size: 0.9rem; }
+    .step-text p { font-size: 0.75rem; margin: 0; color: #666; }
+
+    /* 3. CARDS DE SOLICITAÇÃO */
+    .requests-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+
+    .request-card {
+      background: white; border-radius: var(--card-radius); overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+      display: flex; flex-direction: column; transition: 0.3s;
+    }
+    .request-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+
+    /* Topo do Card */
+    .req-header {
+      padding: 20px; border-bottom: 1px solid #f0f0f0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .req-type {
+      background: #FFF8E1; color: #F57F17; font-size: 0.7rem; font-weight: 800;
+      padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .req-date { font-size: 0.8rem; color: #999; font-weight: 500; }
+
+    /* Corpo do Card */
+    .req-body { padding: 25px; flex-grow: 1; display: flex; gap: 20px; }
+    
+    .req-img {
+      width: 100px; height: 100px; border-radius: 12px; object-fit: cover;
+      background: #f4f4f4; flex-shrink: 0;
+    }
+    
+    .req-info h5 { font-weight: 800; color: var(--k-black); margin-bottom: 5px; font-size: 1.1rem; }
+    .req-vendor { font-size: 0.9rem; color: #666; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
+    
+    .contact-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #F0FDF4; color: var(--k-green); padding: 5px 10px;
+      border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-decoration: none;
+      transition: 0.2s; border: 1px solid transparent;
+    }
+    .contact-badge:hover { border-color: var(--k-green); background: white; }
+
+    /* Ações */
+    .req-footer {
+      padding: 20px; background: #FAFAFA; border-top: 1px solid #eee;
+      display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px;
+    }
+    
+    .btn-approve {
+      background: var(--k-green); color: white; border: none; padding: 12px;
+      border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-approve:hover { background: #059669; }
+    
+    .btn-reject {
+      background: white; color: #EF4444; border: 1px solid #EF4444; padding: 12px;
+      border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-reject:hover { background: #FEF2F2; }
+    
+    .btn-view {
+      background: #E5E7EB; color: #4B5563; width: 45px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; text-decoration: none;
+      transition: 0.2s;
+    }
+    .btn-view:hover { background: #D1D5DB; color: black; }
+
+    /* Empty State */
+    .empty-vip {
+      text-align: center; padding: 80px 20px;
+      background: white; border-radius: var(--card-radius); border: 2px dashed #eee;
+    }
+    .empty-icon { font-size: 4rem; color: #eee; margin-bottom: 20px; }
+
+    /* Animations */
+    .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 768px) {
+      .process-guide { flex-direction: column; align-items: flex-start; }
+      .req-body { flex-direction: column; }
+      .req-img { width: 100%; height: 180px; }
+      .req-footer { grid-template-columns: 1fr 1fr; }
+      .btn-view { grid-column: span 2; width: 100%; }
+    }
+  </style>
+
+<div class="container py-4">
+  
+  <!-- 1. HEADER -->
+  <div class="vip-header fade-up">
+    <h2 class="page-title">
+        <i class="fas fa-crown text-warning"></i> Aprovações VIP
+        <span class="badge-count"><%= solicitacoes.length %></span>
+    </h2>
+    <a href="/admin" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+  </div>
+
+  <% if (solicitacoes.length > 0) { %>
+    <!-- 2. GUIA DE PROCESSO -->
+    <div class="process-guide fade-up" style="animation-delay: 0.1s;">
+        <div class="guide-step">
+            <div class="step-num">1</div>
+            <div class="step-text">
+                <h6>Analisar</h6>
+                <p>Verifique qualidade do produto</p>
+            </div>
+        </div>
+        <div class="guide-step">
+            <div class="step-num">2</div>
+            <div class="step-text">
+                <h6>Contatar</h6>
+                <p>Confirme pagamento no WhatsApp</p>
+            </div>
+        </div>
+        <div class="guide-step">
+            <div class="step-num" style="background:#E8FDF0; color:#10B981;"><i class="fas fa-check"></i></div>
+            <div class="step-text">
+                <h6>Aprovar</h6>
+                <p>Ative o status VIP</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. GRID DE SOLICITAÇÕES -->
+    <div class="requests-grid">
+      <% solicitacoes.forEach((solicitacao, index) => { %>
+        <div class="request-card fade-up" style="animation-delay: <%= index * 0.1 + 0.2 %>s;">
+            
+            <!-- Topo -->
+            <div class="req-header">
+                <span class="req-type"><i class="fas fa-star me-1"></i><%= solicitacao.tipo.toUpperCase() %></span>
+                <span class="req-date"><%= new Date(solicitacao.created_at).toLocaleDateString('pt-BR') %></span>
+            </div>
+
+            <!-- Corpo -->
+            <div class="req-body">
+                <!-- Imagem -->
+                <% 
+                let img = '';
+                if(solicitacao.imagem1) img = '/uploads/produtos/' + solicitacao.imagem1;
+                %>
+                <% if (img) { %>
+                    <img src="<%= img %>" class="req-img" alt="Produto">
+                <% } else { %>
+                    <div class="req-img d-flex align-items-center justify-content-center text-muted h1 bg-light"><i class="fas fa-box"></i></div>
+                <% } %>
+
+                <div class="req-info">
+                    <h5 title="<%= solicitacao.produto_nome %>"><%= solicitacao.produto_nome %></h5>
+                    
+                    <div class="req-vendor">
+                        <i class="fas fa-store"></i> <%= solicitacao.vendedor_nome || 'Vendedor' %>
+                    </div>
+
+                    <% if (solicitacao.telefone) { %>
+                        <a href="https://wa.me/<%= solicitacao.telefone.replace(/\D/g, '') %>?text=Olá! Sobre sua solicitação VIP para o produto <%= solicitacao.produto_nome %>..." target="_blank" class="contact-badge">
+                            <i class="fab fa-whatsapp"></i> <%= solicitacao.telefone %>
+                        </a>
+                    <% } else { %>
+                        <span class="text-muted small">Sem telefone</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Footer Ações -->
+            <div class="req-footer">
+                
+                <form action="/admin/solicitacao-vip/<%= solicitacao.id %>/aprovar" method="POST" class="m-0 approve-form">
+                    <button class="btn-approve w-100">
+                        <i class="fas fa-check"></i> Aprovar
+                    </button>
+                </form>
+
+                <form action="/admin/solicitacao-vip/<%= solicitacao.id %>/rejeitar" method="POST" class="m-0 reject-form">
+                    <button class="btn-reject w-100">
+                        <i class="fas fa-times"></i> Rejeitar
+                    </button>
+                </form>
+
+                <a href="/produto/<%= solicitacao.produto_id %>" target="_blank" class="btn-view" title="Ver Produto">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+
+            </div>
+
+        </div>
+      <% }) %>
+    </div>
+
+  <% } else { %>
+    
+    <!-- EMPTY STATE -->
+    <div class="empty-vip fade-up" style="animation-delay: 0.1s;">
+        <i class="fas fa-crown empty-icon"></i>
+        <h3 class="fw-bold text-muted">Tudo limpo!</h3>
+        <p class="text-muted">Nenhuma solicitação VIP pendente no momento.</p>
+    </div>
+
+  <% } %>
+
+</div>
+
+<script>
+  // Confirmação de Aprovação
+  document.querySelectorAll('.approve-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (!confirm('Confirmar pagamento e ativar status VIP para este produto?')) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  // Confirmação de Rejeição
+  document.querySelectorAll('.reject-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (!confirm('Tem certeza que deseja rejeitar esta solicitação?')) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>

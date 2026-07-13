@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-AO" itemscope itemtype="http://schema.org/WebSite">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#E31C25">
+  
+  <!-- ==================== SEO & METADATA AVANÇADO ==================== -->
+  <title><%= typeof title !== 'undefined' ? title : 'kuandashop | Marketplace Angolano para Comprar e Vender Online' %></title>
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://kuanda.onrender.com<%= typeof currentUrl !== 'undefined' ? currentUrl : '' %>" />
+
+  <!-- Meta Tags Principais -->
+  <meta name="description" content="Marketplace líder em Angola. Compre e venda eletrônicos, moda, carros, imóveis e muito mais. Segurança, entrega rápida e os melhores preços de Luanda a todo o país.">
+  <meta name="author" content="Kuanda Angola">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="language" content="Portuguese">
+  <meta name="geo.region" content="AO">
+  <meta name="geo.placename" content="Luanda">
+  <meta name="geo.position" content="-8.839;13.289">
+  <meta name="ICBM" content="-8.839, 13.289">
+
+  <!-- Open Graph -->
+  <meta property="og:locale" content="pt_AO">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kuanda">
+  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Kuanda - Seu Marketplace em Angola' %>">
+  <meta property="og:description" content="Conectando compradores e vendedores em Angola. Milhares de produtos com os melhores preços. Eletrônicos, Moda, Casa, Carros e muito mais.">
+  <meta property="og:url" content="https://kuanda.onrender.com<%= typeof currentUrl !== 'undefined' ? currentUrl : '' %>">
+  <meta property="og:image" content="https://kuanda.onrender.com/images/og-share-image.png">
+  <meta property="og:image:alt" content="Kuanda Marketplace Angola">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@KuandaAO">
+  <meta name="twitter:creator" content="@KuandaAO">
+  <meta name="twitter:title" content="<%= typeof title !== 'undefined' ? title : 'Kuanda - Marketplace Angola' %>">
+  <meta name="twitter:description" content="Compre e venda online com segurança em Angola. O marketplace que conecta você aos melhores negócios.">
+  <meta name="twitter:image" content="https://kuanda.onrender.com/images/og-share-image.png">
+  <meta name="twitter:image:alt" content="Kuanda Marketplace Angola">
+
+  <!-- Apple Touch & Mobile -->
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.png">
+  <link rel="shortcut icon" href="/image/png" type="/images/logo.png">
+    <script src="/js/chat-monitor.js"></script>
+  <!-- ==================== PERFORMANCE & FONTES ==================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  
+  <!-- Usando Inter Tight e Space Grotesk para um visual mais "Tech/Fashion" -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Frameworks -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- ==================== SCHEMA.ORG ==================== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://kuanda.onrender.com/#website",
+        "name": "Kuanda",
+        "url": "https://kuanda.onrender.com/",
+        "description": "O maior marketplace de Angola para comprar e vender online com segurança e confiança.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://kuanda.onrender.com/produtos?busca={search_term_string}",
+          "query-input": "required name=search_term_string"
+        },
+        "inLanguage": "pt-AO",
+        "keywords": "marketplace angola, compras online, vendas online, kuanda"
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://kuanda.onrender.com/#organization",
+        "name": "Kuanda",
+        "url": "https://kuanda.onrender.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://kuanda.onrender.com/images/logo.png",
+          "width": "300",
+          "height": "60"
+        },
+        "sameAs": [
+          "https://facebook.com/kuandaangola",
+          "https://instagram.com/kuandaangola",
+          "https://twitter.com/KuandaAO",
+          "https://linkedin.com/company/kuandaangola"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+244923456789",
+          "contactType": "customer service",
+          "availableLanguage": "Portuguese"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "AO",
+          "addressRegion": "Luanda"
+        }
+      },
+      {
+        "@type": "LocalBusiness",
+        "name": "Kuanda Marketplace",
+        "image": "https://kuanda.onrender.com/images/og-share-image.png",
+        "telephone": "+244923456789",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Luanda",
+          "addressLocality": "Luanda",
+          "addressRegion": "Luanda",
+          "postalCode": "0000",
+          "addressCountry": "AO"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "-8.839",
+          "longitude": "13.289"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* =========================================
+       GLOBAL DESIGN TOKENS
+       ========================================= */
+    :root {
+      /* Palette */
+      --k-red: #ff3b30; /* Vermelho mais vibrante, estilo iOS */
+      --k-black: #050507;
+      --k-dark-gray: #1c1c1e;
+      --k-light-gray: #f2f2f7;
+      --k-white: #ffffff;
+      
+      /* Easing - Curvas de animação premium */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* Animação suave estilo Apple */
+      --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      
+      /* Glassmorphism */
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: 'Inter Tight', sans-serif;
+      background-color: #fcfcfc;
+      color: var(--k-black);
+      overflow-x: hidden;
+      display: flex; flex-direction: column;
+      padding-top: 100px;
+    }
+    
+    /* Reset Desktop Padding */
+    @media (min-width: 992px) { body { padding-top: 0; } }
+
+    /* Typography Overrides */
+    h1, h2, h3, h4, h5, h6, .btn { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.03em; }
+    
+    main { flex: 1 0 auto; position: relative; z-index: 1; }
+    a { text-decoration: none; color: inherit; cursor: pointer; }
+
+    /* =========================================
+       THE REVOLUTIONARY MENU BUTTON
+       ========================================= */
+    .menu-trigger-container {
+        position: fixed;
+        top: 30px;
+        right: 40px;
+        z-index: 2000;
+        perspective: 1000px; /* Para efeitos 3D sutis */
+    }
+
+    .menu-trigger-btn {
+        width: 64px;
+        height: 64px;
+        background: var(--k-black);
+        border-radius: 20px; /* Squircle shape */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.6s var(--ease-out-expo);
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Subtle glow effect on hover */
+    .menu-trigger-btn::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+    }
+    .menu-trigger-btn:hover::after { opacity: 1; }
+
+    .menu-trigger-btn:hover {
+        transform: scale(1.05) rotate(3deg);
+        box-shadow: 0 30px 60px -12px rgba(227, 28, 37, 0.4); /* Glow vermelho */
+        border-radius: 50%; /* Morphs to circle on hover */
+    }
+
+    /* Fluency Icons Customization */
+    .fluency-icon { width: 28px; height: 28px; position: absolute; transition: all 0.5s var(--ease-out-expo); }
+    
+    .icon-open path, .icon-open rect { fill: white; } /* Ícone branco no fundo preto */
+    .icon-close path { stroke: white; stroke-width: 2.5; }
+
+    /* Animation States */
+    .icon-open { opacity: 1; transform: scale(1) rotate(0); }
+    .icon-close { opacity: 0; transform: scale(0.5) rotate(-180deg); }
+
+    .menu-active .menu-trigger-btn {
+        background: var(--k-red); /* Muda para vermelho quando ativo */
+        border-radius: 50%;
+        transform: rotate(0);
+    }
+    
+    .menu-active .icon-open { opacity: 0; transform: scale(0.5) rotate(180deg); }
+    .menu-active .icon-close { opacity: 1; transform: scale(1) rotate(0); }
+
+    /* =========================================
+       THE ROBUST SIDEBAR (Drawer)
+       ========================================= */
+    .sidebar-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.01); /* Quase invisível inicialmente */
+        backdrop-filter: blur(0px);
+        z-index: 1998;
+        pointer-events: none;
+        transition: all 0.8s var(--ease-out-expo);
+    }
+    .sidebar-overlay.active {
+        background: rgba(0,0,0,0.4);
+        backdrop-filter: blur(8px);
+        pointer-events: auto;
+    }
+
+    .modern-sidebar {
+        position: fixed;
+        top: 0; right: 0;
+        width: 100%; max-width: 550px; /* Bem largo */
+        height: 100vh;
+        background: #ffffff;
+        z-index: 1999;
+        display: flex; flex-direction: column;
+        padding: 60px;
+        box-shadow: -20px 0 60px rgba(0,0,0,0.1);
+        transform: translateX(105%); /* Esconde fora da tela */
+        transition: transform 0.8s var(--ease-out-expo);
+        
+        /* Noise Texture para visual premium */
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    .modern-sidebar.active { transform: translateX(0); }
+
+    /* Conteúdo da Sidebar */
+    .sidebar-header {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 60px;
+        opacity: 0; transform: translateY(-20px); transition: 0.6s 0.1s var(--ease-out-expo);
+    }
+    .modern-sidebar.active .sidebar-header { opacity: 1; transform: translateY(0); }
+
+    .brand-big { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+    .brand-dot { width: 8px; height: 8px; background: var(--k-red); border-radius: 50%; }
+
+    /* Lista de Navegação (Links Gigantes) */
+    .nav-wrapper { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; justify-content: center; }
+    
+    .nav-item-wrapper {
+        overflow: hidden; /* Para mascara da animação */
+    }
+
+    .big-link {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 3.5rem; /* GIGANTE */
+        font-weight: 700;
+        color: #d1d1d6; /* Cinza claro por padrão */
+        line-height: 1.1;
+        display: block;
+        transition: color 0.4s ease, transform 0.4s ease;
+        position: relative;
+        cursor: pointer;
+        transform: translateY(120%); /* Começa escondido em baixo */
+    }
+    
+    /* Animação de entrada em cascata (Stagger) */
+    .modern-sidebar.active .big-link { 
+        transform: translateY(0); 
+    }
+    /* Delays para cada item */
+    .modern-sidebar.active .nav-item-wrapper:nth-child(1) .big-link { transition: transform 0.8s 0.1s var(--ease-out-expo), color 0.3s; }
+    .modern-sidebar.active .nav-item-wrapper:nth-child(2) .big-link { transition: transform 0.8s 0.15s var(--ease-out-expo), color 0.3s; }
+    .modern-sidebar.active .nav-item-wrapper:nth-child(3) .big-link { transition: transform 0.8s 0.2s var(--ease-out-expo), color 0.3s; }
+    .modern-sidebar.active .nav-item-wrapper:nth-child(4) .big-link { transition: transform 0.8s 0.25s var(--ease-out-expo), color 0.3s; }
+    .modern-sidebar.active .nav-item-wrapper:nth-child(5) .big-link { transition: transform 0.8s 0.3s var(--ease-out-expo), color 0.3s; }
+    .modern-sidebar.active .nav-item-wrapper:nth-child(6) .big-link { transition: transform 0.8s 0.35s var(--ease-out-expo), color 0.3s; }
+
+    /* Hover Effects: Focus Dimming */
+    .nav-wrapper:hover .big-link { color: #e5e5ea; /* Todos ficam muito apagados */ }
+    .nav-wrapper .big-link:hover { 
+        color: var(--k-black); /* O hover fica preto total */
+        transform: translateX(20px); /* Move levemente p/ direita */
+    }
+    .big-link.active { color: var(--k-black); }
+
+    /* Link com contador ou badge */
+    .link-badge { font-size: 1rem; vertical-align: middle; background: var(--k-red); color: white; padding: 2px 10px; border-radius: 50px; font-weight: 600; margin-left: 15px; letter-spacing: 0; }
+
+    /* Widgets do Footer da Sidebar */
+    .sidebar-footer {
+        margin-top: auto; opacity: 0; transform: translateY(20px);
+        transition: all 0.6s 0.4s var(--ease-out-expo);
+    }
+    .modern-sidebar.active .sidebar-footer { opacity: 1; transform: translateY(0); }
+
+    /* Widget Estilo Bento Grid */
+    .user-widget {
+        background: #f5f5f7;
+        border-radius: 24px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 12px;
+    }
+
+    .widget-profile {
+        grid-column: 1 / -1;
+        background: white;
+        padding: 15px;
+        border-radius: 16px;
+        display: flex; align-items: center; gap: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .widget-btn {
+        background: white;
+        border-radius: 16px;
+        padding: 15px;
+        display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px;
+        font-weight: 600; font-size: 0.85rem;
+        transition: 0.2s; border: 1px solid transparent;
+        color: #555;
+    }
+    .widget-btn:hover { background: var(--k-black); color: white; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    
+    .widget-cart {
+        grid-column: 1 / -1;
+        background: var(--k-black);
+        color: white;
+        padding: 18px;
+        border-radius: 16px;
+        display: flex; justify-content: space-between; align-items: center;
+        font-weight: 700; cursor: pointer; transition: 0.3s;
+    }
+    .widget-cart:hover { background: #333; transform: scale(1.02); }
+
+    /* =========================================
+       MOBILE HEADER (MANTIDO)
+       ========================================= */
+    .mobile-header {
+      position: fixed; top: 0; left: 0; right: 0; height: 70px;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      z-index: 1040; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    /* =========================================
+       GAMER FOOTER (MANTIDO + TWEAKS)
+       ========================================= */
+    .gamer-footer {
+        flex-shrink: 0; background-color: var(--kf-bg-dark); color: var(--kf-text);
+        padding: 60px 0 30px; position: relative; overflow: hidden; border-top: 1px solid #27272a;
+        margin-top: auto; padding-bottom: 110px;
+    }
+    @media(min-width: 992px) { .gamer-footer { padding-bottom: 40px; } }
+    
+    /* Configurações padrão do footer mantidas para compatibilidade */
+    .gf-header { display: flex; justify-content: space-between; align-items: end; margin-bottom: 30px; padding: 0 20px; }
+    .gf-title { font-weight: 800; font-size: 1.5rem; text-transform: uppercase; background: linear-gradient(90deg, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .gf-badge { background: var(--kf-accent); color: white; padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .gf-scroll-wrapper { position: relative; width: 100%; overflow-x: auto; padding-bottom: 30px; padding-left: 20px; padding-right: 20px; display: flex; gap: 20px; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; cursor: grab; }
+    .gf-scroll-wrapper:active { cursor: grabbing; }
+    .gf-scroll-wrapper::-webkit-scrollbar { display: none; }
+    .game-card { min-width: 170px; height: 260px; border-radius: 16px; overflow: hidden; position: relative; cursor: pointer; transition: all 0.3s ease; border: 1px solid #27272a; background: #000; flex-shrink: 0; }
+    .game-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--kf-neon); z-index: 2; box-shadow: 0 10px 30px rgba(0, 242, 234, 0.15); }
+    .game-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; transition: 0.3s; }
+    .game-card:hover .game-img { opacity: 1; }
+    .game-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, black 30%, transparent); padding: 20px 12px 12px; transform: translateY(100%); transition: 0.3s; }
+    .game-card:hover .game-overlay { transform: translateY(0); }
+    .game-title { font-weight: 800; font-size: 0.95rem; color: white; text-shadow: 0 2px 4px black; margin-bottom: 2px; }
+    .game-price { color: var(--kf-neon); font-weight: 800; font-size: 0.9rem; }
+    .game-platform { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; color: white; backdrop-filter: blur(4px); font-weight: 700; text-transform: uppercase; }
+    .gf-bottom { border-top: 1px solid #27272a; padding-top: 20px; margin-top: 40px; text-align: center; font-size: 0.8rem; color: #52525b; }
+
+    /* =========================================
+       MOBILE DOCK (MANTIDO)
+       ========================================= */
+    .mobile-dock {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px;
+        background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border-radius: 50px; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center;
+        z-index: 1050; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .dock-item { color: rgba(255,255,255,0.5); font-size: 1.3rem; position: relative; transition: 0.3s; }
+    .dock-item:hover, .dock-item.active { color: white; transform: translateY(-2px); }
+    .dock-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--k-yellow); border-radius: 50%; }
+    .dock-fab { background: var(--k-red); color: white; width: 54px; height: 54px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-top: -40px; box-shadow: 0 10px 20px rgba(227, 28, 37, 0.4); border: 4px solid #FAFAFA; transition: 0.3s; }
+    .dock-fab:active { transform: scale(0.95); }
+    
+    @media (max-width: 768px) {
+        .game-card { min-width: 140px; height: 210px; }
+        body { padding-top: 80px; }
+    }
+
+    /* =========================================
+   FLOATING CART BUTTON (DESKTOP)
+   ========================================= */
+.floating-cart-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 65px;
+    height: 65px;
+    background: var(--k-black);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 1030; /* Abaixo do Menu Overlay, mas acima do conteúdo */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Hover Effect */
+.floating-cart-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    color: var(--k-red);
+}
+
+/* Badge (Contador) */
+.cart-fab-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--k-red);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    transition: 0.3s;
+}
+
+/* ANIMAÇÃO DE "PISCAR/PULAR" AO ADICIONAR */
+@keyframes cartPop {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(227, 28, 37, 0); }
+    50% { transform: scale(1.3); box-shadow: 0 0 30px rgba(227, 28, 37, 0.6); background: var(--k-red); color: white;}
+    100% { transform: scale(1); box-shadow: 0 0 0 rgba(227, 28, 37, 0); background: var(--k-black); }
+}
+
+.cart-animating {
+    animation: cartPop 0.6s ease-out;
+}
+
+/* Esconder no mobile pois já temos o Dock Inferior */
+@media (max-width: 991px) {
+    .floating-cart-btn { display: none; }
+}
+  </style>
+</head>
+<body>
+
+  <!-- =======================================================
+       BOTÃO DO MENU REVOLUCIONÁRIO (DESKTOP)
+       ======================================================= -->
+  <div class="menu-trigger-container d-none d-lg-block">
+    <div class="menu-trigger-btn" id="menuTrigger" title="Menu">
+        <!-- Ícone ABRIR (Fluency Style Grid) -->
+        <svg class="fluency-icon icon-open" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="9" height="9" rx="3" fill="currentColor"/>
+            <rect x="13" y="2" width="9" height="9" rx="3" fill="currentColor" fill-opacity="0.6"/>
+            <rect x="2" y="13" width="9" height="9" rx="3" fill="currentColor" fill-opacity="0.6"/>
+            <rect x="13" y="13" width="9" height="9" rx="3" fill="currentColor"/>
+        </svg>
+        
+        <!-- Ícone FECHAR (Fluency Style X) -->
+        <svg class="fluency-icon icon-close" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+  </div>
+
+  <!-- Overlay (Blur Profundo) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- A SIDEBAR ROBUSTA (Drawer) -->
+  <aside class="modern-sidebar" id="mainSidebar">
+    
+    <!-- Cabeçalho Interno -->
+    <div class="sidebar-header">
+        <div class="brand-big">
+            <img src="/images/logo.png" alt="Logo" width="40" height="40" class="rounded-circle shadow-sm">
+            KuandaShop
+            <div class="brand-dot"></div>
+        </div>
+        <span class="badge bg-light text-dark rounded-pill border">v2.0</span>
+    </div>
+
+    <!-- Navegação Gigante (Focus Effect) -->
+    <nav class="nav-wrapper">
+        <div class="nav-item-wrapper">
+            <a href="/" class="big-link <%= (typeof path !== 'undefined' && path === '/') ? 'active' : '' %>">
+                Início
+            </a>
+        </div>
+        <div class="nav-item-wrapper">
+            <a href="/produtos" class="big-link <%= (typeof path !== 'undefined' && path === '/produtos') ? 'active' : '' %>">
+                Produtos
+            </a>
+        </div>
+        <div class="nav-item-wrapper">
+            <a href="/lojas" class="big-link <%= (typeof path !== 'undefined' && path === '/lojas') ? 'active' : '' %>">
+                Lojas
+            </a>
+        </div>
+        <div class="nav-item-wrapper">
+            <a href="/categorias" class="big-link <%= (typeof path !== 'undefined' && path === '/categorias') ? 'active' : '' %>">
+                Categorias
+            </a>
+        </div>
+        <div class="nav-item-wrapper">
+            <a href="/ofertas" class="big-link text-danger">
+                Ofertas<span class="link-badge">HOT</span>
+            </a>
+        </div>
+        <div class="nav-item-wrapper">
+            <a href="/games" class="big-link">
+                Games
+            </a>
+        </div>
+    </nav>
+
+    <!-- Footer da Sidebar (Widgets do Usuário) -->
+    <div class="sidebar-footer">
+        
+        <% if (typeof user !== 'undefined' && user) { %>
+            <!-- Widget User Logado -->
+            <div class="user-widget">
+                <!-- Perfil -->
+                <div class="widget-profile">
+                    <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center" 
+                         style="width: 44px; height: 44px; min-width: 44px; overflow: hidden;">
+                        <% if(user.foto_perfil) { %>
+                            <img src="/uploads/perfil/<%= user.foto_perfil %>" width="100%" height="100%" style="object-fit: cover;">
+                        <% } else { %>
+                            <i class="fas fa-user text-secondary"></i>
+                        <% } %>
+                    </div>
+                    <div style="line-height: 1.2;">
+                        <div class="fw-bold text-dark"><%= user.nome || 'Usuário' %></div>
+                        <small class="text-muted" style="font-size: 0.75rem;">Membro Ativo</small>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <a href="/perfil" class="widget-btn">
+                    <i class="fas fa-cog fs-5"></i>
+                    <span>Config</span>
+                </a>
+                
+                <form action="/logout" method="POST" class="m-0 h-100 w-100">
+                    <button type="submit" class="widget-btn w-100 h-100 border-0">
+                        <i class="fas fa-sign-out-alt fs-5 text-danger"></i>
+                        <span>Sair</span>
+                    </button>
+                </form>
+
+                <!-- Botão Carrinho Largo -->
+                <a href="/carrinho" class="widget-cart">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-shopping-bag text-secondary"></i>
+                        <span>Carrinho</span>
+                    </div>
+                    <div class="bg-white text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" 
+                         style="width: 28px; height: 28px; font-size: 0.8rem;" id="sidebarCartCount">0</div>
+                </a>
+            </div>
+
+            <!-- Botões Extras Admin/Vendedor -->
+            <div class="d-flex gap-2 mt-2">
+                <% if (user.tipo === 'admin') { %>
+                    <a href="/admin" class="btn btn-danger btn-sm w-100 rounded-4 fw-bold py-2"><i class="fas fa-shield-alt"></i> Admin</a>
+                <% } %>
+                <% if (user.tipo === 'vendedor') { %>
+                    <a href="/vendedor" class="btn btn-primary btn-sm w-100 rounded-4 fw-bold py-2"><i class="fas fa-store"></i> Painel</a>
+                <% } %>
+            </div>
+
+        <% } else { %>
+            <!-- Widget Deslogado -->
+            <div class="user-widget" style="background: white; border: 1px solid #eee;">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 10px;">
+                    <h5 class="fw-bold mb-1">Bem-vindo ao Kuanda</h5>
+                    <p class="text-muted small mb-3">Faça login para comprar e vender.</p>
+                </div>
+                <a href="/login" class="btn btn-dark rounded-4 py-3 fw-bold">Entrar</a>
+                <a href="/registro" class="btn btn-outline-dark rounded-4 py-3 fw-bold">Cadastrar</a>
+            </div>
+        <% } %>
+
+    </div>
+
+  </aside>
+
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main>
+    <%- body %>
+  </main>
+
+  <!-- FOOTER GAMER -->
+  <footer class="gamer-footer">
+    
+    <div class="container-fluid gf-header">
+        <div>
+            <div class="gf-title">Jogos Vips Solicite-já</div>
+            <span class="gf-badge bg-dark border border-secondary">Ligue (+244974120856)</span>
+        </div>
+        <span class="gf-badge bg-dark border border-secondary">Novidades</span>
+    </div>
+
+    <!-- CARROUSEL HORIZONTAL -->
+    <div class="gf-scroll-wrapper">
+
+        <!-- 1. GTA V -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-windows"></i> PC</span>
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png" class="game-img" alt="GTA V">
+            <div class="game-overlay">
+                <div class="game-title">Grand Theft Auto V</div>
+                <div class="game-price">30.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 2. FC 24 -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-steam"></i> STEAM</span>
+            <img src="https://store-images.s-microsoft.com/image/apps.62211.14149336736014321.ba14b91a-e8c6-40d0-9285-ac512ca86a54.8021282f-2bc6-41f3-8412-fe458797ea2b?h=210" class="game-img" alt="FC 24">
+            <div class="game-overlay">
+                <div class="game-title">EA Sports FC 24</div>
+                <div class="game-price">80.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 3. COD MW3 -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-battle-net"></i> B.NET</span>
+            <img src="https://store-images.s-microsoft.com/image/apps.55183.13612848337674936.f9e71e15-6765-4282-8a3d-968dccfb729c.f59acc22-2c7b-41fb-96ca-d173dc290712" class="game-img" alt="COD MW3">
+            <div class="game-overlay">
+                <div class="game-title">Call of Duty: MW3</div>
+                <div class="game-price">70.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 4. Forza Horizon 5 -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-xbox"></i> XBOX</span>
+            <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1551360/header.jpg?t=1746471508" class="game-img" alt="Forza 5">
+            <div class="game-overlay">
+                <div class="game-title">Forza Horizon 5</div>
+                <div class="game-price">90.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 5. God of War Ragnarok -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-playstation"></i> PS5</span>
+            <img src="https://upload.wikimedia.org/wikipedia/pt/thumb/a/a5/God_of_War_Ragnar%C3%B6k_capa.jpg/330px-God_of_War_Ragnar%C3%B6k_capa.jpg" class="game-img" alt="GOW Ragnarok">
+            <div class="game-overlay">
+                <div class="game-title">God of War Ragnarok</div>
+                <div class="game-price">100.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 6. GTA VI -->
+        <div class="game-card">
+            <span class="game-platform" style="background: #ff0055;"><i class="fas fa-clock"></i> PRÉ-VENDA</span>
+            <img src="https://www.rockstargames.com/VI/_next/image?url=%2FVI%2F_next%2Fstatic%2Fmedia%2FJason_and_Lucia_01_With_Logos_landscape.8596f77a.jpg&w=1920&q=75" class="game-img" alt="GTA VI">
+            <div class="game-overlay">
+                <div class="game-title">Grand Theft Auto VI</div>
+                <div class="game-price">180.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 7. Black Myth: Wukong -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-steam"></i> STEAM</span>
+            <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/header.jpg?t=1717865675" class="game-img" alt="Black Myth Wukong">
+            <div class="game-overlay">
+                <div class="game-title">Black Myth: Wukong</div>
+                <div class="game-price">75.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 8. COD: Black Ops 6 -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-xbox"></i> XBOX</span>
+            <img src="https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/store/games/bo6/Store_BO6PDP_Hero.webp" class="game-img" alt="COD Black Ops 6">
+            <div class="game-overlay">
+                <div class="game-title">COD: Black Ops 6</div>
+                <div class="game-price">120.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 9. DB: Sparking! ZERO -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-playstation"></i> PS5</span>
+            <img src="https://preview.redd.it/dragon-ball-sparking-zero-turns-a-year-old-today-v0-h0tlyhyvp7uf1.jpeg?auto=webp&s=727df8b439349f419a6605e05f16701f5fa1ce22" class="game-img" alt="Dragon Ball Sparking Zero">
+            <div class="game-overlay">
+                <div class="game-title">DB: Sparking! ZERO</div>
+                <div class="game-price">75.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 10. AC: Shadows -->
+        <div class="game-card">
+            <span class="game-platform" style="background: #ff0055;"><i class="fas fa-clock"></i> PRÉ-VENDA</span>
+            <img src="https://cdn1.epicgames.com/offer/14a28903e3d14bd5aa3e6dbf10868126/EN_EGST_StorePortrait_1200x1600_1200x1600-a010fb65414cbbc48e055d1f6eac41b8" class="game-img" alt="AC Shadows">
+            <div class="game-overlay">
+                <div class="game-title">AC: Shadows</div>
+                <div class="game-price">80.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 11. Silent Hill 2 -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-steam"></i> STEAM</span>
+            <img src="https://upload.wikimedia.org/wikipedia/pt/1/18/Silent_Hill_2_2024_capa.png" class="game-img" alt="Silent Hill 2">
+            <div class="game-overlay">
+                <div class="game-title">Silent Hill 2 Remake</div>
+                <div class="game-price">60.000 Kz</div>
+            </div>
+        </div>
+
+        <!-- 12. Star Wars Outlaws -->
+        <div class="game-card">
+            <span class="game-platform"><i class="fab fa-windows"></i> PC</span>
+            <img src="https://image.api.playstation.com/vulcan/ap/rnd/202306/3020/5d272976398422e4228709c8ac02f56f816c687079af5222.jpg" class="game-img" alt="Star Wars Outlaws">
+            <div class="game-overlay">
+                <div class="game-title">Star Wars Outlaws</div>
+                <div class="game-price">80.000 Kz</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container gf-bottom">
+        <span>&copy; 2026 KuandaShop. Todos os direitos reservados.</span>
+    </div>
+
+  </footer>
+
+  <!-- MOBILE DOCK (MANTIDO) -->
+  <nav class="mobile-dock d-lg-none">
+    <a href="/" class="dock-item <%= (typeof path !== 'undefined' && path === '/') ? 'active' : '' %>">
+        <i class="fas fa-home"></i>
+    </a>
+    <a href="/produtos" class="dock-item <%= (typeof path !== 'undefined' && path === '/produtos') ? 'active' : '' %>">
+        <i class="fas fa-search"></i>
+    </a>
+    
+    <a href="/carrinho" class="dock-fab position-relative">
+        <i class="fas fa-shopping-basket"></i>
+        <span id="mobileCartCount" class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-warning text-dark border border-light" style="font-size: 0.6rem; display: none;">0</span>
+    </a>
+    
+    <a href="/lojas" class="dock-item">
+        <i class="fas fa-store"></i>
+    </a>
+    <a href="<%= (typeof user !== 'undefined' && user) ? '/perfil' : '/login' %>" class="dock-item">
+        <i class="fas fa-user"></i>
+    </a>
+  </nav>
+
+
+<!-- BOTÃO FLUTUANTE DE CARRINHO -->
+<a href="/carrinho" class="floating-cart-btn" id="floatingCartBtn">
+    <div class="cart-fab-badge" id="floatingCartCount" style="display: none;">0</div>
+    <i class="fas fa-shopping-bag fs-4"></i>
+</a>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+/* =========================================================
+   CART MANAGER — ÚNICO, UNIFICADO E ESTÁVEL
+   ========================================================= */
+const CartManager = {
+
+    /* =========================
+       ANIMAÇÃO DO BOTÃO CARRINHO
+       ========================= */
+    triggerAnimation() {
+        const btn = document.getElementById('floatingCartBtn');
+        const dockBtn = document.querySelector('.dock-fab');
+
+        const animate = (el) => {
+            if (!el) return;
+            el.classList.remove('cart-animating');
+            void el.offsetWidth; // força reflow
+            el.classList.add('cart-animating');
+            setTimeout(() => el.classList.remove('cart-animating'), 600);
+        };
+
+        animate(btn);
+        animate(dockBtn);
+    },
+
+    /* =========================
+       ATUALIZAR CONTADOR
+       ========================= */
+    updateCount() {
+        fetch('/carrinho/quantidade')
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    ['sidebarCartCount', 'mobileCartCount', 'floatingCartCount']
+                        .forEach(id => {
+                            const el = document.getElementById(id);
+                            if (!el) return;
+
+                            el.textContent = d.quantidade;
+
+                            if (d.quantidade > 0) {
+                                el.style.display = 'flex';
+                            } else {
+                                el.style.display = (id === 'sidebarCartCount') ? 'flex' : 'none';
+                            }
+                        });
+                }
+            })
+            .catch(err => console.error('[CartCount]', err));
+    },
+
+    /* =========================
+       ADICIONAR AO CARRINHO
+       ========================= */
+    async add(id, name) {
+
+        // TOAST
+        const toast = document.createElement('div');
+        toast.className = 'toast show align-items-center text-white bg-success border-0 position-fixed top-0 end-0 m-3 shadow-lg';
+        toast.style.zIndex = '3000';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body fw-bold">
+                    <i class="fas fa-check-circle me-2"></i> ${name} adicionado!
+                </div>
+            </div>`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.transition = "opacity .5s";
+            toast.style.opacity = "0";
+            setTimeout(() => toast.remove(), 500);
+        }, 2500);
+
+        try {
+            await fetch('/carrinho/adicionar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `produto_id=${id}&quantidade=1`
+            });
+
+            this.updateCount();
+            this.triggerAnimation();
+
+        } catch (err) {
+            console.error('[AddCart]', err);
+        }
+    },
+
+    /* =========================
+       INIT
+       ========================= */
+    init() {
+        this.updateCount();
+        setInterval(() => this.updateCount(), 30000);
+    }
+};
+
+/* DISPONÍVEL GLOBALMENTE */
+window.addToCart = (id, name) => CartManager.add(id, name);
+
+/* =========================================================
+   MENU HIGH-END + UI
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+
+    CartManager.init();
+
+    const menuTrigger = document.getElementById('menuTrigger');
+    const mainSidebar = document.getElementById('mainSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const body = document.body;
+
+    function toggleMenu() {
+        menuTrigger?.classList.toggle('menu-active');
+        mainSidebar?.classList.toggle('active');
+        sidebarOverlay?.classList.toggle('active');
+        body.style.overflow = mainSidebar?.classList.contains('active') ? 'hidden' : '';
+    }
+
+    menuTrigger?.addEventListener('click', toggleMenu);
+    sidebarOverlay?.addEventListener('click', toggleMenu);
+
+    document.querySelectorAll('.big-link').forEach(link => {
+        link.addEventListener('click', () => setTimeout(toggleMenu, 150));
+    });
+
+    /* LIMPEZA GLOBAL DE TOASTS */
+    setTimeout(() => {
+        document.querySelectorAll('.toast').forEach(t => {
+            t.style.opacity = '0';
+            setTimeout(() => t.remove(), 500);
+        });
+    }, 4000);
+
+    /* SCROLL HORIZONTAL FOOTER */
+    const slider = document.querySelector('.gf-scroll-wrapper');
+    if (slider) {
+        let isDown = false, startX, scrollLeft;
+
+        slider.addEventListener('mousedown', e => {
+            isDown = true;
+            slider.style.cursor = 'grabbing';
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        ['mouseleave', 'mouseup'].forEach(evt =>
+            slider.addEventListener(evt, () => {
+                isDown = false;
+                slider.style.cursor = 'grab';
+            })
+        );
+
+        slider.addEventListener('mousemove', e => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            slider.scrollLeft = scrollLeft - (x - startX) * 2;
+        });
+    }
+});
+</script>
+
+<!-- KUANDA NOTIFICATION WIDGET (CORRIGIDO PARA BIP ÚNICO) -->
+<style>
+    .k-fab { position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; background: #E31C25; color: white; border-radius: 50%; box-shadow: 0 4px 20px rgba(227, 28, 37, 0.4); display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10000; transition: transform 0.2s; }
+    .k-fab:hover { transform: scale(1.05); }
+    .k-badge { position: absolute; top: 0; right: 0; background: #111827; color: white; border: 2px solid #fff; min-width: 22px; height: 22px; border-radius: 11px; font-size: 11px; font-weight: bold; display: flex; justify-content: center; align-items: center; padding: 0 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    
+    .k-pop { position: fixed; bottom: 100px; left: 30px; width: 300px; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 10000; display: none; overflow: hidden; border: 1px solid #f0f0f0; animation: kSlideUp 0.4s ease-out; }
+    @keyframes kSlideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .k-pop-head { background: #f9fafb; padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #374151; }
+    .k-pop-body { padding: 15px; color: #4b5563; font-size: 14px; line-height: 1.4; }
+    .k-pop-act { display: block; width: 100%; padding: 10px; text-align: center; background: #E31C25; color: white; text-decoration: none; font-weight: 500; font-size: 13px; }
+</style>
+
+<!-- Elementos Visuais -->
+<div class="k-fab" onclick="window.location.href='/central-mensagens'">
+    <i class="fas fa-comment-alt fa-lg"></i>
+    <div class="k-badge" id="kBadge" style="display:none">0</div>
+</div>
+
+<div class="k-pop" id="kPop">
+    <div class="k-pop-head">
+        <span id="kFrom">Nova Notificação</span>
+        <i class="fas fa-times" style="cursor:pointer; color:#9ca3af" onclick="closeKPop()"></i>
+    </div>
+    <div class="k-pop-body" id="kText">...</div>
+    <a href="/central-mensagens" class="k-pop-act">Ver Detalhes</a>
+</div>
+
+<!-- Som -->
+<audio id="kAudio" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Variáveis de Estado (Memória)
+        let localLastId = 0; // Armazena o ID da última mensagem conhecida
+        let firstRun = true;
+        
+        // Verifica se usuário está logado (via EJS ou verificação de cookie/DOM)
+        // Se você tiver uma variável global 'user', use-a. Caso contrário, o fetch vai retornar erro e o catch pega.
+        const audio = document.getElementById('kAudio');
+
+        async function monitorChat() {
+            try {
+                const res = await fetch('/api/chat/check');
+                if(res.status === 401) return; // Não logado
+                
+                const data = await res.json();
+                
+                // 1. Atualiza Badge (Bolinha vermelha)
+                const badge = document.getElementById('kBadge');
+                const unread = parseInt(data.unread || 0);
+                
+                if (unread > 0) {
+                    badge.style.display = 'flex';
+                    badge.innerText = unread > 99 ? '99+' : unread;
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                // 2. Lógica do Bip e Popup (Baseada no ID da Mensagem, não apenas no contador)
+                // Se o ID recebido for MAIOR que o último ID que conhecemos, é uma mensagem nova.
+                if (data.lastId > localLastId) {
+                    
+                    // Se não for a primeira carga da página (evita bip ao dar F5 se já tiver mensagens)
+                    if (!firstRun) {
+                        // Toca Som
+                        try {
+                            audio.currentTime = 0;
+                            let playPromise = audio.play();
+                            if (playPromise !== undefined) {
+                                playPromise.catch(error => { console.log('Autoplay bloqueado'); });
+                            }
+                        } catch(e){}
+
+                        // Mostra Popup com o texto correto (Compra, Status, etc)
+                        showPopup(data.from, data.preview);
+                    }
+                    
+                    // Atualiza nosso "conhecimento" para o novo ID
+                    localLastId = data.lastId;
+                }
+                
+                firstRun = false;
+
+            } catch (err) {
+                // Silêncio em erro de rede
+            }
+        }
+
+        function showPopup(from, text) {
+            const pop = document.getElementById('kPop');
+            document.getElementById('kFrom').innerText = from || 'Sistema';
+            document.getElementById('kText').innerHTML = text || 'Você tem novas mensagens.';
+            
+            pop.style.display = 'block';
+            
+            // Auto-hide após 5 segundos
+            if (window.popTimeout) clearTimeout(window.popTimeout);
+            window.popTimeout = setTimeout(closeKPop, 5000);
+        }
+
+        window.closeKPop = function() {
+            document.getElementById('kPop').style.display = 'none';
+        }
+
+        // Verifica a cada 3.5 segundos
+        setInterval(monitorChat, 3500);
+    });
+</script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    // --- DEBUG (Abra o F12 no navegador para ver isso) ---
+    // Vamos transformar as mensagens do EJS em um objeto JSON seguro para o JS ler
+    const flashMessages = {
+      success: "<%= (messages.success && messages.success.length > 0) ? messages.success : '' %>",
+      error: "<%= (messages.error && messages.error.length > 0) ? messages.error : '' %>",
+      info: "<%= (messages.info && messages.info.length > 0) ? messages.info : '' %>"
+    };
+    
+    console.log("📨 Mensagens recebidas do servidor:", flashMessages);
+
+    // Configuração do Toast
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 4000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+
+    // Disparar SUCESSO
+    if (flashMessages.success) {
+      Toast.fire({
+        icon: 'success',
+        title: flashMessages.success
+      });
+    }
+
+    // Disparar ERRO
+    if (flashMessages.error) {
+      Toast.fire({
+        icon: 'error',
+        title: flashMessages.error
+      });
+    }
+
+    // Disparar INFO
+    if (flashMessages.info) {
+      Toast.fire({
+        icon: 'info',
+        title: flashMessages.info
+      });
+    }
+  });
+</script>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Script de Notificação Automática do Backend -->
+<% if (locals.notificacaoScript && locals.notificacaoScript.length > 0) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            <%- notificacaoScript %>
+        });
+    </script>
+<% } %>

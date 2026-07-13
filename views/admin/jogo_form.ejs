@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <!-- FontAwesome (Necessário para os ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           SISTEMA DE DESIGN LUXURY MODULAR
+           ========================================= */
+        :root {
+            --bg-page: #f8fafc;
+            --accent: #4f46e5;
+            --accent-soft: rgba(79, 70, 229, 0.1);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+        }
+
+        /* RESET & BASE */
+        * {
+            text-decoration: none !important;
+            outline: none !important;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            padding-bottom: 80px;
+            
+            /* Background Parallax */
+            background-image: 
+                linear-gradient(rgba(248, 250, 252, 0.92), rgba(248, 250, 252, 0.92)),
+                url('https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/store/games/mw3/overview/Store_GamesPDP_Hero01.png?imwidth=1080');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+        }
+
+        /* Layout Container */
+        .page-container {
+            margin-top: 50px; 
+            max-width: 950px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 10px 5px;
+        }
+
+        .form-header h1 {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .btn-close-custom {
+            background: white;
+            color: var(--text-muted);
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            transition: 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .btn-close-custom:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+            border-color: var(--accent);
+        }
+
+        /* Cards Modulares */
+        .modular-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.5s ease backwards;
+        }
+
+        /* Títulos dos Cards */
+        .card-label-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .card-label-box h4 {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        /* Inputs & Grid Boostrap-like */
+        .row { display: flex; flex-wrap: wrap; margin-right: -10px; margin-left: -10px; }
+        .g-4 { gap: 1.5rem; } /* Simulação gap */
+        .col-md-8, .col-md-4, .col-md-6, .col-12 { padding: 0 10px; box-sizing: border-box; margin-bottom: 15px; }
+        .col-md-8 { width: 66.66%; }
+        .col-md-6 { width: 50%; }
+        .col-md-4 { width: 33.33%; }
+        .col-12 { width: 100%; }
+
+        @media(max-width: 768px) {
+            .col-md-8, .col-md-4, .col-md-6 { width: 100%; }
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            border-radius: 14px;
+            padding: 12px 16px;
+            border: 2px solid #f1f5f9;
+            background: #fcfdfe;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Área de Links */
+        .link-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 50px;
+            gap: 12px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .btn-del-link {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            border-radius: 12px;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        .btn-del-link:hover { background: #ef4444; color: white; }
+
+        .btn-add-more {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .btn-add-more:hover { border-color: var(--accent); color: var(--accent); background: #f8fafc; }
+
+        /* Trailer Box */
+        .trailer-box {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+            border: 1px solid #e0e7ff;
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+        .input-group { display: flex; }
+        .input-group-text {
+            background: white; border: 2px solid #f1f5f9; border-right: none;
+            padding: 0 15px; border-radius: 14px 0 0 14px;
+            display: flex; align-items: center; font-size: 1.2rem;
+        }
+        .input-group .form-control { border-radius: 0 14px 14px 0; }
+
+        /* Botão Publicar */
+        .btn-publish {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .btn-publish:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Switch Custom */
+        .form-switch { display: flex; align-items: center; }
+        .form-switch .form-check-input {
+            width: 3.5em; height: 1.8em; cursor: pointer;
+            appearance: none; background-color: #cbd5e1;
+            border-radius: 2em; position: relative; transition: 0.3s;
+            margin: 0;
+        }
+        .form-switch .form-check-input::before {
+            content: ''; position: absolute; width: 1.4em; height: 1.4em;
+            border-radius: 50%; top: 0.2em; left: 0.2em;
+            background: white; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .form-switch .form-check-input:checked { background-color: #10b981; }
+        .form-switch .form-check-input:checked::before { transform: translateX(1.7em); }
+
+        /* Helpers */
+        .text-muted { color: #64748b; font-size: 0.85rem; margin-top: 5px; display: block; }
+        .bg-light { background-color: #f8fafc; }
+        .rounded-4 { border-radius: 16px; }
+        .p-4 { padding: 1.5rem; }
+        .border { border: 1px solid #e2e8f0; }
+        .justify-content-between { justify-content: space-between; }
+        .me-2 { margin-right: 0.5rem; }
+        .text-primary { color: var(--accent); }
+
+        /* Animações */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsividade Mobile */
+        @media (max-width: 768px) {
+            .link-item { grid-template-columns: 1fr; gap: 8px; }
+            .btn-del-link { height: 40px; margin-top: 5px; }
+            .modular-card { padding: 20px; }
+            .input-group { flex-direction: column; }
+            .input-group-text { border-radius: 14px 14px 0 0; border-right: 2px solid #f1f5f9; border-bottom: none; width: 100%; justify-content: center; padding: 10px; }
+            .input-group .form-control { border-radius: 0 0 14px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    
+    <!-- HEADER -->
+    <header class="form-header">
+        <h1><%= title %></h1>
+        <a href="/admin/jogos" class="btn-close-custom" title="Cancelar e Voltar">
+            <i class="fa-solid fa-xmark"></i>
+        </a>
+    </header>
+
+    <!-- FORMULÁRIO ÚNICO E UNIFICADO -->
+    <!-- enctype é crucial para upload de arquivos -->
+    <form action="<%= action %>" method="POST" enctype="multipart/form-data">
+
+        <!-- CARD 1: DETALHES GERAIS -->
+        <div class="modular-card" style="animation-delay: 0.1s;">
+            <div class="card-label-box">
+                <div class="icon-circle"><i class="fa-solid fa-gamepad"></i></div>
+                <h4>Informações do Título</h4>
+            </div>
+            <div class="row">
+                <!-- Título -->
+                <div class="col-md-8">
+                    <label class="form-label">Nome Oficial</label>
+                    <input type="text" name="titulo" class="form-control" value="<%= jogo ? jogo.titulo : '' %>" required placeholder="Ex: God of War Ragnarök">
+                </div>
+                
+                <!-- Preço -->
+                <div class="col-md-4">
+                    <label class="form-label">Preço (Kz)</label>
+                    <input type="number" step="0.01" name="preco" class="form-control" value="<%= jogo ? jogo.preco : '' %>" placeholder="Deixe vazio se for Grátis">
+                </div>
+                
+                <!-- Plataforma -->
+                <div class="col-md-4">
+                    <label class="form-label">Plataforma</label>
+                    <select name="plataforma" class="form-select">
+                        <option value="PC" <%= jogo && jogo.plataforma == 'PC' ? 'selected' : '' %>>Computador (PC)</option>
+                        <option value="PSN" <%= jogo && jogo.plataforma == 'PSN' ? 'selected' : '' %>>PlayStation 4/5</option>
+                        <option value="XBOX" <%= jogo && jogo.plataforma == 'XBOX' ? 'selected' : '' %>>Xbox Series X/S</option>
+                        <option value="NINTENDO" <%= jogo && jogo.plataforma == 'NINTENDO' ? 'selected' : '' %>>Nintendo Switch</option>
+                    </select>
+                </div>
+                
+                <!-- Gênero (Valores Corrigidos) -->
+                <div class="col-md-4">
+                    <label class="form-label">Gênero Principal</label>
+                    <select name="genero" class="form-select">
+                        <option value="Ação" <%= jogo && jogo.genero == 'Ação' ? 'selected' : '' %>>Ação</option>
+                        <option value="Aventura" <%= jogo && jogo.genero == 'Aventura' ? 'selected' : '' %>>Aventura</option>
+                        <option value="RPG" <%= jogo && jogo.genero == 'RPG' ? 'selected' : '' %>>RPG</option>
+                        <option value="FPS" <%= jogo && jogo.genero == 'FPS' ? 'selected' : '' %>>FPS (Tiro)</option>
+                        <option value="Terror" <%= jogo && jogo.genero == 'Terror' ? 'selected' : '' %>>Terror / Horror</option>
+                        <option value="Luta" <%= jogo && jogo.genero == 'Luta' ? 'selected' : '' %>>Luta</option>
+                        <option value="Corrida" <%= jogo && jogo.genero == 'Corrida' ? 'selected' : '' %>>Corrida / Racing</option>
+                        <option value="Esporte" <%= jogo && jogo.genero == 'Esporte' ? 'selected' : '' %>>Esporte</option>
+                        <option value="Estratégia" <%= jogo && jogo.genero == 'Estratégia' ? 'selected' : '' %>>Estratégia</option>
+                    </select>
+                </div>
+                
+                <!-- Classificação -->
+                <div class="col-md-4">
+                    <label class="form-label">Classificação Indicativa</label>
+                    <select name="classificacao" class="form-select">
+                        <option value="L" <%= jogo && jogo.classificacao == 'L' ? 'selected' : '' %>>Livre</option>
+                        <option value="10" <%= jogo && jogo.classificacao == '10' ? 'selected' : '' %>>10 Anos</option>
+                        <option value="12" <%= jogo && jogo.classificacao == '12' ? 'selected' : '' %>>12 Anos</option>
+                        <option value="14" <%= jogo && jogo.classificacao == '14' ? 'selected' : '' %>>14 Anos</option>
+                        <option value="16" <%= jogo && jogo.classificacao == '16' ? 'selected' : '' %>>16 Anos</option>
+                        <option value="18" <%= jogo && jogo.classificacao == '18' ? 'selected' : '' %>>18 Anos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: TRAILER -->
+        <div class="modular-card" style="animation-delay: 0.2s;">
+            <div class="card-label-box">
+                <div class="icon-circle"><i class="fa-solid fa-play"></i></div>
+                <h4>Mídia Promocional</h4>
+            </div>
+            <div class="trailer-box">
+                <label class="form-label">Trailer Oficial (YouTube URL)</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-brands fa-youtube" style="color:#ef4444;"></i></span>
+                    <input type="url" name="trailer_url" class="form-control" value="<%= jogo ? jogo.trailer_url : '' %>" placeholder="https://youtube.com/watch?v=...">
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3: LINKS DE DOWNLOAD (DINÂMICOS) -->
+        <div class="modular-card" style="animation-delay: 0.3s;">
+            <div class="card-label-box">
+                <div class="icon-circle"><i class="fa-solid fa-download"></i></div>
+                <h4>Links de Instalação</h4>
+            </div>
+            
+            <div id="linksContainer">
+                <% if (typeof links !== 'undefined' && links.length > 0) { %>
+                    <% links.forEach((link) => { %>
+                        <div class="link-item">
+                            <input type="text" name="links_labels[]" class="form-control" placeholder="Nome (Ex: Parte 1 / Torrent)" value="<%= link.label %>" required>
+                            <input type="url" name="links_urls[]" class="form-control" placeholder="URL do Arquivo" value="<%= link.url %>" required>
+                            <button type="button" class="btn-del-link" onclick="this.parentElement.remove()" title="Remover Link"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <!-- Link Padrão (Se for novo jogo) -->
+                    <div class="link-item">
+                        <input type="text" name="links_labels[]" class="form-control" placeholder="Ex: Servidor Google Drive" required>
+                        <input type="url" name="links_urls[]" class="form-control" placeholder="https://..." required>
+                        <button type="button" class="btn-del-link" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                <% } %>
+            </div>
+
+            <button type="button" class="btn-add-more mt-3" onclick="addLink()">
+                <i class="fa-solid fa-plus-circle me-2"></i> Adicionar Novo Servidor
+            </button>
+        </div>
+
+        <!-- CARD 4: ARQUIVOS DE IMAGEM -->
+        <div class="modular-card" style="animation-delay: 0.4s;">
+            <div class="card-label-box">
+                <div class="icon-circle"><i class="fa-solid fa-image"></i></div>
+                <h4>Identidade Visual</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Capa Vertical (Poster)</label>
+                    <input type="file" name="capa" class="form-control" accept="image/*" <%= jogo ? '' : 'required' %>>
+                    <% if(jogo && jogo.capa) { %><small class="text-muted">Atual: <%= jogo.capa %></small><% } %>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Banner Horizontal (Backdrop)</label>
+                    <input type="file" name="banner" class="form-control" accept="image/*">
+                    <% if(jogo && jogo.banner) { %><small class="text-muted">Atual: <%= jogo.banner %></small><% } %>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Capturas de Tela (Screenshots)</label>
+                    <input type="file" name="screenshots" class="form-control" accept="image/*" multiple>
+                    <small class="text-muted">Pressione Ctrl (ou Cmd) para selecionar várias imagens de uma vez.</small>
+                    <% if(jogo && jogo.screenshots) { %>
+                        <small class="text-muted">Imagens atuais salvas: <%= jogo.screenshots.length %></small>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 5: DETALHES FINAIS E STATUS -->
+        <div class="modular-card" style="animation-delay: 0.5s;">
+            <div class="card-label-box">
+                <div class="icon-circle"><i class="fa-solid fa-align-left"></i></div>
+                <h4>Conteúdo e Publicação</h4>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Sinopse / Descrição Completa</label>
+                <textarea name="descricao" class="form-control" rows="5" placeholder="Descreva a história e a jogabilidade..."><%= jogo ? jogo.descricao : '' %></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Requisitos de Sistema (Mínimos/Recomendados)</label>
+                <textarea name="requisitos" class="form-control" rows="3" placeholder="Ex: Windows 10, i5 9400F, GTX 1660..."><%= jogo ? jogo.requisitos : '' %></textarea>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between p-4 bg-light rounded-4 border">
+                <div>
+                    <h6 class="fw-bold m-0 text-dark" style="display:flex; align-items:center;">
+                        <i class="fa-solid fa-eye me-2 text-primary"></i> Visibilidade na Loja
+                    </h6>
+                    <small class="text-muted">Ative para que os usuários possam ver e comprar este jogo.</small>
+                </div>
+                <div class="form-switch">
+                    <input class="form-check-input" type="checkbox" name="ativo" id="ativo" <%= (!jogo || jogo.ativo) ? 'checked' : '' %>>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-publish">
+                <i class="fa-solid fa-paper-plane"></i> <%= jogo ? 'SALVAR ALTERAÇÕES' : 'PUBLICAR JOGO' %>
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- SCRIPT DE LINKS DINÂMICOS -->
+<script>
+    function addLink() {
+        const container = document.getElementById('linksContainer');
+        
+        // Criar elemento
+        const div = document.createElement('div');
+        div.className = 'link-item';
+        
+        // Inserir HTML (Input names = links_labels[] e links_urls[])
+        div.innerHTML = `
+            <input type="text" name="links_labels[]" class="form-control" placeholder="Servidor / Parte" required>
+            <input type="url" name="links_urls[]" class="form-control" placeholder="https://..." required>
+            <button type="button" class="btn-del-link" onclick="this.parentElement.remove()" title="Remover"><i class="fa-solid fa-trash-can"></i></button>
+        `;
+        
+        // Adicionar ao container com animação simples
+        div.style.animation = "fadeInUp 0.3s ease";
+        container.appendChild(div);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,979 @@
+<style>
+    /* =========================================
+       KUANDA "FULL PREMIUM" DESIGN SYSTEM
+       ========================================= */
+    :root {
+        --k-primary: #E31C25;
+        --k-dark: #0F1115;
+        --k-gold: #FFC107;
+        --k-gold-gradient: linear-gradient(135deg, #FFD700, #FDB931);
+        --bg-body: #F8F9FA;
+        
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 32px;
+        
+        --shadow-soft: 0 8px 30px rgba(0,0,0,0.04);
+        --shadow-hover: 0 15px 35px rgba(0,0,0,0.1);
+        --shadow-vip: 0 10px 40px rgba(255, 215, 0, 0.2);
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-body);
+        color: #1f2937;
+        margin: 0; padding: 0;
+        overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; }
+    a { text-decoration: none; color: inherit; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    
+    .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* === 1. HERO BANNER (NAVBAR FIX) === */
+    .hero-container {
+        position: relative; width: 100%;
+        z-index: 1; 
+        margin-top: 0;
+        margin-bottom: 70px;
+    }
+    .hero-carousel-wrap {
+        border-bottom-left-radius: var(--radius-lg);
+        border-bottom-right-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+        position: relative;
+    }
+    .hero-img {
+        width: 100%; height: 500px; object-fit: cover;
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+    }
+
+    /* === 2. CATEGORIAS (Flutuantes & Ícones Únicos) === */
+    .cat-overlap {
+        margin-top: -100px;
+        position: relative; z-index: 10;
+        padding-bottom: 20px;
+    }
+    .cat-scroll {
+        display: flex; gap: 20px; overflow-x: auto; padding: 20px 15px 40px;
+        scrollbar-width: none; justify-content: flex-start;
+    }
+    .cat-scroll::-webkit-scrollbar { display: none; }
+
+    .cat-item {
+        min-width: 100px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        cursor: pointer; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cat-item:hover { transform: translateY(-12px); }
+
+    .cat-icon {
+        width: 80px; height: 80px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border-radius: 24px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border: 2px solid rgba(255,255,255,0.7);
+        transition: 0.3s;
+    }
+    .cat-item:hover .cat-icon { 
+        border-color: var(--k-primary); 
+        box-shadow: 0 15px 35px rgba(227, 28, 37, 0.25); 
+        background: white;
+    }
+    .cat-icon img { 
+        width: 50px; height: 50px;
+        object-fit: contain; 
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+    
+    .cat-label { 
+        font-size: 0.85rem; font-weight: 700; color: #222; 
+        background: rgba(255,255,255,0.9); padding: 4px 12px; border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* === 3. SIDEBAR (REDESIGN COMPLETO & MODERNO) === */
+    .sidebar-premium {
+        position: sticky; top: 100px;
+        background: #FFFFFF;
+        border-radius: 24px;
+        padding: 25px;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    
+    /* Decoration Circle in Sidebar */
+    .sidebar-premium::before {
+        content: ''; position: absolute; top: -30px; right: -30px;
+        width: 100px; height: 100px; border-radius: 50%;
+        background: linear-gradient(135deg, rgba(227, 28, 37, 0.05), transparent);
+        pointer-events: none;
+    }
+
+    .sb-header-wrapper {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 20px; padding-bottom: 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .sb-header {
+        font-size: 0.85rem; font-weight: 800; text-transform: uppercase; 
+        letter-spacing: 0.5px; color: #9CA3AF; display: flex; align-items: center; gap: 8px;
+    }
+    .sb-header i { color: var(--k-primary); font-size: 1rem; }
+    
+    .sb-item { 
+        display: flex; align-items: center; gap: 15px; 
+        margin-bottom: 16px; padding: 8px; border-radius: 12px;
+        transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        background: transparent;
+    }
+    .sb-item:last-child { margin-bottom: 0; }
+    
+    .sb-item:hover { 
+        background: #F9FAFB; 
+        transform: translateX(5px); 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    
+    .sb-img { 
+        width: 55px; height: 55px; border-radius: 14px; 
+        object-fit: cover; background: #f4f4f4; 
+        border: 1px solid rgba(0,0,0,0.05);
+        flex-shrink: 0;
+    }
+    
+    .sb-info { flex: 1; min-width: 0; } /* min-width fix text truncation */
+    .sb-info h6 { 
+        font-size: 0.9rem; font-weight: 700; margin: 0 0 4px 0; 
+        line-height: 1.3; color: var(--k-dark);
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    
+    .sb-sub { 
+        font-size: 0.75rem; color: #6B7280; font-weight: 500;
+        display: block; 
+    }
+    .sb-price { 
+        color: var(--k-primary); font-weight: 800; font-size: 0.9rem; 
+        background: rgba(227, 28, 37, 0.08); padding: 2px 8px; 
+        border-radius: 6px; display: inline-block; margin-top: 2px;
+    }
+
+    /* Divider entre seções da sidebar */
+    .sb-divider { height: 1px; background: #f3f4f6; margin: 25px 0; }
+
+    /* === 4. VIP SECTION === */
+    .vip-container {
+        background: linear-gradient(135deg, #fffcf5 0%, #fff 100%);
+        border: 1px solid rgba(255, 215, 0, 0.3); border-radius: var(--radius-md);
+        padding: 25px; margin-bottom: 40px; position: relative; overflow: hidden;
+        box-shadow: var(--shadow-soft);
+    }
+    .vip-container::before {
+        content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px;
+        background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%); z-index: 0;
+    }
+    
+    /* === 5. PRODUCT CARDS (3x3 Mobile) === */
+    .products-grid {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px;
+    }
+
+    .prod-card {
+        background: white; border-radius: var(--radius-md); overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-soft);
+        transition: 0.3s; display: flex; flex-direction: column; position: relative; height: 100%;
+        z-index: 1;
+    }
+    .prod-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); border-color: transparent; }
+
+    /* Estilo VIP Específico */
+    .prod-card.vip-card { border: 1px solid #FFD700; box-shadow: var(--shadow-vip); }
+    .vip-badge-label {
+        position: absolute; top: 12px; left: 12px; z-index: 2;
+        background: var(--k-gold-gradient); color: black; font-weight: 800;
+        font-size: 0.7rem; padding: 4px 12px; border-radius: 20px; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15); letter-spacing: 0.5px;
+    }
+
+    .prod-img-wrap { position: relative; padding-top: 100%; background: #f8f9fa; overflow: hidden; display: block; }
+    .prod-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+    .prod-card:hover .prod-img { transform: scale(1.08); }
+
+    .btn-add {
+        position: absolute; bottom: 12px; right: 12px; width: 40px; height: 40px;
+        border-radius: 50%; background: white; color: var(--k-dark); border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        transition: 0.2s; z-index: 3; cursor: pointer;
+    }
+    .btn-add:hover { background: var(--k-primary); color: white; transform: scale(1.1); }
+
+    .prod-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
+    .prod-title {
+        font-size: 1rem; font-weight: 700; color: #111; margin-bottom: 8px;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        height: 2.6em; line-height: 1.3;
+    }
+    .prod-price { font-size: 1.15rem; font-weight: 800; color: var(--k-dark); margin-top: auto; }
+    
+    /* === 6. CINEMA === */
+    .cinema-scroll { 
+        display: flex; gap: 20px; overflow-x: auto; padding: 20px 5px 30px; 
+        scrollbar-width: none;
+    }
+    .cinema-scroll::-webkit-scrollbar { display: none; }
+
+    .movie-card {
+        min-width: 160px; width: 160px; 
+        border-radius: 16px; overflow: hidden; position: relative; 
+        transition: transform 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+        cursor: pointer; background: #000;
+    }
+    .movie-card:hover { transform: scale(1.05); z-index: 5; box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+    
+    .movie-img { 
+        width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block;
+        opacity: 0.9; transition: 0.3s;
+    }
+    .movie-card:hover .movie-img { opacity: 1; }
+
+    .movie-badge {
+        position: absolute; top: 8px; right: 8px;
+        background: rgba(227, 28, 37, 0.9); color: white;
+        font-size: 0.65rem; font-weight: 800; padding: 2px 6px;
+        border-radius: 4px; backdrop-filter: blur(4px);
+    }
+
+    /* === 7. CTA KUANDA APP === */
+    .cta-hero {
+      position: relative; width: 100%; min-height: 600px;
+      padding: 120px 8vw; display: flex; align-items: center; overflow: hidden;
+      background: radial-gradient(circle at 20% 30%, rgba(87, 86, 86, 0.9), transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(188, 54, 206, 0.2), transparent 45%),
+                  linear-gradient(135deg, #020617, #020617 60%, #030712);
+      color: #fff;
+    }
+    .cta-hero::after {
+      content: ""; position: absolute; inset: 0;
+      background-image: url("https://png.pngtree.com/thumb_back/fh260/background/20210915/pngtree-geometric-pattern-white-gold-minimalist-creative-background-image_879782.jpg");
+      opacity: 0.04; pointer-events: none;
+    }
+    .cta-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px; mask-image: linear-gradient(to bottom, black, transparent);
+    }
+    .cta-wrapper {
+      position: relative; z-index: 2; max-width: 1400px; margin: auto;
+      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 80px; align-items: center;
+    }
+    .cta-title {
+      font-size: clamp(2.5rem, 4vw, 3.8rem); font-weight: 900; line-height: 1.1; margin-bottom: 24px;
+      background: linear-gradient(to right, #fff, #c7d2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .cta-text { max-width: 520px; font-size: 1.15rem; line-height: 1.7; color: #9ca3af; margin-bottom: 40px; }
+    .cta-actions { display: flex; gap: 18px; flex-wrap: wrap; }
+    .store-btn {
+      display: inline-flex; align-items: center; gap: 14px; padding: 14px 22px;
+      border-radius: 14px; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(12px);
+      transition: all 0.35s ease; text-decoration: none; color: #fff;
+    }
+    .store-btn:hover { transform: translateY(-6px) scale(1.03); background: rgba(255,255,255,0.12); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
+    .store-btn img { height: 32px; }
+    .cta-visual { position: relative; display: flex; justify-content: center; }
+    .app-mockup { max-height: 520px; transform: rotate(-8deg) translateY(40px); filter: drop-shadow(0 40px 80px rgba(0,0,0,0.6)); transition: all 0.6s ease; }
+    .cta-hero:hover .app-mockup { transform: rotate(0deg) translateY(0); }
+    .cta-visual::before {
+      content: ""; position: absolute; width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(99,102,241,0.4), transparent 70%);
+      filter: blur(80px); z-index: -1;
+    }
+
+    /* === 8. LOJAS CARDS === */
+    .stores-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+    .stores-scroll::-webkit-scrollbar { display: none; }
+    .store-card {
+        min-width: 210px; background: white; border-radius: var(--radius-md); overflow: hidden;
+        box-shadow: var(--shadow-soft); border: 1px solid rgba(0,0,0,0.03); transition: 0.3s;
+    }
+    .store-card:hover { transform: translateY(-5px); }
+    .store-cover { height: 75px; background: linear-gradient(45deg, #222, #555); }
+    .store-avatar { 
+        width: 65px; height: 65px; border-radius: 50%; border: 3px solid white; 
+        margin: -35px auto 10px; background: white; overflow: hidden; 
+    }
+    .store-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .store-info { text-align: center; padding: 0 15px 20px; }
+    .store-name { font-weight: 800; font-size: 0.95rem; display: block; margin-bottom: 5px; color: var(--k-dark); }
+    .btn-visit { 
+        background: #f3f4f6; color: #333; font-size: 0.75rem; font-weight: 700; 
+        padding: 6px 18px; border-radius: 20px; transition: 0.2s; display: inline-block;
+    }
+    .btn-visit:hover { background: var(--k-dark); color: white; }
+
+    /* === 9. PLANOS E MATRIZ === */
+    .plans-section { padding: 80px 0; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); position: relative; overflow: hidden; }
+    .plans-bg-decor { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, transparent 70%); top: -20%; right: -10%; z-index: 0; pointer-events: none; }
+    .plans-header { text-align: center; margin-bottom: 50px; position: relative; z-index: 1; }
+    .plans-title { font-weight: 900; font-size: 2.5rem; letter-spacing: -1px; background: linear-gradient(90deg, #0f172a, #334155); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+    .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+    .plan-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 24px; padding: 40px; position: relative; transition: all 0.4s; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+    .plan-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 30px 60px -15px rgba(0,0,0,0.15); border-color: var(--card-color, #4f46e5); }
+    .plan-vendedor { --card-color: #4f46e5; --card-bg: #e0e7ff; }
+    .plan-gamer { --card-color: #E31C25; --card-bg: #fee2e2; }
+    .plan-cine { --card-color: #0d9488; --card-bg: #ccfbf1; }
+    .plan-icon { width: 60px; height: 60px; background: var(--card-bg); color: var(--card-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 25px; transition: 0.3s; }
+    .plan-card:hover .plan-icon { background: var(--card-color); color: white; transform: rotate(-10deg); }
+    .plan-name { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: #1e293b; }
+    .plan-desc { font-size: 0.95rem; color: #64748b; margin-bottom: 30px; line-height: 1.6; }
+    .plan-features { list-style: none; padding: 0; margin: 0 0 auto 0; }
+    .plan-features li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #334155; margin-bottom: 12px; font-weight: 500; }
+    .plan-features i { color: var(--card-color); }
+    .btn-plan-action { margin-top: 30px; padding: 15px; border-radius: 12px; background: #f1f5f9; color: #334155; font-weight: 700; text-align: center; transition: 0.3s; }
+    .plan-card:hover .btn-plan-action { background: var(--card-color); color: white; box-shadow: 0 10px 20px -5px var(--card-color); }
+
+    .matrix-section { margin-top: 30px; margin-bottom: 50px; padding: 0 15px; }
+    .matrix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; max-width: 1300px; margin: 0 auto; }
+    .matrix-card { position: relative; display: block; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 16/9; box-shadow: var(--shadow-soft); isolation: isolate; transition: all 0.4s; }
+    .matrix-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .matrix-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 60%, transparent 100%); z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; transition: 0.3s; }
+    .matrix-content { position: relative; z-index: 2; transform: translateY(0); transition: 0.4s; }
+    .matrix-title { font-family: 'Plus Jakarta Sans', sans-serif; color: white; font-size: 1.5rem; font-weight: 800; margin: 0 0 5px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+    .matrix-sub { color: rgba(255,255,255,0.8); font-size: 0.9rem; font-weight: 500; opacity: 0; transform: translateY(10px); transition: 0.4s; }
+    .matrix-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-vip); }
+    .matrix-card:hover .matrix-img { transform: scale(1.1); }
+    .matrix-card:hover .matrix-sub { opacity: 1; transform: translateY(0); }
+    .matrix-card:hover .matrix-overlay { background: linear-gradient(to top, rgba(227, 28, 37, 0.8) 0%, rgba(0,0,0,0.2) 100%); }
+
+    /* === 10. RESPONSIVIDADE === */
+    @media (max-width: 991px) {
+        .col-sidebar { display: none; }
+        .hero-img { height: 320px; }
+        .cta-wrapper { grid-template-columns: 1fr; text-align: center; }
+        .cta-text { margin-inline: auto; }
+        .cta-actions { justify-content: center; }
+        .app-mockup { max-height: 420px; }
+    }
+
+    @media (max-width: 768px) {
+        .products-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .prod-card { border-radius: 12px; }
+        .prod-body { padding: 10px 6px; }
+        .prod-title { font-size: 0.7rem; height: 2.6em; line-height: 1.2; margin-bottom: 4px; }
+        .prod-price { font-size: 0.85rem; }
+        .btn-add { width: 28px; height: 28px; font-size: 0.7rem; bottom: 6px; right: 6px; }
+        
+        .cat-overlap { margin-top: -60px; }
+        .cat-item { min-width: 80px; }
+        .cat-icon { width: 60px; height: 60px; border-radius: 18px; }
+        .cat-icon img { width: 35px; height: 35px; }
+        .cat-label { font-size: 0.7rem; }
+        
+        .movie-card { min-width: 120px; width: 120px; }
+        
+        .cta-title { font-size: 1.5rem; }
+        .cta-text { font-size: 0.9rem; }
+        .app-btn { height: 40px; margin: 5px; }
+        .cta-mockup { display: block; max-height: 200px; margin: 20px auto 0; transform: none; }
+
+        .plans-section { padding: 40px 0; background: #f8fafc; }
+        .plans-title { font-size: 1.8rem; margin-bottom: 30px; }
+        .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px; }
+        .plan-card { padding: 15px; border-radius: 16px; align-items: center; text-align: center; min-height: 140px; justify-content: center; border: 1px solid #e2e8f0; background: white; }
+        .plan-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 10px; border-radius: 10px; }
+        .plan-name { font-size: 0.8rem; margin-bottom: 0; line-height: 1.1; }
+        .plan-desc, .plan-features, .btn-plan-action { display: none; }
+        .plan-card::after { content: 'Ver'; font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); margin-top: 5px; font-weight: 700; opacity: 0.7; }
+
+        .matrix-section { margin-top: 10px; margin-bottom: 30px; padding: 0 10px; }
+        .matrix-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .matrix-card { aspect-ratio: 1/1; border-radius: 12px; }
+        .matrix-overlay { padding: 8px; justify-content: center; align-items: center; background: rgba(0,0,0,0.3); text-align: center; }
+        .matrix-title { font-size: 0.75rem; margin: 0; line-height: 1.1; }
+        .matrix-sub { display: none; }
+    }
+</style>
+
+<!-- 1. HERO CAROUSEL -->
+<div class="hero-container fade-up">
+    <div class="hero-carousel-wrap">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            
+            <div class="carousel-indicators">
+                <% if (typeof banners !== 'undefined' && banners.length > 0) { %>
+                    <% banners.forEach((banner, index) => { %>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" aria-label="Slide <%= index + 1 %>"></button>
+                    <% }) %>
+                <% } %>
+            </div>
+
+            <div class="carousel-inner" id="venom-banners-target">
+                <% if (typeof banners !== 'undefined' && banners.length > 0) { %>
+                    <% banners.forEach((banner, index) => { %>
+                        <div class="carousel-item <%= index === 0 ? 'active' : '' %>" data-bs-interval="4000">
+                            <a href="<%= banner.link || '#' %>">
+                                <img src="<%= banner.imagem %>" class="hero-img d-block w-100" alt="Banner">
+                            </a>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="carousel-item active">
+                        <div style="height: 460px; background: #1a1a1a; display:flex; align-items:center; justify-content:center; color:white;">
+                            <div class="text-center">
+                                <h2 class="fw-bold">KuandaShop</h2>
+                                <p>Carregando ofertas...</p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <% if (typeof banners !== 'undefined' && banners.length > 1) { %>
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            <% } %>
+
+        </div>
+    </div>
+</div>
+
+<!-- 2. CATEGORIAS FLUTUANTES (ÍCONES ÚNICOS) -->
+<div class="container cat-overlap fade-up" style="animation-delay: 0.1s;">
+    <div class="cat-scroll">
+        <% 
+        const iconBase = "https://img.icons8.com/3d-fluency/94/";
+        /* Mapeamento Expandido de Ícones */
+        const catMap = { 
+            'tech': 'iphone.png', 'celular': 'iphone.png', 'telefone': 'iphone.png',
+            'informatica': 'laptop.png', 'pc': 'workstation.png', 'computador': 'laptop.png',
+            'roupa': 't-shirt.png', 'gift': 'dress.png', 'vestido': 'dress.png',
+            'sapato': 'sneakers.png', 'calçado': 'sneakers.png',
+            'casa': 'sofa.png', 'movel': 'sofa.png', 'decora': 'plant.png',
+            'beleza': 'lipstick.png', 'cosmetico': 'perfume.png',
+            'saude': 'heart-with-pulse.png',
+            'game': 'game-controller.png', 'jogo': 'game-controller.png', 'console': 'arcade-cabinet.png',
+            'carro': 'steering-wheel.png', 'auto': 'car.png',
+            'esporte': 'basketball.png', 'fitness': 'dumbbell.png',
+            'livro': 'books.png', 'papelaria': 'pencil.png',
+            'musica': 'musical-notes.png', 'instrumento': 'guitar.png',
+            'bebe': 'teddy-bear.png', 'brinquedo': 'robot-3.png',
+            'joia': 'diamond.png', 'relogio': 'watch.png',
+            'ferramenta': 'hammer.png'
+        };
+        
+        if (typeof categorias !== 'undefined') { 
+            categorias.forEach(cat => { 
+                let icon = 'gift.png'; // Ícone padrão
+                const lower = cat.nome.toLowerCase();
+                // Tenta encontrar uma correspondência
+                for (const [key, val] of Object.entries(catMap)) { 
+                    if (lower.includes(key)) { icon = val; break; } 
+                }
+        %>
+            <a href="/produtos?categoria=<%= cat.id %>" class="cat-item">
+                <div class="cat-icon">
+                    <img src="<%= iconBase + icon %>" loading="lazy" alt="<%= cat.nome %>">
+                </div>
+                <span class="cat-label text-truncate" style="max-width: 90px"><%= cat.nome.split(' ')[0] %></span>
+            </a>
+        <% }); } %>
+    </div>
+</div>
+
+<!-- CONTAINER PRINCIPAL -->
+<div class="container pb-5">
+    <div class="row g-4">
+        
+        <!-- SIDEBAR (Desktop) -->
+        <div class="col-lg-3 d-none d-lg-block col-sidebar">
+            <div class="sidebar-premium fade-up" style="animation-delay: 0.2s;">
+                
+                <!-- 3.1 SIDEBAR: LOJAS RECENTES -->
+                <div class="sb-header-wrapper">
+                    <div class="sb-header"><i class="fas fa-store"></i> Novas Lojas</div>
+                </div>
+                
+                <div id="venom-sidebar-stores">
+                    <% if (typeof lojas !== 'undefined' && lojas.length > 0) { %>
+                        <% lojas.slice(0, 5).forEach(loja => { %>
+                            <a href="/loja/<%= loja.id %>" class="sb-item">
+                                <img src="/uploads/perfil/<%= loja.foto_perfil %>" class="sb-img" onerror="this.src='/images/store-placeholder.png'">
+                                <div class="sb-info">
+                                    <h6><%= loja.nome_loja || loja.nome %></h6>
+                                    <span class="sb-sub">Visitar Loja</span>
+                                </div>
+                            </a>
+                        <% }) %>
+                    <% } %>
+                </div>
+
+                <div class="sb-divider"></div>
+
+                <!-- 3.2 SIDEBAR: PRODUTOS RECENTES -->
+                <div class="sb-header-wrapper">
+                    <div class="sb-header"><i class="fas fa-fire"></i> Em Alta</div>
+                </div>
+
+                <div id="venom-sidebar-products">
+                    <% if (typeof produtosDestaque !== 'undefined' && produtosDestaque.length > 0) { %>
+                        <% produtosDestaque.slice(0, 5).forEach(prod => { %>
+                            <a href="/produto/<%= prod.id %>" class="sb-item">
+                                <img src="/uploads/produtos/<%= prod.imagem1 %>" class="sb-img" onerror="this.src='/images/placeholder.jpg'">
+                                <div class="sb-info">
+                                    <h6 class="text-truncate"><%= prod.nome %></h6>
+                                    <div class="sb-price"><%= Number(prod.preco).toLocaleString() %> Kz</div>
+                                </div>
+                            </a>
+                        <% }) %>
+                    <% } else { %>
+                        <!-- Este elemento é o gatilho para o Script preencher via JS se o EJS falhar -->
+                        <div class="venom-loading text-muted small ms-1">
+                            <i class="fas fa-circle-notch fa-spin me-2"></i>Buscando novidades...
+                        </div>
+                    <% } %>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="col-lg-9 col-12">
+
+            <!-- 4. LOJAS OFICIAIS (CARDS) -->
+            <section class="mb-5 fade-up" style="animation-delay: 0.3s;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold m-0 d-flex align-items-center">
+                        <!-- Ícone 3D Fluency -->
+                        <img src="images/store.png" width="40" height="40" class="me-2" alt="Loja">
+                        Lojas Oficiais
+                    </h4>
+                    <a href="/lojas" class="text-danger fw-bold small">Ver todas</a>
+                </div>
+                <div class="stores-scroll" id="venom-stores-target">
+                    <% if (typeof lojas !== 'undefined' && lojas.length > 0) { %>
+                        <% lojas.slice(0, 8).forEach(loja => { %>
+                            <div class="store-card">
+                                <div class="store-cover"></div>
+                                <div class="store-avatar">
+                                    <img src="/uploads/perfil/<%= loja.foto_perfil %>" onerror="this.src='/images/store-placeholder.png'">
+                                </div>
+                                <div class="store-info">
+                                    <a href="/loja/<%= loja.id %>" class="store-name"><%= loja.nome_loja || loja.nome %></a>
+                                    <a href="/loja/<%= loja.id %>" class="btn-visit">Ver Loja</a>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="venom-loading text-muted small ms-2">Carregando lojas...</div>
+                    <% } %>
+                </div>
+            </section>
+
+            <!-- 5. VIP EXCLUSIVO (Gold Theme) -->
+            <% if (typeof produtosVip !== 'undefined' && produtosVip.length > 0) { %>
+            <section class="vip-container fade-up" style="animation-delay: 0.4s;">
+                <div class="d-flex justify-content-between align-items-center mb-4 position-relative z-1">
+                    <h4 class="fw-bold m-0 text-dark"><i class="fas fa-crown text-warning me-2"></i>Seleção VIP</h4>
+                </div>
+                
+                <div class="products-grid" id="venom-vip-target">
+                    <% produtosVip.slice(0, 4).forEach(prod => { %>
+                        <div class="prod-card vip-card">
+                            <a href="/produto/<%= prod.id %>" class="prod-img-wrap">
+                                <span class="vip-badge-label">VIP</span>
+                                <img src="/uploads/produtos/<%= prod.imagem1 %>" class="prod-img" loading="lazy" onerror="this.src='/images/placeholder.jpg'">
+                                <button class="btn-add" onclick="event.preventDefault(); addToCart(<%= prod.id %>, '<%= prod.nome %>', <%= prod.preco %>);">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </a>
+                            <div class="prod-body">
+                                <a href="/produto/<%= prod.id %>" class="text-reset"><h3 class="prod-title"><%= prod.nome %></h3></a>
+                                <div class="prod-price"><%= Number(prod.preco).toLocaleString('pt-AO') %> Kz</div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </section>
+            <% } %>
+
+            <!-- 6. PRODUTOS RECENTES (Grid Geral) -->
+            <section class="mb-5 fade-up" style="animation-delay: 0.5s;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold m-0">Explorar Produtos</h4>
+                    <a href="/produtos" class="btn btn-outline-dark rounded-pill btn-sm">Ver Tudo</a>
+                </div>
+
+                <div class="products-grid" id="venom-products-target">
+                    <% 
+                    let feed = [];
+                    // Combina Destaques e Ofertas para a Grid Principal
+                    if (typeof produtosDestaque !== 'undefined') feed = [...feed, ...produtosDestaque];
+                    if (typeof produtosOferta !== 'undefined') feed = [...feed, ...produtosOferta];
+                    // Remove duplicatas
+                    const uniqueFeed = [...new Map(feed.map(item => [item.id, item])).values()].slice(0, 20);
+
+                    if (uniqueFeed.length > 0) {
+                        uniqueFeed.forEach(prod => { 
+                            const preco = Number(prod.preco);
+                    %>
+                        <div class="prod-card">
+                            <a href="/produto/<%= prod.id %>" class="prod-img-wrap">
+                                <% if(Number(prod.preco_promocional) > 0) { %>
+                                    <span class="position-absolute top-0 end-0 m-2 badge bg-danger" style="z-index:2; font-size:0.65rem; padding:4px 8px;">OFERTA</span>
+                                <% } %>
+                                <img src="/uploads/produtos/<%= prod.imagem1 %>" class="prod-img" loading="lazy" onerror="this.src='/images/placeholder.jpg'">
+                                <button class="btn-add" onclick="event.preventDefault(); addToCart(<%= prod.id %>, '<%= prod.nome %>', <%= preco %>);">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </a>
+                            <div class="prod-body">
+                                <a href="/produto/<%= prod.id %>" class="text-reset"><h3 class="prod-title"><%= prod.nome %></h3></a>
+                                <div class="prod-price"><%= preco.toLocaleString('pt-AO') %> Kz</div>
+                            </div>
+                        </div>
+                    <% }) } %>
+                </div>
+                
+                <% if (uniqueFeed.length === 0) { %>
+                    <div id="venom-empty-state" class="text-center py-5 text-muted">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                        <p>Carregando produtos...</p>
+                    </div>
+                <% } %>
+            </section>
+
+            <!-- 7. SESSÃO ESTATICA (MATRIX) -->
+                <div class="matrix-section fade-up" style="animation-delay: 0.15s;">
+                <div class="matrix-grid">
+                    
+                    <!-- CARD 1 -->
+                    <a href="/filmes" class="matrix-card">
+                        <img src="/images/card3.png" class="matrix-img" alt="Streaming" onerror="this.src='https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop'">
+                        <div class="matrix-overlay">
+                            <div class="matrix-content">
+                                <h3 class="matrix-title">Streaming</h3>
+                                <p class="matrix-sub">Saiba Mais +</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- CARD 2 -->
+                    <a href="/ofertas" class="matrix-card">
+                        <img src="/images/card2.png" class="matrix-img" alt="Ofertas" onerror="this.src='https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=800&auto=format&fit=crop'">
+                        <div class="matrix-overlay">
+                            <div class="matrix-content">
+                                <h3 class="matrix-title">Ofertas Hot</h3>
+                                <p class="matrix-sub">Saiba Mais +</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- CARD 3 -->
+                    <a href="/games" class="matrix-card">
+                        <img src="/images/card1.webp" class="matrix-img" alt="Gamer" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop'">
+                        <div class="matrix-overlay">
+                            <div class="matrix-content">
+                                <h3 class="matrix-title">Baixar Games</h3>
+                                <p class="matrix-sub">Saiba Mais +</p>
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- 8. PLANOS -->
+            <section class="plans-section fade-up">
+                <div class="plans-bg-decor"></div>
+                <div class="container">
+                    <div class="plans-header">
+                        <h2 class="plans-title">Recursos Premium</h2>
+                        <p class="text-muted">Escolha o plano ideal para vender mais ou jogar sem limites.</p>
+                    </div>
+                    <div class="plans-grid">
+                        <!-- VENDEDOR -->
+                        <a href="/planos" class="plan-card plan-vendedor">
+                            <div class="plan-icon"><i class="fas fa-store"></i></div>
+                            <h3 class="plan-name">Para Vendedores</h3>
+                            <p class="plan-desc">Comece sua loja online. Planos Básico, Pro e Elite para escalar seu negócio.</p>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i> Painel Administrativo</li>
+                                <li><i class="fas fa-check"></i> Até 1000 Produtos</li>
+                                <li><i class="fas fa-check"></i> Destaque na Home</li>
+                            </ul>
+                            <div class="btn-plan-action">Ver Planos de Loja</div>
+                        </a>
+                        <!-- GAMER -->
+                        <a href="/planos" class="plan-card plan-gamer">
+                            <div class="plan-icon"><i class="fas fa-gamepad"></i></div>
+                            <h3 class="plan-name">Kuanda Pass</h3>
+                            <p class="plan-desc">Acesso ilimitado a todos os jogos da plataforma. Baixe sem restrições.</p>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i> Jogos PC & Console</li>
+                                <li><i class="fas fa-check"></i> Downloads Ilimitados</li>
+                                <li><i class="fas fa-check"></i> Servidores VIP</li>
+                            </ul>
+                            <div class="btn-plan-action">Assinar Pass</div>
+                        </a>
+                        <!-- CINEMA -->
+                        <a href="/planos" class="plan-card plan-cine">
+                            <div class="plan-icon"><i class="fas fa-film"></i></div>
+                            <h3 class="plan-name">Cine Club</h3>
+                            <p class="plan-desc">Os melhores lançamentos do cinema e séries em 4K. Assista tudo.</p>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i> Qualidade 4K HDR</li>
+                                <li><i class="fas fa-check"></i> Sem Anúncios</li>
+                                <li><i class="fas fa-check"></i> Dual Áudio</li>
+                            </ul>
+                            <div class="btn-plan-action">Virar Sócio</div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 9. CINEMA (Uniforme 2:3) -->
+            <% if (typeof filmes !== 'undefined' && filmes.length > 0) { %>
+            <section class="mb-5 fade-up">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold m-0 d-flex align-items-center">
+                        <img src="images/cinema.png" width="40" height="40" class="me-2" alt="Cinema">
+                        Cinema & Séries
+                    </h4>
+                    <a href="/filmes" class="small text-muted">Ver cartaz</a>
+                </div>
+                <div class="cinema-scroll">
+                    <% filmes.forEach(filme => { %>
+                        <a href="/filme/<%= filme.id %>" class="text-decoration-none">
+                            <div class="movie-card">
+                                <img src="/uploads/filmes/<%= filme.poster %>" class="movie-img" loading="lazy" onerror="this.src='/images/poster-placeholder.jpg'">
+                                <span class="movie-badge"><%= filme.classificacao || 'L' %></span>
+                                <% if(filme.preco > 0) { %>
+                                    <div class="position-absolute bottom-0 end-0 m-2 badge bg-warning text-dark shadow">Premium</div>
+                                <% } %>
+                            </div>
+                            <h6 class="mt-2 text-dark fw-bold text-truncate" style="font-size: 0.9rem; width: 160px;"><%= filme.titulo %></h6>
+                        </a>
+                    <% }) %>
+                </div>
+            </section>
+            <% } %>
+
+        </div>
+    </div>
+</div>
+
+<!-- CTA KUANDA APP -->
+<section class="cta-hero">
+    <div class="cta-grid"></div>
+    <div class="cta-wrapper">
+        <!-- LEFT -->
+        <div>
+            <h2 class="cta-title">KuandaApp<br>Brevemente</h2>
+            <p class="cta-text">Descubra produtos exclusivos, vendedores e uma experiência ultra rápida em breve em alguns clicks tudo com vocé aqui.</p>
+            <div class="cta-actions">
+                <a href="#" class="store-btn">
+                    <img src="/images/app-store.png" alt="App Store" onerror="this.style.display='none'">
+                    <div><small style="opacity:.7;font-size:.75rem">Disponível na</small><br><strong>App Store</strong></div>
+                </a>
+                <a href="#" class="store-btn">
+                    <img src="/images/google-play.png" alt="Google Play" onerror="this.style.display='none'">
+                    <div><small style="opacity:.7;font-size:.75rem">Disponível no</small><br><strong>Google Play</strong></div>
+                </a>
+            </div>
+        </div>
+        <!-- RIGHT -->
+        <div class="cta-visual">
+            <img src="/images/app.png" alt="Kuanda App Mockup" class="app-mockup" onerror="this.style.display='none'">
+        </div>
+    </div>
+</section>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- =========================================================================
+     SCRIPT VENOM 4.0 (SIDEBAR FIXED & PRESERVED)
+     ========================================================================= -->
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    // Elementos Alvo
+    const prodTarget = document.getElementById('venom-products-target');
+    const sideProdTarget = document.getElementById('venom-sidebar-products');
+    const storeTarget = document.getElementById('venom-stores-target');
+    const sideStoreTarget = document.getElementById('venom-sidebar-stores');
+    const emptyState = document.getElementById('venom-empty-state');
+
+    // --- TEMPLATES HTML (ATUALIZADOS PARA O NOVO DESIGN DA SIDEBAR) ---
+    
+    const createCardHTML = (img, title, price, link) => `
+        <div class="prod-card" style="animation: fadeUp 0.5s ease">
+            <a href="${link}" class="prod-img-wrap">
+                <img src="${img}" class="prod-img" onerror="this.src='/images/placeholder.jpg'">
+                <button class="btn-add" onclick="event.preventDefault(); window.location.href='${link}'"><i class="fas fa-plus"></i></button>
+            </a>
+            <div class="prod-body">
+                <a href="${link}" class="text-reset"><h3 class="prod-title">${title}</h3></a>
+                <div class="prod-price">${price}</div>
+            </div>
+        </div>`;
+
+    // NOVO TEMPLATE DA SIDEBAR (Widget Style)
+    const createSidebarItemHTML = (img, title, price, link) => `
+        <a href="${link}" class="sb-item" style="animation: fadeUp 0.5s ease">
+            <img src="${img}" class="sb-img" onerror="this.src='/images/placeholder.jpg'">
+            <div class="sb-info">
+                <h6 class="text-truncate">${title}</h6>
+                <div class="sb-price">${price}</div>
+            </div>
+        </a>`;
+
+    const createStoreCardHTML = (img, name, link) => `
+        <div class="store-card">
+            <div class="store-cover"></div>
+            <div class="store-avatar"><img src="${img}" onerror="this.src='/images/store-placeholder.png'"></div>
+            <div class="store-info">
+                <a href="${link}" class="store-name">${name}</a>
+                <a href="${link}" class="btn-visit">Ver Loja</a>
+            </div>
+        </div>`;
+
+    // NOVO TEMPLATE DA SIDEBAR DE LOJAS
+    const createSidebarStoreHTML = (img, name, link) => `
+        <a href="${link}" class="sb-item" style="animation: fadeUp 0.5s ease">
+            <img src="${img}" class="sb-img" onerror="this.src='/images/store-placeholder.png'">
+            <div class="sb-info">
+                <h6 class="text-truncate">${name}</h6>
+                <span class="sb-sub">Visitar Loja</span>
+            </div>
+        </a>`;
+
+    // --- LÓGICA DE PRODUTOS ---
+    const needMain = prodTarget && prodTarget.children.length < 1;
+    const needSide = sideProdTarget && sideProdTarget.querySelector('.venom-loading');
+
+    if (needMain || needSide) {
+        try {
+            const res = await fetch('/produtos?ordenar=novos'); 
+            if (res.ok) {
+                const html = await res.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const scraped = doc.querySelectorAll('.prod-card'); 
+                
+                if (scraped.length > 0) {
+                    if (needMain) {
+                        if(emptyState) emptyState.remove();
+                        prodTarget.innerHTML = '';
+                        Array.from(scraped).slice(0, 16).forEach(card => {
+                            const data = extractCardData(card);
+                            prodTarget.insertAdjacentHTML('beforeend', createCardHTML(data.img, data.title, data.price, data.link));
+                        });
+                    }
+                    if (needSide) {
+                        sideProdTarget.innerHTML = ''; 
+                        Array.from(scraped).slice(0, 5).forEach(card => {
+                            const data = extractCardData(card);
+                            sideProdTarget.insertAdjacentHTML('beforeend', createSidebarItemHTML(data.img, data.title, data.price, data.link));
+                        });
+                    }
+                } else {
+                    if(needSide) sideProdTarget.innerHTML = '<div class="text-muted small ms-1">Sem novidades.</div>';
+                }
+            }
+        } catch (e) { console.error('Venom Products Error:', e); }
+    }
+
+    // --- LÓGICA DE LOJAS ---
+    const needMainStore = storeTarget && storeTarget.querySelector('.venom-loading');
+    const needSideStore = sideStoreTarget && sideStoreTarget.innerHTML.trim() === ''; 
+
+    if (needMainStore || needSideStore) {
+        try {
+            const res = await fetch('/lojas');
+            if (res.ok) {
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const scraped = doc.querySelectorAll('.store-card, .store-card-premium, .card'); 
+                
+                if (scraped.length > 0) {
+                    if (needMainStore) {
+                        storeTarget.innerHTML = '';
+                        Array.from(scraped).slice(0, 10).forEach(store => {
+                            const data = extractStoreData(store);
+                            storeTarget.insertAdjacentHTML('beforeend', createStoreCardHTML(data.img, data.name, data.link));
+                        });
+                    }
+                    if (sideStoreTarget && (sideStoreTarget.children.length === 0 || sideStoreTarget.querySelector('.venom-loading'))) {
+                        sideStoreTarget.innerHTML = '';
+                        Array.from(scraped).slice(0, 5).forEach(store => {
+                            const data = extractStoreData(store);
+                            sideStoreTarget.insertAdjacentHTML('beforeend', createSidebarStoreHTML(data.img, data.name, data.link));
+                        });
+                    }
+                }
+            }
+        } catch (e) { console.error('Venom Stores Error:', e); }
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function extractCardData(card) {
+        return {
+            img: card.querySelector('img')?.src || '/images/placeholder.jpg',
+            title: card.querySelector('.prod-title, h3, h4, h5')?.innerText.trim() || 'Produto',
+            price: card.querySelector('.prod-price, .price')?.innerText.trim() || '00 Kz',
+            link: card.querySelector('a')?.getAttribute('href') || '#'
+        };
+    }
+
+    function extractStoreData(store) {
+        return {
+            img: store.querySelector('img')?.src || '/images/store-placeholder.png',
+            name: store.querySelector('.store-name, .store-title, h4, h5')?.innerText.trim() || 'Loja',
+            link: store.querySelector('a')?.getAttribute('href') || '#'
+        };
+    }
+});
+
+function addToCart(id, nome, preco) {
+    fetch('/carrinho/adicionar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ produto_id: id, quantidade: 1 })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success) {
+            const t = document.createElement('div');
+            t.style.cssText = "position:fixed;bottom:20px;right:20px;background:#10B981;color:white;padding:12px 25px;border-radius:12px;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,0.2); font-weight:600; display:flex; align-items:center; gap:10px; animation: slideIn 0.3s ease;";
+            t.innerHTML = `<i class="fas fa-check-circle fa-lg"></i> <div>${nome}<br><small style="opacity:0.9">Adicionado!</small></div>`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(20px)'; setTimeout(() => t.remove(), 300); }, 2500);
+
+            const badges = document.querySelectorAll('#deskCartCount, #mobileCartCount');
+            if(badges.length) {
+                badges.forEach(b => {
+                    b.innerText = d.quantidade;
+                    b.style.display = 'inline-block';
+                });
+            }
+        }
+    });
+}
+</script>
+<script src="/js/chat-monitor.js"></script>

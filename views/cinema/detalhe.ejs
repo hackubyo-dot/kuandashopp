@@ -1,0 +1,487 @@
+<%- contentFor('body') %>
+
+<style>
+    /* === DESIGN SYSTEM KUANDA CINEMA === */
+    :root {
+        --primary: #E31C25;
+        --dark: #0a0a0a;
+        --card: #141414;
+        --border: #2a2a2a;
+        --text-gray: #b3b3b3;
+    }
+
+    .cinema-page {
+        background-color: var(--dark);
+        color: #fff;
+        min-height: 100vh;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        padding-bottom: 100px;
+    }
+
+    /* --- HERO HEADER --- */
+    .hero-header {
+        position: relative;
+        height: 70vh;
+        width: 100%;
+        overflow: hidden;
+    }
+    .hero-bg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+        opacity: 0.6;
+        transform: scale(1.05);
+        animation: zoomEffect 20s infinite alternate;
+    }
+    @keyframes zoomEffect { from { transform: scale(1.05); } to { transform: scale(1.15); } }
+
+    .hero-content {
+        position: absolute;
+        bottom: 0; left: 0; width: 100%;
+        padding: 60px 5%;
+        display: flex;
+        align-items: flex-end;
+        gap: 50px;
+        background: linear-gradient(0deg, var(--dark) 0%, rgba(10,10,10,0.8) 50%, transparent 100%);
+    }
+
+    /* --- POSTER & INFO --- */
+    .hero-poster {
+        width: 260px;
+        border-radius: 12px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+        border: 1px solid rgba(255,255,255,0.15);
+        z-index: 10;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+    }
+
+    .hero-info h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        line-height: 1;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.9);
+    }
+
+    .meta-tags span {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        margin-right: 10px;
+    }
+    .tag-premium { background: rgba(227, 28, 37, 0.2) !important; color: #ff5252; border-color: rgba(227, 28, 37, 0.4) !important; }
+
+    /* --- MAIN CONTENT GRID --- */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2.8fr 1fr;
+        gap: 50px;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px 5%;
+        position: relative;
+        z-index: 20;
+    }
+
+    /* --- MODERN PLAYER CONTAINER --- */
+    .player-wrapper {
+        background: #000;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        aspect-ratio: 16/9;
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+    .video-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* Tela de Download (para Mega/Mediafire) */
+    .download-screen {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at center, #1f1f1f 0%, #000 100%);
+        text-align: center;
+    }
+    .dl-btn {
+        background: var(--primary);
+        color: #fff;
+        padding: 18px 50px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 0 30px rgba(227, 28, 37, 0.3);
+    }
+    .dl-btn:hover { background: #ff333d; transform: scale(1.05); color: #fff; box-shadow: 0 0 50px rgba(227, 28, 37, 0.6); }
+
+    /* --- SERVERS LIST --- */
+    .servers-container {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+    .server-btn {
+        background: #222;
+        color: #ddd;
+        border: 1px solid #333;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .server-btn:hover { background: #333; color: #fff; }
+    .server-btn.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 5px 15px rgba(227, 28, 37, 0.3);
+    }
+
+    /* --- LOCK GATES --- */
+    .premium-gate {
+        background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(10,10,10,0.98));
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 60px;
+        text-align: center;
+        backdrop-filter: blur(20px);
+    }
+    .price-tag { font-size: 3.5rem; font-weight: 800; color: #fff; margin: 20px 0; }
+    
+    .buy-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 16px 60px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+    }
+    .buy-btn:hover { background: #ff333d; box-shadow: 0 10px 30px rgba(227, 28, 37, 0.4); }
+
+    /* --- SIDEBAR --- */
+    .info-card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 30px;
+        border: 1px solid var(--border);
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #222;
+        font-size: 0.95rem;
+    }
+    .info-row:last-child { border: none; }
+    .info-key { color: var(--text-gray); }
+    .info-val { color: #fff; font-weight: 600; }
+
+    @media(max-width: 1024px) {
+        .main-grid { grid-template-columns: 1fr; }
+        .hero-header { height: auto; padding-top: 100px; padding-bottom: 50px; }
+        .hero-content { position: relative; flex-direction: column; text-align: center; background: transparent; padding: 20px; }
+        .hero-poster { width: 200px; margin-bottom: 20px; }
+        .hero-info h1 { font-size: 2.5rem; }
+    }
+</style>
+
+<div class="cinema-page">
+
+    <!-- HERO SECTION -->
+    <div class="hero-header">
+        <img src="<%= filme.banner ? '/uploads/filmes/' + filme.banner : '/uploads/filmes/' + filme.poster %>" class="hero-bg">
+        
+        <div class="hero-content">
+            <img src="/uploads/filmes/<%= filme.poster %>" class="hero-poster">
+            
+            <div class="hero-info">
+                <h1><%= filme.titulo %></h1>
+                
+                <div class="meta-tags d-flex flex-wrap justify-content-center justify-content-lg-start mb-4">
+                    <span><%= new Date(filme.data_lancamento).getFullYear() %></span>
+                    <span><i class="fas fa-star text-warning me-2"></i><%= filme.classificacao %></span>
+                    <span><%= filme.tipo === 'serie' ? 'Série' : 'Filme' %></span>
+                    <% if(filme.preco > 0) { %>
+                        <span class="tag-premium"><i class="fas fa-crown me-2"></i>Premium</span>
+                    <% } else { %>
+                        <span class="bg-success text-white border-0">Grátis</span>
+                    <% } %>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <% if (filme.trailer_url) { %>
+                        <a href="<%= filme.trailer_url %>" target="_blank" class="btn btn-outline-light rounded-pill px-4 py-2 fw-bold">
+                            <i class="fab fa-youtube me-2"></i> Trailer
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-grid">
+        
+        <!-- LEFT COLUMN: PLAYER & CONTENT -->
+        <div>
+            
+            <!-- CASO 1: TEM ACESSO (PLAYER ATIVO) -->
+            <% if (temAcesso) { %>
+                
+                <h3 class="mb-3 text-white"><i class="fas fa-play-circle text-danger me-2"></i>Assistir Agora</h3>
+
+                <% if (links.length > 0) { %>
+                    <!-- PLAYER WRAPPER -->
+                    <div class="player-wrapper">
+                        
+                        <!-- IFRAME (Para Google Drive / EmbedPlay / Youtube) -->
+                        <iframe id="mainIframe" class="video-iframe" src="" allowfullscreen style="display: none;"></iframe>
+                        
+                        <!-- TELA DE DOWNLOAD (Para Mega / Mediafire / Terabox) -->
+                        <div id="downloadScreen" class="download-screen" style="display: none;">
+                            <i class="fas fa-cloud-download-alt fa-5x text-secondary mb-3"></i>
+                            <h3 class="text-white mb-2">Servidor de Download</h3>
+                            <p class="text-gray mb-4">Este servidor (<span id="serverNameLabel" class="text-danger fw-bold"></span>) requer download direto.</p>
+                            <a id="downloadBtn" href="#" target="_blank" class="dl-btn">
+                                <i class="fas fa-download"></i> Baixar Arquivo
+                            </a>
+                        </div>
+
+                        <!-- ESTADO INICIAL -->
+                        <div id="initialState" class="download-screen">
+                            <div class="spinner-border text-danger mb-3" role="status"></div>
+                            <p class="text-gray">Carregando player...</p>
+                        </div>
+                    </div>
+
+                    <!-- SELECTOR DE SERVIDORES -->
+                    <div class="servers-container">
+                        <p class="text-uppercase text-gray fs-6 fw-bold mb-3 ls-1">Escolha um Servidor:</p>
+                        <div id="serverButtons">
+                            <% links.forEach((link, i) => { %>
+                                <!-- Passamos a URL original bruta para o JS processar -->
+                                <button class="server-btn" 
+                                        onclick="selectServer('<%= link.url %>', '<%= link.label %>', this)">
+                                    <i class="fas fa-server"></i> <%= link.label || 'Servidor ' + (i+1) %>
+                                </button>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- LÓGICA JAVASCRIPT DE CONVERSÃO NO FRONTEND -->
+                    <script>
+                        function selectServer(rawUrl, label, btnElement) {
+                            // 1. UI Updates
+                            document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                            btnElement.classList.add('active');
+
+                            const iframe = document.getElementById('mainIframe');
+                            const dlScreen = document.getElementById('downloadScreen');
+                            const initial = document.getElementById('initialState');
+                            const dlBtn = document.getElementById('downloadBtn');
+                            const serverLabel = document.getElementById('serverNameLabel');
+
+                            // Hide initial
+                            if(initial) initial.style.display = 'none';
+
+                            // 2. MAGIC CONVERSION LOGIC (Frontend)
+                            let finalUrl = rawUrl.trim();
+                            let mode = 'download'; // default
+
+                            // REGRA A: EmbedPlay (embedplay.upns.ink)
+                            // Converte /d/ para /e/ para forçar modo player
+                            if (finalUrl.includes('embedplay') || finalUrl.includes('upns.ink')) {
+                                mode = 'stream';
+                                if (finalUrl.includes('/d/')) {
+                                    finalUrl = finalUrl.replace('/d/', '/e/');
+                                }
+                            }
+                            
+                            // REGRA B: Google Drive
+                            // Converte /view ou /file/d/ para /preview
+                            else if (finalUrl.includes('drive.google.com')) {
+                                mode = 'stream';
+                                if (finalUrl.includes('/view')) {
+                                    finalUrl = finalUrl.replace('/view', '/preview');
+                                } else if (finalUrl.includes('/file/d/') && !finalUrl.includes('/preview')) {
+                                    // Adiciona /preview ao final se não tiver
+                                    if(!finalUrl.endsWith('/preview')) finalUrl += '/preview';
+                                }
+                            }
+
+                            // REGRA C: YouTube
+                            else if (finalUrl.includes('youtube.com') || finalUrl.includes('youtu.be')) {
+                                mode = 'stream';
+                                if(finalUrl.includes('watch?v=')) {
+                                    finalUrl = finalUrl.replace('watch?v=', 'embed/');
+                                }
+                            }
+
+                            // REGRA D: Mega / Mediafire / TeraBox (Sempre Download)
+                            else if (
+                                finalUrl.includes('mega.nz') || 
+                                finalUrl.includes('mediafire.com') || 
+                                finalUrl.includes('terabox.com')
+                            ) {
+                                mode = 'download';
+                            }
+
+                            // 3. APPLY TO DOM
+                            if (mode === 'stream') {
+                                console.log('Modo Stream:', finalUrl);
+                                dlScreen.style.display = 'none';
+                                iframe.style.display = 'block';
+                                iframe.src = finalUrl;
+                            } else {
+                                console.log('Modo Download:', finalUrl);
+                                iframe.style.display = 'none';
+                                iframe.src = ''; // Stop video
+                                dlScreen.style.display = 'flex';
+                                dlBtn.href = finalUrl;
+                                serverLabel.textContent = label;
+                            }
+                        }
+
+                        // Auto-select first server on load
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const firstBtn = document.querySelector('.server-btn');
+                            if(firstBtn) firstBtn.click();
+                        });
+                    </script>
+
+                <% } else { %>
+                    <div class="alert alert-dark p-4 rounded-3 border-secondary text-center">
+                        <i class="fas fa-film fa-2x mb-3 text-muted"></i>
+                        <h5>Links indisponíveis</h5>
+                        <p class="mb-0 text-muted">Aguarde, nossa equipe está subindo os arquivos.</p>
+                    </div>
+                <% } %>
+
+            <!-- CASO 2: PEDIDO PENDENTE -->
+            <% } else if (pedidoPendente) { %>
+                
+                <div class="premium-gate border border-warning">
+                    <i class="fas fa-clock fa-4x text-warning mb-4"></i>
+                    <h2 class="text-white fw-bold">Pagamento em Análise</h2>
+                    <p class="text-gray mb-4 fs-5">Recebemos sua solicitação. Aguarde a confirmação do administrador para liberar o player.</p>
+                    <button disabled class="btn btn-warning rounded-pill px-5 fw-bold opacity-75">
+                        Processando...
+                    </button>
+                </div>
+
+            <!-- CASO 3: BLOQUEADO (PAGAR) -->
+            <% } else { %>
+
+                <div class="premium-gate">
+                    <span class="badge bg-danger mb-3 px-3 py-2 rounded-pill">CONTEÚDO PREMIUM</span>
+                    <h2 class="text-white fw-bold mb-2">Desbloqueie este Título</h2>
+                    <p class="text-gray mx-auto" style="max-width: 500px;">
+                        Compre acesso vitalício para assistir online ou baixar em alta qualidade (4K/1080p).
+                    </p>
+
+                    <div class="price-tag">
+                        <%= parseFloat(filme.preco).toLocaleString('pt-AO', {style: 'currency', currency: 'AOA'}) %>
+                    </div>
+
+                    <form action="/filme/<%= filme.id %>/comprar" method="POST">
+                        <button type="submit" class="buy-btn">
+                            <i class="fas fa-unlock me-2"></i> Comprar Agora
+                        </button>
+                    </form>
+
+                    <div class="mt-4 pt-4 border-top border-secondary w-50 mx-auto">
+                        <small class="text-gray">Pagamento via Transferência ou Multicaixa Express</small>
+                    </div>
+                </div>
+
+            <% } %>
+
+            <!-- SINOPSE -->
+            <div class="mt-5">
+                <h4 class="text-white border-start border-4 border-danger ps-3 mb-3">Sinopse</h4>
+                <p class="text-gray fs-5" style="line-height: 1.8; text-align: justify;">
+                    <%= filme.sinopse %>
+                </p>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: SIDEBAR -->
+        <div>
+            <div class="info-card">
+                <h5 class="text-white mb-4"><i class="fas fa-info-circle text-danger me-2"></i>Detalhes</h5>
+                
+                <div class="info-row">
+                    <span class="info-key">Título</span>
+                    <span class="info-val text-end"><%= filme.titulo %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-key">Lançamento</span>
+                    <span class="info-val"><%= new Date(filme.data_lancamento).getFullYear() %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-key">Qualidade</span>
+                    <span class="info-val">4K UHD / 1080p</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-key">Áudio</span>
+                    <span class="info-val">Dublado / Legendado</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-key">Formato</span>
+                    <span class="info-val">MKV / MP4</span>
+                </div>
+            </div>
+
+            <!-- CARD PARA QUEM NÃO É PREMIUM -->
+            <% if (!temAcesso) { %>
+                <div class="mt-4 p-4 rounded-4 text-center position-relative overflow-hidden" 
+                     style="background: linear-gradient(45deg, #E31C25, #8E0E14);">
+                    
+                    <div style="position: relative; z-index: 2;">
+                        <i class="fas fa-crown fa-3x text-white mb-3"></i>
+                        <h4 class="text-white fw-bold">Seja Premium</h4>
+                        <p class="text-white-50 small mb-3">Assine o Kuanda Pass e tenha acesso a todo o catálogo.</p>
+                        <a href="/planos" class="btn btn-light text-danger fw-bold w-100 rounded-pill shadow">
+                            Ver Planos
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+    </div>
+</div>
+<script src="/js/chat-monitor.js"></script>

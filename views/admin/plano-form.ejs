@@ -1,0 +1,265 @@
+
+  <style>
+    /* =========================================
+       KUANDA PRICING BUILDER CSS
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --k-gray: #F9FAFB;
+      --card-radius: 24px;
+      --input-radius: 12px;
+    }
+
+    body { background-color: var(--k-gray); }
+
+    /* 1. HEADER */
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;
+    }
+    .page-title {
+      font-weight: 800; font-size: 1.8rem; color: var(--k-black); margin: 0;
+      letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px;
+    }
+    
+    .btn-back {
+      background: white; border: 1px solid #E5E7EB; color: #666;
+      padding: 10px 20px; border-radius: 50px; font-weight: 600;
+      transition: 0.2s; text-decoration: none; font-size: 0.9rem;
+    }
+    .btn-back:hover { background: #f3f4f6; color: var(--k-black); }
+
+    /* 2. CARD PRINCIPAL */
+    .builder-card {
+      background: white; border-radius: var(--card-radius); overflow: hidden;
+      box-shadow: 0 20px 40px -5px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02);
+      max-width: 800px; margin: 0 auto;
+    }
+
+    /* Topo do Card */
+    .builder-header {
+      padding: 40px 40px 30px; border-bottom: 1px solid #F3F4F6;
+      background: linear-gradient(to right, #fff, #FAFAFA);
+    }
+    .builder-label {
+      font-size: 0.75rem; font-weight: 800; color: #9CA3AF; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 10px; display: block;
+    }
+    .builder-main-title {
+      font-size: 2rem; font-weight: 800; color: var(--k-black); line-height: 1.1; margin: 0;
+    }
+
+    /* Corpo do Formulário */
+    .builder-body { padding: 40px; }
+
+    /* Grid Layout */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+    
+    /* Inputs */
+    .form-group { margin-bottom: 25px; }
+    .input-label {
+      font-weight: 700; font-size: 0.85rem; color: #4B5563; margin-bottom: 8px; display: block;
+    }
+    
+    .custom-input {
+      width: 100%; padding: 14px 18px; border-radius: var(--input-radius);
+      background: #F9FAFB; border: 1px solid transparent;
+      color: var(--k-black); font-weight: 600; font-size: 1rem; outline: none;
+      transition: 0.2s;
+    }
+    .custom-input:focus {
+      background: white; border-color: var(--k-black); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .custom-input::placeholder { color: #9CA3AF; font-weight: 400; }
+
+    /* Preço Input com Sulfixo */
+    .price-wrapper { position: relative; }
+    .price-suffix {
+      position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+      font-weight: 700; color: #9CA3AF; font-size: 0.9rem;
+    }
+
+    /* Free Badge (Automático) */
+    .badge-free {
+      display: none; position: absolute; right: 50px; top: 50%; transform: translateY(-50%);
+      background: #E8FDF0; color: #10B981; font-size: 0.7rem; font-weight: 800;
+      padding: 4px 8px; border-radius: 6px; text-transform: uppercase;
+    }
+
+    /* Funcionalidades (Toggles) */
+    .features-section {
+      background: #FAFAFA; border-radius: 20px; padding: 25px; border: 1px solid #F3F4F6;
+      margin-top: 20px;
+    }
+    .features-title { font-weight: 800; font-size: 0.9rem; margin-bottom: 20px; color: var(--k-black); }
+
+    .feature-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 0; border-bottom: 1px dashed #E5E7EB;
+    }
+    .feature-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .feature-item:first-child { padding-top: 0; }
+
+    .feat-info h6 { margin: 0 0 4px; font-weight: 700; font-size: 0.95rem; }
+    .feat-info p { margin: 0; font-size: 0.8rem; color: #6B7280; }
+
+    /* Switch iOS */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #E5E7EB; transition: .4s; border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    input:checked + .slider { background-color: var(--k-black); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Footer Ações */
+    .builder-footer {
+      padding: 30px 40px; background: #FAFAFA; border-top: 1px solid #F3F4F6;
+      display: flex; align-items: center; justify-content: flex-end; gap: 15px;
+    }
+
+    .btn-save {
+      background: var(--k-red); color: white; border: none;
+      padding: 14px 35px; border-radius: 50px; font-weight: 700; font-size: 1rem;
+      cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(227, 28, 37, 0.25);
+    }
+    .btn-save:hover { background: #BE123C; transform: translateY(-2px); }
+    
+    .btn-cancel {
+      color: #6B7280; font-weight: 700; text-decoration: none; padding: 10px 20px;
+      transition: 0.2s;
+    }
+    .btn-cancel:hover { color: var(--k-black); }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; gap: 0; }
+      .builder-header, .builder-body, .builder-footer { padding: 25px; }
+    }
+  </style>
+
+<div class="container py-4">
+  
+  <div class="page-header">
+    <h2 class="page-title">
+        <i class="fas fa-layer-group text-danger"></i> Planos de Assinatura
+    </h2>
+    <a href="/admin/planos" class="btn-back"><i class="fas fa-arrow-left me-2"></i>Voltar</a>
+  </div>
+
+  <form action="<%= action %>" method="POST" class="builder-card">
+    
+    <!-- TOPO -->
+    <div class="builder-header">
+        <span class="builder-label"><%= plano ? 'EDITANDO ID #' + plano.id : 'NOVO PLANO' %></span>
+        <h1 class="builder-main-title"><%= plano ? plano.nome : 'Criar Plano de Vendas' %></h1>
+    </div>
+
+    <!-- CORPO -->
+    <div class="builder-body">
+        
+        <div class="form-grid">
+            <!-- Nome -->
+            <div class="form-group">
+                <label class="input-label">Nome do Plano</label>
+                <input type="text" class="custom-input" name="nome" 
+                       value="<%= plano ? plano.nome : '' %>" 
+                       placeholder="Ex: Start, Pro, Elite..." required>
+            </div>
+
+            <!-- Preço -->
+            <div class="form-group">
+                <label class="input-label">Mensalidade</label>
+                <div class="price-wrapper">
+                    <input type="number" class="custom-input" name="preco_mensal" id="priceInput"
+                           value="<%= plano && plano.preco_mensal ? parseFloat(plano.preco_mensal) : '' %>" 
+                           step="0.01" min="0" placeholder="0.00" oninput="checkFree()">
+                    <span class="badge-free" id="freeBadge">GRÁTIS</span>
+                    <span class="price-suffix">Kz / mês</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Limite -->
+        <div class="form-group">
+            <label class="input-label">Limite de Produtos</label>
+            <input type="number" class="custom-input" name="limite_produtos" 
+                   value="<%= plano ? plano.limite_produtos : 10 %>" 
+                   min="1" required placeholder="Quantidade máxima de produtos...">
+        </div>
+
+        <!-- Funcionalidades -->
+        <div class="features-section">
+            <h6 class="features-title">RECURSOS HABILITADOS</h6>
+            
+            <!-- VIP -->
+            <div class="feature-item">
+                <div class="feat-info">
+                    <h6>Anúncios VIP</h6>
+                    <p>Permite ao vendedor destacar produtos como VIP.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" name="permite_vip" <%= (plano && plano.permite_vip) ? 'checked' : '' %>>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Destaque Home -->
+            <div class="feature-item">
+                <div class="feat-info">
+                    <h6>Destaque na Homepage</h6>
+                    <p>Produtos aparecem no carrossel principal da loja.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" name="permite_destaque" <%= (plano && plano.permite_destaque) ? 'checked' : '' %>>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Suporte (Exemplo Extra) -->
+            <div class="feature-item">
+                <div class="feat-info">
+                    <h6>Suporte Prioritário</h6>
+                    <p>Atendimento via WhatsApp dedicado.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked disabled> <!-- Fixo visualmente -->
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="builder-footer">
+        <a href="/admin/planos" class="btn-cancel">Cancelar</a>
+        <button type="submit" class="btn-save">
+            <i class="fas fa-check me-2"></i> <%= plano ? 'Salvar Alterações' : 'Publicar Plano' %>
+        </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+    // Detecta se é grátis
+    function checkFree() {
+        const val = document.getElementById('priceInput').value;
+        const badge = document.getElementById('freeBadge');
+        if (val === '0' || val === '') {
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+    
+    // Init
+    document.addEventListener('DOMContentLoaded', checkFree);
+</script>

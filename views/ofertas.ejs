@@ -1,0 +1,330 @@
+    <style>
+        /* =========================================
+           KUANDA DEALS PAGE CSS
+           ========================================= */
+        :root {
+            --k-red: #E31C25;
+            --k-black: #0F0F0F;
+            --k-deal-bg: #FFF0F0;
+        }
+
+        /* 1. HERO HEADER DE OFERTAS */
+        .deals-hero {
+            background: linear-gradient(135deg, #E31C25 0%, #B91C1C 100%);
+            color: white;
+            border-radius: 30px;
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(227, 28, 37, 0.2);
+        }
+
+        /* Elementos Decorativos */
+        .deals-hero::before {
+            content: '%'; position: absolute; top: -20px; left: -20px;
+            font-size: 15rem; font-weight: 900; opacity: 0.1; transform: rotate(-20deg);
+        }
+        .deals-hero::after {
+            content: 'SALE'; position: absolute; bottom: -40px; right: -20px;
+            font-size: 10rem; font-weight: 900; opacity: 0.1;
+        }
+
+        .deals-title { font-size: 3rem; font-weight: 800; margin-bottom: 10px; position: relative; z-index: 2; }
+        .deals-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 30px; position: relative; z-index: 2; }
+
+        /* Timer (Decorativo) */
+        .countdown-box {
+            display: inline-flex; gap: 15px; background: rgba(0,0,0,0.2);
+            padding: 15px 30px; border-radius: 50px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2); position: relative; z-index: 2;
+        }
+        .time-unit span { font-size: 1.5rem; font-weight: 800; display: block; line-height: 1; }
+        .time-unit small { font-size: 0.65rem; text-transform: uppercase; opacity: 0.8; }
+
+        /* 2. FILTROS RÁPIDOS (PILLS) */
+        .filter-pills {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px;
+            margin-bottom: 30px; scrollbar-width: none; justify-content: center;
+        }
+        .filter-pills::-webkit-scrollbar { display: none; }
+        
+        .pill-btn {
+            background: white; border: 1px solid #eee; padding: 10px 20px;
+            border-radius: 50px; font-weight: 600; color: #666; cursor: pointer;
+            transition: 0.3s; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .pill-btn:hover, .pill-btn.active {
+            background: var(--k-black); color: white; transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--k-black);
+        }
+
+        /* 3. GRID DE OFERTAS */
+        .deals-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        /* Card de Oferta Especial */
+        .deal-card {
+            background: white; border-radius: 20px; overflow: hidden;
+            border: 1px solid #ffecec; position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column; height: 100%;
+        }
+        .deal-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(227, 28, 37, 0.1);
+            border-color: rgba(227, 28, 37, 0.3);
+        }
+
+        /* Badge de Desconto (Destaque) */
+        .discount-badge {
+            position: absolute; top: 12px; left: 12px; z-index: 2;
+            background: var(--k-red); color: white; padding: 6px 12px;
+            border-radius: 8px; font-weight: 800; font-size: 0.8rem;
+            box-shadow: 0 5px 15px rgba(227, 28, 37, 0.3);
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(227, 28, 37, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(227, 28, 37, 0); } 100% { box-shadow: 0 0 0 0 rgba(227, 28, 37, 0); } }
+
+        /* Imagem */
+        .deal-img-box {
+            position: relative; padding-top: 100%; background: #fff5f5; overflow: hidden;
+        }
+        .deal-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; transition: transform 0.6s ease;
+        }
+        .deal-card:hover .deal-img { transform: scale(1.08); }
+
+        /* Corpo */
+        .deal-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .deal-vendor { font-size: 0.75rem; color: #999; margin-bottom: 5px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .deal-title {
+            font-size: 1.1rem; font-weight: 700; color: var(--k-black); margin-bottom: 10px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            text-decoration: none; line-height: 1.3;
+        }
+        .deal-title:hover { color: var(--k-red); }
+
+        /* Preços Gigantes */
+        .deal-prices { margin-top: auto; margin-bottom: 15px; }
+        .price-new { font-size: 1.5rem; font-weight: 800; color: var(--k-red); display: block; line-height: 1; }
+        .price-old { font-size: 0.9rem; color: #aaa; text-decoration: line-through; font-weight: 500; }
+
+        /* Botão */
+        .btn-grab-deal {
+            width: 100%; padding: 12px; border-radius: 12px; border: none;
+            background: var(--k-black); color: white; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.2s; cursor: pointer;
+        }
+        .btn-grab-deal:hover { background: var(--k-red); transform: scale(1.02); }
+
+        /* Empty State */
+        .no-deals {
+            text-align: center; padding: 80px 20px;
+            background: white; border-radius: 30px; border: 2px dashed #eee;
+        }
+
+        /* Responsivo (Mobile 3x3 Logic Adaptada) */
+        @media (max-width: 991px) {
+            .deals-hero { padding: 40px 20px; border-radius: 20px; margin-bottom: 30px; }
+            .deals-title { font-size: 2rem; }
+            .filter-pills { justify-content: flex-start; padding-left: 5px; }
+            
+            /* Grid Compacto */
+            .deals-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 Colunas no Mobile */
+                gap: 10px;
+            }
+            
+            .deal-card { border-radius: 12px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+            .deal-body { padding: 10px; }
+            
+            .deal-vendor, .price-old { display: none; } /* Limpa visual */
+            .deal-title { font-size: 0.75rem; line-height: 1.2; height: 2.4em; margin-bottom: 5px; }
+            .price-new { font-size: 0.9rem; }
+            .discount-badge { padding: 2px 5px; font-size: 0.6rem; top: 5px; left: 5px; border-radius: 4px; }
+            
+            /* Botão vira ícone */
+            .btn-grab-deal {
+                width: 30px; height: 30px; border-radius: 50%; padding: 0;
+                position: absolute; bottom: 8px; right: 8px;
+                background: var(--k-red); box-shadow: 0 4px 10px rgba(227, 28, 37, 0.3);
+            }
+            .btn-grab-deal span { display: none; }
+            .btn-grab-deal i { font-size: 0.8rem; margin: 0; }
+            
+            /* Ajuste layout preços para caber o botão */
+            .deal-prices { margin-bottom: 0; }
+        }
+
+        /* --- ADICIONE ISTO AO SEU CSS PARA CORRIGIR O ERRO VISUAL --- */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Garante que o container tenha altura mínima se estiver vazio */
+        .deals-grid {
+            min-height: 200px; 
+        }
+    </style>
+
+<div class="container py-4">
+
+    <!-- 1. HERO BANNER -->
+    <div class="deals-hero fade-up">
+        <h1 class="deals-title">Ofertas Relâmpago <i class="fas fa-bolt text-warning"></i></h1>
+        <p class="deals-subtitle">Descontos exclusivos por tempo limitado. Aproveite antes que acabe!</p>
+        
+        <!-- Timer Simulado -->
+        <div class="countdown-box">
+            <div class="time-unit">
+                <span id="hours">04</span><small>Horas</small>
+            </div>
+            <div class="time-unit"><span>:</span></div>
+            <div class="time-unit">
+                <span id="minutes">59</span><small>Min</small>
+            </div>
+            <div class="time-unit"><span>:</span></div>
+            <div class="time-unit">
+                <span id="seconds">30</span><small>Seg</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. FILTROS RÁPIDOS -->
+    <div class="filter-pills fade-up" style="animation-delay: 0.1s;">
+        <button class="pill-btn active" onclick="filterDeals('all')">Todas</button>
+        <% categorias.forEach(cat => { %>
+            <button class="pill-btn" onclick="filterDeals('<%= cat.id %>')"><%= cat.nome %></button>
+        <% }) %>
+    </div>
+
+    <!-- 3. GRID DE OFERTAS -->
+    <% if (produtos.length === 0) { %>
+        <div class="no-deals fade-up">
+            <i class="fas fa-tags fa-4x text-muted mb-3 opacity-25"></i>
+            <h3 class="fw-bold text-muted">Sem ofertas no momento</h3>
+            <p class="text-muted">Nossos vendedores estão preparando novos descontos. Volte em breve!</p>
+            <a href="/produtos" class="btn btn-dark rounded-pill px-5 mt-3">Ver Todos os Produtos</a>
+        </div>
+    <% } else { %>
+        <div class="deals-grid">
+            <% produtos.forEach((prod, index) => { 
+               const preco = Number(prod.preco) || 0;
+               const promo = Number(prod.preco_promocional) || 0;
+               const desconto = Math.round(((preco - promo) / preco) * 100);
+            %>
+                <!-- Card de Oferta -->
+                <div class="deal-card fade-up" style="animation-delay: <%= index * 0.05 %>s;" data-cat="<%= prod.categoria_id %>">
+                    
+                    <!-- Badge % OFF -->
+                    <div class="discount-badge">-<%= desconto %>%</div>
+
+                    <!-- Imagem -->
+                    <a href="/produto/<%= prod.id %>" class="deal-img-box">
+                        <% if (prod.imagem1) { %>
+                            <img src="/uploads/produtos/<%= prod.imagem1 %>" class="deal-img" loading="lazy">
+                        <% } else { %>
+                            <div class="deal-img d-flex align-items-center justify-content-center text-muted bg-light"><i class="fas fa-image"></i></div>
+                        <% } %>
+                    </a>
+
+                    <!-- Corpo -->
+                    <div class="deal-body">
+                        <span class="deal-vendor"><i class="fas fa-store me-1"></i> <%= prod.nome_loja %></span>
+                        
+                        <a href="/produto/<%= prod.id %>" class="deal-title"><%= prod.nome %></a>
+                        
+                        <div class="deal-prices">
+                            <span class="price-old"><%= preco.toLocaleString('pt-AO') %> Kz</span>
+                            <span class="price-new"><%= promo.toLocaleString('pt-AO') %> Kz</span>
+                        </div>
+
+                        <button class="btn-grab-deal" onclick="addToCart(<%= prod.id %>, '<%= prod.nome.replace(/'/g, "\\'") %>')">
+                            <i class="fas fa-shopping-bag"></i> <span>Comprar Agora</span>
+                        </button>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+
+</div>
+
+<script>
+    // 1. Timer Regressivo (Simulado para criar urgência)
+    function startTimer() {
+        let h = 4, m = 59, s = 59;
+        setInterval(() => {
+            s--;
+            if (s < 0) { s = 59; m--; }
+            if (m < 0) { m = 59; h--; }
+            if (h < 0) { h = 4; } // Reinicia loop
+            
+            document.getElementById('hours').innerText = h < 10 ? '0'+h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0'+m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0'+s : s;
+        }, 1000);
+    }
+    startTimer();
+
+    // 2. Filtro Front-end (Sem recarregar)
+    function filterDeals(catId) {
+        // Ativar botão visualmente
+        document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Filtrar cards
+        const cards = document.querySelectorAll('.deal-card');
+        cards.forEach(card => {
+            if (catId === 'all' || card.dataset.cat === catId) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // 3. Adicionar ao Carrinho (Reutilizando função global)
+    function addToCart(id, nome) {
+        if(window.CartSystem) {
+            window.addToCart(id, nome);
+        } else {
+            // Fallback simples
+            fetch('/carrinho/adicionar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `produto_id=${id}&quantidade=1`
+            }).then(r => r.json()).then(d => {
+                if(d.success) location.reload();
+            });
+        }
+    }
+    
+    // Animação Scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.style.animation = 'fadeUp 0.6s ease forwards';
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+    document.querySelectorAll('.fade-up').forEach(el => {
+        el.style.opacity = '0'; // Começa invisível
+        observer.observe(el);
+    });
+</script>

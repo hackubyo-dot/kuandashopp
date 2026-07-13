@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-ao">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuanda Admin Modern</title>
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           KUANDA DESIGN SYSTEM V2 (MODERN & ROBUST)
+           ========================================= */
+        :root {
+            /* Palette */
+            --k-primary: #E31C25;      /* Vermelho Marca */
+            --k-primary-soft: rgba(227, 28, 37, 0.1);
+            --k-dark: #0F172A;         /* Azul Noite Profundo */
+            --k-light: #F8FAFC;        /* Branco Gelo */
+            --k-gray: #64748B;
+            
+            /* Surfaces */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --blur-strength: 20px;
+            
+            /* Radius & Spacing */
+            --radius-xl: 24px;
+            --radius-md: 16px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F1F5F9;
+            /* Fundo sutil moderno */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(227, 28, 37, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 193, 7, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--k-dark);
+            padding-top: 110px;
+            padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none !important; transition: all 0.3s ease; }
+
+        /* --- NAVBAR CAPSULE FLOATING --- */
+        .nav-capsule {
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 1280px; 
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(var(--blur-strength)); -webkit-backdrop-filter: blur(var(--blur-strength));
+            border: 1px solid white;
+            border-radius: 100px;
+            padding: 12px 30px; 
+            z-index: 1000; 
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        
+        .brand-logo {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--k-primary), #FF4D4D);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(227, 28, 37, 0.3);
+        }
+
+        /* --- KPI CARDS (ROBUST) --- */
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
+        }
+        .kpi-icon-wrapper {
+            width: 50px; height: 50px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+        .kpi-label {
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--k-gray);
+        }
+        .kpi-value {
+            font-size: 1.75rem; font-weight: 800; color: var(--k-dark);
+            margin-top: 5px; letter-spacing: -1px;
+        }
+
+        /* --- GLASS PANELS (CONTENT) --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid white;
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 30px;
+        }
+        .panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        .panel-title {
+            font-size: 1.1rem; font-weight: 800; color: var(--k-dark);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .panel-title i { color: var(--k-primary); }
+
+        /* --- MODERN FLOATING TABLE --- */
+        .table-container { overflow-x: auto; }
+        .table-modern {
+            width: 100%; border-collapse: separate; border-spacing: 0 12px;
+        }
+        .table-modern thead th {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            color: var(--k-gray); padding: 0 20px 10px; border: none;
+            letter-spacing: 0.5px;
+        }
+        .table-modern tbody tr {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease;
+        }
+        .table-modern tbody tr:hover { transform: scale(1.01); z-index: 10; position: relative; }
+        .table-modern tbody td {
+            padding: 20px; border: none; vertical-align: middle;
+        }
+        .table-modern tbody td:first-child { border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
+        .table-modern tbody td:last-child { border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
+
+        /* STATUS PILLS */
+        .status-pill {
+            padding: 6px 14px; border-radius: 30px;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            display: inline-block;
+        }
+        .st-pending { background: #FFF7ED; color: #C2410C; border: 1px solid #FFEDD5; }
+        .st-success { background: #F0FDF4; color: #15803D; border: 1px solid #DCFCE7; }
+        .st-error { background: #FEF2F2; color: #B91C1C; border: 1px solid #FEE2E2; }
+
+        /* --- SIDEBAR RANKINGS --- */
+        .ranking-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .ranking-item:last-child { border-bottom: none; }
+        .rank-pos {
+            font-size: 0.8rem; font-weight: 800; color: #CBD5E1; width: 25px;
+        }
+        .rank-avatar {
+            width: 42px; height: 42px; border-radius: 12px; object-fit: cover;
+            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .rank-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+        .rank-sub { font-size: 0.75rem; color: var(--k-gray); }
+        .rank-val { font-weight: 800; font-size: 0.9rem; color: var(--k-dark); }
+
+        /* --- MOBILE 3x3 MATRIX WIDGETS --- */
+        @media (max-width: 576px) {
+            .nav-capsule { top: 15px; width: 95%; padding: 10px 20px; }
+            .hide-mobile { display: none; }
+            
+            .matrix-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .matrix-card {
+                background: white; border-radius: 14px;
+                padding: 10px 5px; text-align: center;
+                border: 1px solid #F1F5F9;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+                display: flex; flex-direction: column; justify-content: center; height: 90px;
+            }
+            .mtx-icon { font-size: 1rem; margin-bottom: 5px; color: var(--k-primary); }
+            .mtx-code { font-size: 0.65rem; font-weight: 800; color: var(--k-dark); display: block; }
+            .mtx-price { font-size: 0.6rem; color: var(--k-gray); font-weight: 600; }
+            .mtx-dot { width: 6px; height: 6px; border-radius: 50%; margin: 4px auto 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR PREMIUM -->
+    <nav class="nav-capsule">
+        <div class="d-flex align-items-center gap-3">
+            <div class="brand-logo">K</div>
+            <div class="d-flex flex-column">
+                <span class="fw-bold lh-1" style="font-size: 0.95rem;">Kuanda</span>
+                <span class="small text-muted" style="font-size: 0.7rem;">Admin Workspace</span>
+            </div>
+        </div>
+        
+        <div class="d-flex gap-2 align-items-center">
+            <a href="/admin" class="btn btn-light rounded-pill px-3 py-2 fw-bold text-muted small d-none d-sm-block">
+                <i class="fas fa-grid me-1"></i> Dashboard
+            </a>
+            <form action="/logout" method="POST" class="m-0">
+                <button class="btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm" style="font-size: 0.85rem;">
+                    Sair
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-lg-5 px-3">
+        
+        <!-- HEADER DE BOAS VINDAS -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4 class="fw-bold mb-1">Visão Geral</h4>
+                <p class="text-muted small">Acompanhe o desempenho em tempo real.</p>
+            </div>
+        </div>
+
+        <!-- KPIs MODERNOS -->
+        <div class="row g-3 g-xl-4 mb-5">
+            <!-- Card 1 -->
+            <div class="col-6 col-lg-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="kpi-label">Receita Total</div>
+                            <div class="kpi-value">
+                                <%= parseFloat(stats.receita_total).toLocaleString() %><small style="font-size:0.5em; opacity:0.6; margin-left:4px">Kz</small>
+                            </div>
+                        </div>
+                        <div class="kpi-icon-wrapper" style="background: #DCFCE7; color: #166534;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="col-6 col-lg-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="kpi-label">Pedidos</div>
+                            <div class="kpi-value"><%= stats.total_pedidos %></div>
+                        </div>
+                        <div class="kpi-icon-wrapper" style="background: #E0F2FE; color: #0284C7;">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-6 col-lg-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="kpi-label">Parceiros</div>
+                            <div class="kpi-value"><%= stats.total_vendedores %></div>
+                        </div>
+                        <div class="kpi-icon-wrapper" style="background: #FEF3C7; color: #D97706;">
+                            <i class="fas fa-store"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="col-6 col-lg-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="kpi-label">Ticket Médio</div>
+                            <div class="kpi-value">
+                                <%= parseFloat(stats.ticket_medio).toFixed(0) %><small style="font-size:0.5em; opacity:0.6; margin-left:4px">Kz</small>
+                            </div>
+                        </div>
+                        <div class="kpi-icon-wrapper" style="background: #F1F5F9; color: #475569;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="row g-4">
+            
+            <!-- COLUNA ESQUERDA: Tabela de Pedidos -->
+            <div class="col-lg-8">
+                <div class="glass-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-bolt"></i> Vendas Recentes
+                        </div>
+                        <span class="badge bg-light text-dark border">Hoje</span>
+                    </div>
+
+                    <!-- Desktop & Tablet View -->
+                    <div class="table-container d-none d-sm-block">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Vendedor</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% pedidos.forEach(p => { %>
+                                    <tr>
+                                        <td>
+                                            <span class="fw-bold text-dark">#<%= p.codigo || p.id %></span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold" style="font-size: 0.9rem;"><%= p.nome_loja %></div>
+                                        </td>
+                                        <td>
+                                            <div class="text-muted" style="font-size: 0.85rem;"><%= p.cliente_nome %></div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold"><%= parseFloat(p.total).toLocaleString() %> Kz</span>
+                                        </td>
+                                        <td>
+                                            <% 
+                                                let stClass = 'st-pending';
+                                                if(p.status === 'entregue') stClass = 'st-success';
+                                                if(p.status === 'cancelado') stClass = 'st-error';
+                                            %>
+                                            <span class="status-pill <%= stClass %>"><%= p.status %></span>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mobile 3x3 Widget Grid View -->
+                    <div class="d-block d-sm-none">
+                        <div class="matrix-grid">
+                            <% pedidos.forEach(p => { %>
+                                <div class="matrix-card">
+                                    <div class="mtx-icon">
+                                        <% if(p.status === 'entregue') { %>
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        <% } else if(p.status === 'cancelado') { %>
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        <% } else { %>
+                                            <i class="fas fa-clock text-warning"></i>
+                                        <% } %>
+                                    </div>
+                                    <span class="mtx-code">#<%= p.codigo || p.id %></span>
+                                    <span class="mtx-price"><%= parseFloat(p.total).toLocaleString() %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- COLUNA DIREITA: Rankings -->
+            <div class="col-lg-4">
+                
+                <!-- TOP LOJAS -->
+                <div class="glass-panel mb-4">
+                    <div class="panel-header">
+                        <div class="panel-title text-danger">
+                            <i class="fas fa-trophy"></i> Líderes de Venda
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-column gap-2">
+                        <% topLojas.forEach((loja, i) => { %>
+                            <div class="ranking-item">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="rank-pos">0<%= i+1 %></span>
+                                    <img src="/uploads/perfil/<%= loja.foto_perfil || 'default.png' %>" class="rank-avatar" onerror="this.src='https://via.placeholder.com/42'">
+                                    <div>
+                                        <div class="rank-name text-truncate" style="max-width: 110px;"><%= loja.nome_loja %></div>
+                                        <div class="rank-sub"><%= loja.qtd_pedidos %> vendas</div>
+                                    </div>
+                                </div>
+                                <div class="rank-val text-success">
+                                    <%= parseFloat(loja.total_vendido).toLocaleString() %> <small>Kz</small>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- TOP PRODUTOS -->
+                <div class="glass-panel">
+                    <div class="panel-header">
+                        <div class="panel-title" style="color: #6366f1;">
+                            <i class="fas fa-fire"></i> Mais Vendidos
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <% topProdutos.forEach((prod, i) => { %>
+                            <div class="ranking-item">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="rank-pos">0<%= i+1 %></span>
+                                    <img src="/uploads/produtos/<%= prod.imagem1 %>" class="rank-avatar" style="border-radius: 8px;" onerror="this.src='https://via.placeholder.com/42'">
+                                    <div>
+                                        <div class="rank-name text-truncate" style="max-width: 140px;"><%= prod.nome %></div>
+                                        <div class="rank-sub text-danger fw-bold"><%= prod.total_vendido %> un</div>
+                                    </div>
+                                </div>
+                                <div class="ms-auto">
+                                    <i class="fas fa-chevron-right text-muted small"></i>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

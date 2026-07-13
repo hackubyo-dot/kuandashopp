@@ -1,0 +1,485 @@
+<!-- 
+    ARQUIVO: views/admin/planos.ejs 
+    ESTE ARQUIVO É RENDERIZADO DENTRO DO SEU LAYOUT PRINCIPAL
+-->
+
+<style>
+    /* =========================================
+       CORREÇÕES DE LAYOUT & INTERFACE
+       ========================================= */
+    :root {
+        --ks-primary: #E11D48;
+        --ks-primary-soft: #FFE4E6;
+        --ks-dark: #0F172A;
+        --ks-gray: #64748B;
+        --ks-bg: #F8FAFC;
+        --ks-card-bg: #FFFFFF;
+        --ks-border: #E2E8F0;
+        --ks-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        --ks-radius: 12px;
+    }
+
+    /* Container de segurança para não travar a navbar */
+    .admin-page-wrapper {
+        position: relative;
+        z-index: 1; /* Garante que fica abaixo do menu fixo (que geralmente é 1000+) */
+        padding-top: 20px; /* Espaço para respirar */
+        padding-bottom: 60px;
+    }
+
+    /* Títulos */
+    .page-title { font-weight: 800; font-size: 1.75rem; color: var(--ks-dark); letter-spacing: -0.025em; margin: 0; }
+    .page-subtitle { font-size: 0.95rem; color: var(--ks-gray); margin-top: 4px; }
+
+    /* Botões de Ação do Topo */
+    .btn-action {
+        padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+        display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
+        text-decoration: none !important; border: 1px solid transparent; cursor: pointer;
+    }
+    .btn-primary-custom { background: var(--ks-dark); color: white; }
+    .btn-primary-custom:hover { background: #1E293B; transform: translateY(-1px); color: white; }
+    
+    .btn-outline-custom { background: white; border-color: var(--ks-border); color: var(--ks-gray); }
+    .btn-outline-custom:hover { background: #F8FAFC; border-color: #CBD5E1; color: var(--ks-dark); }
+
+    /* Cards de Estatísticas */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .stat-card {
+        background: var(--ks-card-bg); padding: 24px; border-radius: var(--ks-radius);
+        box-shadow: var(--ks-shadow); border: 1px solid var(--ks-border);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .stat-info h3 { font-size: 1.8rem; font-weight: 800; margin: 0; line-height: 1.1; color: var(--ks-dark); }
+    .stat-info span { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--ks-gray); letter-spacing: 0.025em; }
+    
+    .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .sc-blue .stat-icon { background: #E0F2FE; color: #0284C7; }
+    .sc-green .stat-icon { background: #DCFCE7; color: #16A34A; }
+    .sc-purple .stat-icon { background: #F3E8FF; color: #9333EA; }
+    .sc-yellow .stat-icon { background: #FEF3C7; color: #D97706; }
+
+    /* Tabs (Abas) Limpas - Sem sublinhado excessivo */
+    .custom-tabs {
+        display: flex; gap: 8px; margin-bottom: 30px;
+        border-bottom: 1px solid var(--ks-border); padding-bottom: 1px;
+    }
+    .tab-btn {
+        background: transparent; border: none; padding: 10px 16px; font-weight: 600; color: var(--ks-gray);
+        cursor: pointer; transition: 0.2s; font-size: 0.95rem; border-radius: 6px;
+        position: relative; top: 1px; /* Para sobrepor a borda */
+    }
+    .tab-btn:hover { color: var(--ks-dark); background: rgba(0,0,0,0.02); }
+    
+    .tab-btn.active {
+        color: var(--ks-dark); background: white;
+        border: 1px solid var(--ks-border); border-bottom-color: white;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .badge-pill { background: var(--ks-primary); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.7rem; vertical-align: middle; margin-left: 6px; }
+
+    /* Grid de Planos */
+    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .plan-item {
+        background: var(--ks-card-bg); border-radius: var(--ks-radius); padding: 32px;
+        border: 1px solid var(--ks-border); box-shadow: var(--ks-shadow);
+        transition: 0.3s; position: relative; overflow: hidden;
+    }
+    .plan-item:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    
+    .plan-name { font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--ks-dark); }
+    .plan-badge { font-size: 0.75rem; background: #F1F5F9; padding: 4px 12px; border-radius: 100px; font-weight: 600; color: var(--ks-gray); }
+    
+    .plan-price { font-size: 2.25rem; font-weight: 800; color: var(--ks-dark); margin: 20px 0; letter-spacing: -1px; }
+    .plan-price small { font-size: 1rem; font-weight: 500; color: var(--ks-gray); letter-spacing: normal; }
+    
+    .plan-features { list-style: none; padding: 0; margin: 0 0 24px 0; }
+    .plan-features li { margin-bottom: 12px; color: var(--ks-gray); font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+    .check-icon { color: #10B981; flex-shrink: 0; }
+    .x-icon { color: #CBD5E1; flex-shrink: 0; }
+
+    /* Tabelas */
+    .vendor-table-card {
+        background: var(--ks-card-bg); border-radius: var(--ks-radius);
+        box-shadow: var(--ks-shadow); border: 1px solid var(--ks-border); overflow: hidden;
+    }
+    .table-custom { width: 100%; border-collapse: collapse; }
+    .table-custom th {
+        text-align: left; padding: 16px 24px; background: #F8FAFC; color: var(--ks-gray);
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .table-custom td { padding: 16px 24px; border-top: 1px solid var(--ks-border); vertical-align: middle; }
+    .table-custom tr:hover { background: #FAFAFA; }
+
+    .v-cell { display: flex; align-items: center; gap: 16px; }
+    .v-placeholder {
+        width: 40px; height: 40px; border-radius: 10px; background: var(--ks-dark); color: white;
+        display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem;
+    }
+    .v-avatar { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; border: 1px solid var(--ks-border); }
+    .v-info h6 { margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--ks-dark); }
+    .v-info span { font-size: 0.85rem; color: var(--ks-gray); }
+
+    /* Barra de Progresso do Limite */
+    .limit-progress { width: 120px; height: 6px; background: #F1F5F9; border-radius: 100px; overflow: hidden; margin-top: 6px; }
+    .limit-fill { height: 100%; border-radius: 100px; }
+    .fill-green { background: #10B981; }
+    .fill-yellow { background: #F59E0B; }
+    .fill-red { background: #EF4444; }
+
+    /* Status Dot */
+    .status-badge {
+        display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px;
+        font-size: 0.75rem; font-weight: 700;
+    }
+    .status-active { background: #DCFCE7; color: #166534; }
+    .status-inactive { background: #FEE2E2; color: #991B1B; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 80px 20px; }
+    .empty-icon { font-size: 3.5rem; color: #E2E8F0; margin-bottom: 20px; }
+</style>
+
+<div class="admin-page-wrapper">
+    <div class="container">
+        
+        <!-- HEADER -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="page-title">Gestão de Assinaturas</h2>
+                <p class="page-subtitle">Configure planos e monitore o desempenho das lojas.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/admin/" class="btn-action btn-primary-custom">
+                    <i class="fas fa-tachometer-alt"></i> Painel
+                </a>
+                <a href="/admin/migrar-planos" class="btn-action btn-outline-custom">
+                    <i class="fas fa-sync-alt"></i> Migrar Dados
+                </a>
+                <a href="/admin/planos/novo" class="btn-action btn-primary-custom">
+                    <i class="fas fa-plus"></i> Novo Plano
+                </a>
+            </div>
+        </div>
+
+        <!-- FEEDBACK MESSAGES -->
+        <% if (messages.success) { %>
+            <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-3">
+                <i class="fas fa-check-circle fs-5"></i>
+                <span class="fw-medium"><%= messages.success %></span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (messages.error) { %>
+            <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-3">
+                <i class="fas fa-exclamation-circle fs-5"></i>
+                <span class="fw-medium"><%= messages.error %></span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card sc-blue">
+                <div class="stat-info">
+                    <h3><%= stats.total_planos || planos.length %></h3>
+                    <span>Planos Ativos</span>
+                </div>
+                <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+            </div>
+            <div class="stat-card sc-green">
+                <div class="stat-info">
+                    <h3><%= stats.vendedores_ativos || 0 %></h3>
+                    <span>Lojas Ativas</span>
+                </div>
+                <div class="stat-icon"><i class="fas fa-store"></i></div>
+            </div>
+            <div class="stat-card sc-purple">
+                <div class="stat-info">
+                    <h3><%= stats.vendedores_com_plano || 0 %></h3>
+                    <span>Assinantes</span>
+                </div>
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="stat-card sc-yellow">
+                <div class="stat-info">
+                    <h3><%= stats.vendedores_sem_plano || vendedoresSemPlano.length %></h3>
+                    <span>Pendentes</span>
+                </div>
+                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="custom-tabs">
+            <button class="tab-btn active" onclick="switchTab('planos', this)">
+                <i class="fas fa-th-large me-1"></i> Planos
+            </button>
+            <button class="tab-btn" onclick="switchTab('vendedores', this)">
+                <i class="fas fa-users me-1"></i> Base de Vendedores
+            </button>
+            <button class="tab-btn text-danger" onclick="switchTab('sem-plano', this)">
+                <i class="fas fa-exclamation-circle me-1"></i> Sem Plano 
+                <% if(vendedoresSemPlano.length > 0) { %>
+                    <span class="badge-pill"><%= vendedoresSemPlano.length %></span>
+                <% } %>
+            </button>
+        </div>
+
+        <!-- TAB 1: LISTA DE PLANOS -->
+        <div id="tab-planos" class="tab-content">
+            <% if (planos.length === 0) { %>
+                <div class="empty-state">
+                    <i class="fas fa-box-open empty-icon"></i>
+                    <h4 class="fw-bold text-dark">Nenhum plano criado</h4>
+                    <p class="text-muted mb-4">Comece criando planos para monetizar sua plataforma.</p>
+                    <a href="/admin/planos/novo" class="btn-action btn-primary-custom">Criar Primeiro Plano</a>
+                </div>
+            <% } else { %>
+                <div class="plans-grid">
+                    <% planos.forEach(plano => { %>
+                        <div class="plan-item">
+                            <div class="plan-header">
+                                <div>
+                                    <h4 class="plan-name"><%= plano.nome %></h4>
+                                    <span class="plan-badge"><%= plano.total_vendedores || 0 %> lojas</span>
+                                </div>
+                            </div>
+                            
+                            <div class="plan-price">
+                                <% if (parseFloat(plano.preco_mensal) > 0) { %>
+                                    <%= parseFloat(plano.preco_mensal).toLocaleString('pt-AO') %><small> Kz/mês</small>
+                                <% } else { %>
+                                    Grátis
+                                <% } %>
+                            </div>
+
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check-circle check-icon"></i> Até <%= plano.limite_produtos %> produtos</li>
+                                <li class="<%= plano.permite_vip ? '' : 'opacity-50' %>">
+                                    <i class="fas <%= plano.permite_vip ? 'fa-check-circle check-icon' : 'fa-times-circle x-icon' %>"></i>
+                                    Anúncios VIP
+                                </li>
+                                <li class="<%= plano.permite_destaque ? '' : 'opacity-50' %>">
+                                    <i class="fas <%= plano.permite_destaque ? 'fa-check-circle check-icon' : 'fa-times-circle x-icon' %>"></i>
+                                    Destaque na Home
+                                </li>
+                            </ul>
+
+                            <div class="plan-actions">
+                                <a href="/admin/planos/<%= plano.id %>/editar" class="btn btn-outline-secondary border fw-bold w-100">Editar</a>
+                                <form action="/admin/planos/<%= plano.id %>?_method=DELETE" method="POST" class="m-0">
+                                    <button type="submit" class="btn btn-outline-danger w-100 border" onclick="return confirm('Excluir este plano? Isso não afeta os vendedores atuais imediatamente.')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- TAB 2: VENDEDORES POR PLANO -->
+        <div id="tab-vendedores" class="tab-content" style="display: none;">
+            <% if (vendedoresPorPlano.length === 0) { %>
+                <div class="empty-state">
+                    <i class="fas fa-users-slash empty-icon"></i>
+                    <h4 class="fw-bold text-dark">Nenhum vendedor associado</h4>
+                    <p class="text-muted">Os vendedores aparecerão aqui quando tiverem um plano.</p>
+                </div>
+            <% } else { %>
+                <% vendedoresPorPlano.forEach(grupo => { %>
+                    <% if (grupo.vendedores && grupo.vendedores.length > 0) { %>
+                        <div class="vendor-group">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="fas fa-layer-group text-primary"></i>
+                                <h5 class="fw-bold m-0"><%= grupo.plano_nome %></h5>
+                                <span class="badge bg-light text-dark border"><%= grupo.vendedores.length %></span>
+                            </div>
+
+                            <div class="vendor-table-card">
+                                <div class="table-responsive">
+                                    <table class="table-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>Loja</th>
+                                                <th>Responsável</th>
+                                                <th>Uso de Limite</th>
+                                                <th>Status</th>
+                                                <th>Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% grupo.vendedores.forEach(v => { %>
+                                                <tr>
+                                                    <td>
+                                                        <div class="v-cell">
+                                                            <% if(v.foto_perfil) { %>
+                                                                <img src="/uploads/perfil/<%= v.foto_perfil %>" class="v-avatar" onerror="this.src='https://via.placeholder.com/40'">
+                                                            <% } else { %>
+                                                                <div class="v-placeholder"><%= (v.nome_loja || 'L').charAt(0).toUpperCase() %></div>
+                                                            <% } %>
+                                                            <div class="v-info">
+                                                                <h6><%= v.nome_loja || 'Sem Nome' %></h6>
+                                                                <span><%= v.email %></span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="fw-semibold"><%= v.nome %></td>
+                                                    <td>
+                                                        <% 
+                                                            const limit = v.limite_produtos || 10;
+                                                            const current = v.total_produtos || 0;
+                                                            const pct = Math.min((current / limit) * 100, 100);
+                                                            let color = pct > 90 ? 'fill-red' : pct > 70 ? 'fill-yellow' : 'fill-green';
+                                                        %>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="fw-bold" style="font-size: 0.85rem;"><%= current %> / <%= limit %></span>
+                                                        </div>
+                                                        <div class="limit-progress">
+                                                            <div class="limit-fill <%= color %>" style="width: <%= pct %>%"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <% if (v.loja_ativa) { %>
+                                                            <span class="status-badge status-active"><span class="status-dot"></span> Ativa</span>
+                                                        <% } else { %>
+                                                            <span class="status-badge status-inactive"><span class="status-dot"></span> Inativa</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <!-- BOTÃO QUE LEVA PARA A TELA DE GERÊNCIA -->
+                                                        <a href="/admin/vendedor/<%= v.id %>/gerenciar" class="btn btn-sm btn-light border text-primary fw-bold">
+                                                            <i class="fas fa-cog me-1"></i> Gerenciar
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }) %>
+            <% } %>
+        </div>
+
+        <!-- TAB 3: PENDENTES (SEM PLANO) -->
+        <div id="tab-sem-plano" class="tab-content" style="display: none;">
+            <div class="vendor-table-card p-4">
+                <% if (vendedoresSemPlano.length === 0) { %>
+                    <div class="empty-state py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h4 class="fw-bold text-dark">Tudo em ordem!</h4>
+                        <p class="text-muted">Não há vendedores sem plano no momento.</p>
+                    </div>
+                <% } else { %>
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                                <i class="fas fa-exclamation-triangle fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold m-0 text-dark"><%= vendedoresSemPlano.length %> Vendedores Pendentes</h5>
+                                <small class="text-muted">Eles precisam de um plano para cadastrar produtos.</small>
+                            </div>
+                        </div>
+                        <button class="btn-action btn-primary-custom" data-bs-toggle="modal" data-bs-target="#massAssignModal">
+                            Resolver Todos
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Loja</th>
+                                    <th>Contato</th>
+                                    <th>Produtos Atuais</th>
+                                    <th>Data Cadastro</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% vendedoresSemPlano.forEach(v => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="v-cell">
+                                                <div class="v-placeholder"><i class="fas fa-store"></i></div>
+                                                <div class="v-info">
+                                                    <h6><%= v.nome_loja || 'Sem Nome' %></h6>
+                                                    <span><%= v.nome %></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="fw-semibold"><%= v.telefone || '-' %></td>
+                                        <td><span class="badge bg-light text-dark border fw-bold"><%= v.total_produtos || 0 %> produtos</span></td>
+                                        <td class="text-muted small fw-bold"><%= new Date(v.created_at).toLocaleDateString('pt-BR') %></td>
+                                        <td>
+                                            <!-- BOTÃO CONFIGURAR INDIVIDUAL -->
+                                            <a href="/admin/vendedor/<%= v.id %>/gerenciar" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold text-decoration-none">
+                                                Configurar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL: ATRIBUIÇÃO EM MASSA (O Único Modal Restante) -->
+<div class="modal fade" id="massAssignModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-bottom-0 bg-dark text-white rounded-top-4 py-3">
+                <h5 class="modal-title fw-bold"><i class="fas fa-magic me-2"></i>Atribuição em Massa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="/admin/vendedor/atribuir-plano-massivo" method="POST">
+                    <p class="text-muted mb-4">Selecione um plano para aplicar imediatamente a todos os <strong><%= vendedoresSemPlano.length %></strong> vendedores que estão pendentes.</p>
+                    
+                    <div class="mb-4">
+                        <label class="fw-bold mb-2 small text-uppercase text-muted">Plano Destino</label>
+                        <select class="form-select border-2 py-3 fw-bold" name="plano_id" required>
+                            <option value="">Selecione um plano...</option>
+                            <% planos.forEach(p => { %>
+                                <option value="<%= p.id %>"><%= p.nome %> (<%= p.limite_produtos %> prods)</option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-3">
+                        Aplicar Plano a Todos
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab Switcher Simples (Sem conflito de URL)
+    function switchTab(tabId, btn) {
+        // Esconde todos
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        // Mostra o alvo
+        const target = document.getElementById('tab-' + tabId);
+        if(target) target.style.display = 'block';
+        
+        // Ativa o botão
+        btn.classList.add('active');
+    }
+</script>

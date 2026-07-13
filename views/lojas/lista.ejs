@@ -1,0 +1,349 @@
+<style>
+    /* =========================================
+       KUANDA DISCOVERY SYSTEM (RESPONSIVE)
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --bg-soft: #F9FAFB;
+      --card-radius: 24px;
+      --mobile-radius: 16px;
+    }
+
+    body { background-color: var(--bg-soft); }
+
+    /* 1. HERO HEADER */
+    .discovery-header {
+      text-align: center;
+      padding: 40px 20px 60px;
+      position: relative;
+    }
+    .discovery-title {
+      font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--k-black) 0%, #444 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .discovery-subtitle { font-size: 1.1rem; color: #666; max-width: 600px; margin: 0 auto; }
+
+    /* 2. CARD DA LOJA (PREMIUM - DESKTOP) */
+    .store-card-premium {
+      background: white;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    .store-card-premium:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    /* Topo do Card (Banner) */
+    .card-banner-strip {
+      height: 100px;
+      background: linear-gradient(45deg, #111, #333);
+      position: relative;
+      overflow: hidden;
+    }
+    .card-banner-strip::before {
+        content: ''; position: absolute; inset: 0;
+        background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px; opacity: 0.3;
+    }
+
+    /* Avatar Flutuante */
+    .card-avatar-wrapper {
+      width: 80px; height: 80px;
+      margin: -40px auto 0; /* Sobe metade para o banner */
+      position: relative; z-index: 2;
+      border-radius: 50%;
+      background: white;
+      padding: 4px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .card-avatar-wrapper img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    }
+    .card-avatar-placeholder {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: var(--k-black); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 800;
+    }
+
+    /* Corpo do Card */
+    .card-body-content {
+      padding: 15px 25px 25px;
+      text-align: center;
+      flex-grow: 1;
+      display: flex; flex-direction: column;
+    }
+
+    .store-title {
+      font-size: 1.25rem; font-weight: 800; color: var(--k-black);
+      margin-bottom: 5px; text-decoration: none; display: block;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .store-title:hover { color: var(--k-red); }
+
+    .store-rating-row {
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      margin-bottom: 15px; font-size: 0.85rem; color: #FFC107;
+    }
+    
+    .store-desc-short {
+      font-size: 0.9rem; color: #666; line-height: 1.5;
+      margin-bottom: 20px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* Estatísticas (Grid Interno) */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px; padding: 15px 0;
+      border-top: 1px dashed #eee;
+      border-bottom: 1px dashed #eee;
+      margin-bottom: 20px; margin-top: auto; /* Empurra para baixo */
+    }
+    .stat-box h6 { font-size: 1rem; font-weight: 800; margin: 0; color: var(--k-black); }
+    .stat-box span { font-size: 0.7rem; text-transform: uppercase; color: #999; font-weight: 600; }
+
+    /* Botões */
+    .card-actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    
+    .btn-visit {
+      background: var(--k-black); color: white; border: none;
+      padding: 10px; border-radius: 12px; font-weight: 700; font-size: 0.9rem;
+      transition: 0.2s; text-decoration: none; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-visit:hover { background: #333; color: white; transform: translateY(-2px); }
+    
+    .btn-whatsapp-icon {
+      background: #E8FDF0; color: #25D366; width: 42px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      transition: 0.2s; text-decoration: none;
+    }
+    .btn-whatsapp-icon:hover { background: #25D366; color: white; transform: translateY(-2px); }
+
+    /* Empty State */
+    .empty-state-box {
+        background: white; border-radius: 30px; padding: 60px 20px;
+        text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        max-width: 600px; margin: 0 auto;
+    }
+    .empty-icon {
+        width: 100px; height: 100px; background: #FFF5F5; border-radius: 50%;
+        color: var(--k-red); display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; margin: 0 auto 30px;
+    }
+
+    /* Animação */
+    .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* =========================================
+       RESPONSIVIDADE: MINIATURIZAÇÃO (GRID 3x3)
+       ========================================= */
+    @media (max-width: 768px) {
+        .discovery-header { padding: 30px 15px 40px; text-align: left; }
+        .discovery-title { font-size: 1.8rem; }
+        .discovery-subtitle { font-size: 0.9rem; }
+
+        /* Transformação do Container da Grid */
+        .stores-row {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 10px !important;
+            padding: 0 10px;
+        }
+
+        /* Os col-lg-4 do bootstrap atrapalham a grid CSS pura, então vamos resetar */
+        .store-col { width: auto !important; padding: 0 !important; }
+
+        /* Card Miniaturizado */
+        .store-card-premium {
+            border-radius: var(--mobile-radius);
+            box-shadow: none; border: 1px solid #eee;
+            min-height: 140px;
+        }
+        
+        .card-banner-strip { height: 50px; } /* Banner menor */
+        
+        .card-avatar-wrapper {
+            width: 50px; height: 50px; margin: -25px auto 0;
+            padding: 2px;
+        }
+        .card-avatar-placeholder { font-size: 1rem; }
+
+        .card-body-content { padding: 8px 5px; }
+        
+        .store-title {
+            font-size: 0.75rem; margin-bottom: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        
+        /* Esconder elementos desnecessários no mobile */
+        .store-rating-row, .store-desc-short, .stats-grid, .btn-whatsapp-icon {
+            display: none !important;
+        }
+
+        /* Botão "Visitar" vira link total ou mini botão */
+        .card-actions { display: block; margin-top: auto; }
+        .btn-visit {
+            padding: 4px; font-size: 0.6rem; border-radius: 6px;
+            height: 24px; background: transparent; color: var(--k-black);
+            border: 1px solid #eee;
+        }
+        .btn-visit span { display: none; } /* Esconde texto "Visitar Loja" se quiser só icone, ou deixa */
+        .btn-visit::after { content: 'Ver'; } /* Texto curto */
+    }
+  </style>
+
+
+<div class="container-fluid px-0 py-4">
+  
+  <!-- Header -->
+  <div class="discovery-header fade-up">
+    <div class="container">
+        <h2 class="discovery-title">Lojas Oficiais</h2>
+        <p class="discovery-subtitle">Explore as melhores marcas e vendedores de Angola.</p>
+    </div>
+  </div>
+
+  <% if (lojas.length === 0) { %>
+    <!-- EMPTY STATE -->
+    <div class="container">
+        <div class="empty-state-box fade-up" style="animation-delay: 0.1s;">
+            <div class="empty-icon"><i class="fas fa-store-slash"></i></div>
+            <h3 class="fw-bold mb-3">Nenhuma loja encontrada</h3>
+            <p class="text-muted mb-4">Ainda não temos parceiros cadastrados. Seja o primeiro!</p>
+            <a href="/registro?tipo=vendedor" class="btn btn-danger btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                <i class="fas fa-rocket me-2"></i>Criar Minha Loja
+            </a>
+        </div>
+    </div>
+  <% } else { %>
+    
+    <!-- GRID DE LOJAS (Adaptativa) -->
+    <div class="container">
+        <div class="row g-4 stores-row">
+          <% lojas.forEach((loja, index) => { %>
+            <!-- Adicionada classe 'store-col' para controle via CSS -->
+            <div class="col-lg-4 col-md-6 store-col fade-up" style="animation-delay: <%= index * 0.05 %>s;">
+              
+              <!-- O LINK ENVOLVE O CARD INTEIRO NO MOBILE PARA MELHOR UX -->
+              <div class="store-card-premium" onclick="if(window.innerWidth < 768) window.location.href='/loja/<%= loja.id %>'">
+                
+                <!-- LÓGICA DO BANNER -->
+                <% 
+                   let bannerStyle = '';
+                   if (loja.banner_loja) {
+                       let urlImg = '/uploads/banners/' + loja.banner_loja;
+                       bannerStyle = "background-image: url('" + urlImg + "'); background-size: cover; background-position: center;";
+                   } else {
+                       bannerStyle = "background: linear-gradient(45deg, #0F0F0F, #2c2c2c);";
+                   }
+                %>
+
+                <div class="card-banner-strip" style="<%= bannerStyle %>">
+                    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.1);"></div>
+                </div>
+
+                <!-- Avatar -->
+                <div class="card-avatar-wrapper">
+                    <% 
+                    let foto = loja.foto_perfil || loja.foto_vendedor || loja.avatar;
+                    let nome = loja.nome_loja || 'Loja Parceira';
+                    %>
+                    <% if (foto) { %>
+                        <img src="/uploads/perfil/<%= foto %>" alt="<%= nome %>" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<%= nome.charAt(0) %>&background=0F0F0F&color=fff&size=150';">
+                    <% } else { %>
+                        <div class="card-avatar-placeholder"><%= nome.charAt(0).toUpperCase() %></div>
+                    <% } %>
+                </div>
+
+                <!-- Conteúdo -->
+                <div class="card-body-content">
+                    
+                    <a href="/loja/<%= loja.id %>" class="store-title">
+                        <%= nome %> <i class="fas fa-check-circle text-primary small align-top d-none d-md-inline" title="Verificado"></i>
+                    </a>
+
+                    <!-- Rating (Some no Mobile) -->
+                    <div class="store-rating-row">
+                        <% if (loja.media_classificacao) { %>
+                            <% const media = Math.round(Number(loja.media_classificacao) || 0); %>
+                            <% for(let i=1; i<=5; i++) { %>
+                                <i class="<%= i <= media ? 'fas' : 'far' %> fa-star"></i>
+                            <% } %>
+                            <span class="text-muted ms-1 fw-bold text-dark"><%= parseFloat(loja.media_classificacao).toFixed(1) %></span>
+                        <% } else { %>
+                            <span class="text-muted small"><i class="far fa-star me-1"></i>Nova</span>
+                        <% } %>
+                    </div>
+
+                    <!-- Descrição (Some no Mobile) -->
+                    <p class="store-desc-short">
+                        <%= loja.descricao_loja || 'Visite nossa loja para ver os melhores produtos com a qualidade que você merece.' %>
+                    </p>
+
+                    <!-- Estatísticas (Some no Mobile) -->
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <h6><%= loja.total_produtos || 0 %></h6>
+                            <span>Prods</span>
+                        </div>
+                        <div class="stat-box" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
+                            <h6><%= loja.total_seguidores || 0 %></h6>
+                            <span>Fãs</span>
+                        </div>
+                        <div class="stat-box">
+                            <h6 class="text-success">ON</h6>
+                            <span>Status</span>
+                        </div>
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="card-actions">
+                        <a href="/loja/<%= loja.id %>" class="btn-visit">
+                            <span>Visitar Loja</span>
+                        </a>
+                        
+                        <% if (loja.telefone) { %>
+                            <a href="https://wa.me/<%= loja.telefone.replace(/\D/g, '') %>" target="_blank" class="btn-whatsapp-icon" title="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        <% } %>
+                    </div>
+
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+    </div>
+  <% } %>
+
+</div>
+
+<script>
+    // Animação de Entrada
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+
+    document.querySelectorAll('.fade-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
+</script>

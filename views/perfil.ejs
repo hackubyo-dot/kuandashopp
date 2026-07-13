@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Kuanda Shop</title>
+    
+    <!-- ÍCONES E FONTES -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/chat-monitor.js"></script>
+    
+    <style>
+        /* =================================================================
+           KUANDA ULTIMATE PROFILE UI - VFINAL
+           Design Profissional, Responsivo e Limpo
+        ================================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #0F0F0F;
+            --accent: #E31C25;
+            --accent-hover: #C2181F;
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --radius-2xl: 32px;
+            --radius-xl: 20px;
+            --radius-lg: 12px;
+            --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            padding-top: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; padding-bottom: 80px; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+        /* --- ALERTS (NOTIFICAÇÕES FLUTUANTES) --- */
+        .alert-container {
+            position: fixed; top: 100px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+        }
+        .alert-premium {
+            min-width: 300px; padding: 16px 24px; border-radius: var(--radius-lg);
+            backdrop-filter: blur(10px); box-shadow: var(--shadow-premium);
+            display: flex; align-items: center; gap: 12px; font-weight: 700;
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+        .alert-success { background: rgba(16, 185, 129, 0.95); color: white; border-left: 5px solid #065f46; }
+        .alert-error { background: rgba(239, 68, 68, 0.95); color: white; border-left: 5px solid #7f1d1d; }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* --- HERO SECTION --- */
+        .hero-wrapper { position: relative; margin-bottom: 50px; }
+        .main-banner {
+            height: 320px; border-radius: var(--radius-2xl);
+            background-size: cover; background-position: center;
+            position: relative; overflow: hidden; box-shadow: var(--shadow-premium);
+            background-color: #1e293b;
+        }
+        .main-banner::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%);
+        }
+        .banner-edit-label {
+            position: absolute; top: 25px; right: 25px; z-index: 10;
+            background: rgba(255, 255, 255, 0.9); padding: 10px 20px; border-radius: 50px;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .banner-edit-label:hover { transform: scale(1.05); color: var(--accent); background: white; }
+
+        .profile-info-overlay {
+            margin-top: -90px; padding: 0 50px; position: relative; z-index: 20;
+            display: flex; align-items: flex-end; gap: 30px;
+        }
+        .avatar-box {
+            width: 170px; height: 170px; border-radius: 60px;
+            border: 6px solid var(--surface); box-shadow: var(--shadow-premium);
+            position: relative; background: #f1f5f9; flex-shrink: 0;
+        }
+        .avatar-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 52px; }
+        .avatar-edit-btn {
+            position: absolute; bottom: -5px; right: -5px;
+            width: 45px; height: 45px; background: var(--accent);
+            color: white; border-radius: 14px; border: 4px solid var(--surface);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.3s;
+        }
+        .avatar-edit-btn:hover { transform: scale(1.1); background: var(--accent-hover); }
+
+        /* --- BADGES --- */
+        .badge-kuanda {
+            padding: 6px 14px; border-radius: 50px; font-size: 0.75rem;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .badge-vendor { background: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; }
+        .badge-admin { background: #0F172A; color: #F8FAFC; }
+        .badge-client { background: #F1F5F9; color: #475569; }
+        .badge-plan { background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; }
+
+        /* --- HUB ACTIONS --- */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 50px 0 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px;
+        }
+        .section-header h3 { font-weight: 800; font-size: 1.4rem; margin: 0; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+        .section-header h3 i { color: var(--accent); }
+        
+        .action-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px; margin-bottom: 40px;
+        }
+        .action-card {
+            background: var(--surface); padding: 25px; border-radius: var(--radius-xl);
+            text-decoration: none !important; color: inherit; transition: 0.3s;
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .action-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: var(--shadow-premium); }
+        .action-icon {
+            width: 50px; height: 50px; border-radius: 14px;
+            background: #F8FAFC; color: var(--primary);
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+        }
+        .action-card:hover .action-icon { background: var(--accent); color: white; }
+
+        /* --- GAME & MOVIE CARDS --- */
+        .history-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        .product-history-card {
+            background: var(--surface); border-radius: var(--radius-xl);
+            padding: 15px; display: flex; gap: 18px; align-items: center;
+            border: 1px solid var(--border); transition: 0.3s; position: relative;
+            overflow: hidden;
+        }
+        .product-history-card:hover { border-color: var(--accent); box-shadow: var(--shadow-premium); transform: translateY(-3px); }
+        .history-thumb {
+            width: 85px; height: 115px; border-radius: var(--radius-lg);
+            object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
+            background-color: #eee;
+        }
+        .history-info { flex: 1; min-width: 0; }
+        .history-status {
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 6px; letter-spacing: 0.5px;
+        }
+        .status-active { background: #DCFCE7; color: #166534; }
+        .status-pending { background: #FEF3C7; color: #92400E; }
+        
+        .card-pending { opacity: 0.75; background: #FAFAFA; border-style: dashed; }
+        .card-pending:hover { opacity: 1; border-style: solid; }
+
+        /* --- TABLES --- */
+        .premium-table-card {
+            background: var(--surface); border-radius: var(--radius-xl);
+            border: 1px solid var(--border); overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .table-premium { width: 100%; border-collapse: collapse; }
+        .table-premium th { 
+            background: #F8FAFC; padding: 18px 24px; font-size: 0.75rem; 
+            text-transform: uppercase; font-weight: 800; color: var(--text-muted); 
+            text-align: left; letter-spacing: 0.5px;
+        }
+        .table-premium td { padding: 18px 24px; border-top: 1px solid var(--border); vertical-align: middle; font-size: 0.95rem; }
+        .table-premium tr:hover td { background: #F8FAFC; }
+
+        /* --- FORMS --- */
+        .settings-card {
+            background: var(--surface); border-radius: var(--radius-xl);
+            padding: 40px; border: 1px solid var(--border); box-shadow: var(--shadow-premium);
+        }
+        .form-group-modern { margin-bottom: 25px; }
+        .form-group-modern label { display: block; font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 10px; }
+        .input-modern {
+            width: 100%; padding: 14px 20px; border-radius: var(--radius-lg);
+            border: 2px solid #F1F5F9; background: #F8FAFC; font-weight: 600; transition: 0.3s;
+            box-sizing: border-box; font-family: inherit; font-size: 1rem; color: var(--text-main);
+        }
+        .input-modern:focus { border-color: var(--accent); background: white; outline: none; box-shadow: 0 0 0 4px rgba(227, 28, 37, 0.1); }
+        .input-modern:disabled { background: #E2E8F0; color: #94A3B8; cursor: not-allowed; }
+
+        .btn-save-kuanda {
+            background: var(--primary); color: white; padding: 16px 40px;
+            border-radius: var(--radius-lg); border: none; font-weight: 800; font-size: 1rem;
+            cursor: pointer; transition: 0.3s; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-save-kuanda:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(227, 28, 37, 0.25); }
+        .btn-logout {
+            background: white; border: 2px solid #fee2e2; color: #ef4444; 
+            padding: 10px 25px; border-radius: 50px; font-weight: 700; 
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-logout:hover { background: #fee2e2; color: #991b1b; }
+
+        /* --- UTILS --- */
+        .d-none { display: none; }
+        .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+        .col-md-6, .col-lg-7, .col-lg-5, .col-md-4, .col-12 { padding: 0 15px; box-sizing: border-box; }
+        .col-md-6 { width: 50%; }
+        .col-md-4 { width: 33.333%; }
+        .col-lg-7 { width: 60%; }
+        .col-lg-5 { width: 40%; }
+        .col-12 { width: 100%; }
+        .empty-state { text-align: center; padding: 40px; background: white; border-radius: var(--radius-xl); border: 1px dashed var(--border); color: var(--text-muted); width: 100%; grid-column: 1 / -1; }
+
+        @media (max-width: 992px) {
+            .col-lg-7, .col-lg-5 { width: 100%; margin-bottom: 30px; }
+        }
+        @media (max-width: 768px) {
+            .profile-info-overlay { padding: 0 20px; flex-direction: column; text-align: center; align-items: center; margin-top: -80px; }
+            .hero-wrapper { margin-bottom: 60px; }
+            .action-grid { grid-template-columns: 1fr 1fr; }
+            .history-grid { grid-template-columns: 1fr; }
+            .col-md-6, .col-md-4 { width: 100%; }
+            .section-header h3 { font-size: 1.2rem; }
+            .table-premium { display: block; overflow-x: auto; white-space: nowrap; }
+            .avatar-box { width: 140px; height: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- MENSAGENS FLUTUANTES (FEEDBACK) -->
+<div class="alert-container">
+    <% if (messages && messages.error) { %>
+        <div class="alert-premium alert-error"><i class="fas fa-exclamation-circle"></i> <%= messages.error %></div>
+    <% } %>
+    <% if (messages && messages.success) { %>
+        <div class="alert-premium alert-success"><i class="fas fa-check-circle"></i> <%= messages.success %></div>
+    <% } %>
+</div>
+
+<div class="container">
+
+    <!-- 1. HERO SECTION (BANNER & AVATAR) -->
+    <section class="hero-wrapper">
+        <!-- BANNER -->
+        <div class="main-banner" style="background-image: url('<%= usuario.banner_loja ? `/uploads/banners/${usuario.banner_loja}` : 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029' %>');">
+            <form action="/perfil/atualizar" method="POST" enctype="multipart/form-data" id="bannerForm">
+                <input type="hidden" name="nome" value="<%= usuario.nome %>">
+                <label for="banner_input" class="banner-edit-label">
+                    <i class="fas fa-camera"></i> <span>Alterar Capa</span>
+                    <input type="file" name="banner_loja" id="banner_input" class="d-none" accept="image/*" onchange="document.getElementById('bannerForm').submit()">
+                </label>
+            </form>
+        </div>
+
+        <!-- INFO DO USUÁRIO -->
+        <div class="profile-info-overlay">
+            <div class="avatar-box">
+                <img src="<%= usuario.foto_perfil ? `/uploads/perfil/${usuario.foto_perfil}` : `https://ui-avatars.com/api/?name=${usuario.nome}&background=0F172A&color=fff&size=256` %>" id="profileDisplay">
+                <form action="/perfil/atualizar" method="POST" enctype="multipart/form-data" id="avatarForm">
+                    <input type="hidden" name="nome" value="<%= usuario.nome %>">
+                    <label for="avatar_input" class="avatar-edit-btn">
+                        <i class="fas fa-pen"></i>
+                        <input type="file" name="foto_perfil" id="avatar_input" class="d-none" accept="image/*" onchange="document.getElementById('avatarForm').submit()">
+                    </label>
+                </form>
+            </div>
+            
+            <div style="flex-grow: 1; padding-bottom: 10px;">
+                <h1 style="font-weight: 850; font-size: 2.2rem; margin: 0; line-height: 1.2;"><%= usuario.nome %></h1>
+                <p class="text-muted" style="margin: 5px 0 15px 0; font-weight: 500;"><i class="fas fa-envelope me-2"></i><%= usuario.email %></p>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; @media(min-width: 768px){justify-content: flex-start;}">
+                    <% if(usuario.tipo === 'vendedor') { %>
+                        <span class="badge-kuanda badge-vendor"><i class="fas fa-store"></i> Vendedor</span>
+                    <% } else if(usuario.tipo === 'admin') { %>
+                        <span class="badge-kuanda badge-admin"><i class="fas fa-shield-alt"></i> Admin</span>
+                    <% } else { %>
+                        <span class="badge-kuanda badge-client"><i class="fas fa-user"></i> Cliente</span>
+                    <% } %>
+
+                    <% if(typeof planoInfo !== 'undefined' && planoInfo) { %>
+                        <span class="badge-kuanda badge-plan"><i class="fas fa-crown"></i> <%= planoInfo.nome %></span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div style="padding-bottom: 15px;">
+                <form action="/logout" method="POST">
+                    <button type="submit" class="btn-logout">
+                        <i class="fas fa-sign-out-alt me-2"></i> Sair
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. HUB DE AÇÕES -->
+    <div class="section-header">
+        <h3><i class="fas fa-th-large"></i> Hub Central</h3>
+    </div>
+    <div class="action-grid">
+        <a href="/carrinho" class="action-card">
+            <div class="action-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div><div style="font-weight: 800; font-size: 1.1rem;">Carrinho</div><small class="text-muted">Ver itens</small></div>
+        </a>
+        <a href="/games" class="action-card">
+            <div class="action-icon" style="background: #F0F9FF; color: #0284C7;"><i class="fas fa-gamepad"></i></div>
+            <div><div style="font-weight: 800; font-size: 1.1rem;">Jogos</div><small class="text-muted">Ir para Loja</small></div>
+        </a>
+
+        <% if (usuario.tipo === 'vendedor') { %>
+            <a href="/vendedor/vendas" class="action-card" style="background: var(--primary); color: white; border-color: var(--primary);">
+                <div class="action-icon" style="background: rgba(255,255,255,0.15); color: white;"><i class="fas fa-store"></i></div>
+                <div><div style="font-weight: 800; font-size: 1.1rem;">Minhas vendas</div><small style="color: rgba(255,255,255,0.7)">Painel de Vendas</small></div>
+            </a>
+        <% } %>
+
+        <% if (usuario.tipo === 'admin') { %>
+            <a href="/admin" class="action-card" style="background: #FFF1F2; border-color: #FECACA;">
+                <div class="action-icon" style="background: #FFE4E6; color: #E11D48;"><i class="fas fa-user-shield"></i></div>
+                <div><div style="font-weight: 800; color: #E11D48; font-size: 1.1rem;">Admin</div><small style="color: #E11D48;">Painel Geral</small></div>
+            </a>
+        <% } %>
+    </div>
+
+    <!-- 3. BIBLIOTECA DE JOGOS -->
+    <div class="section-header">
+        <h3><i class="fas fa-gamepad"></i> Meus Jogos</h3>
+        <a href="/games" style="color: var(--accent); font-weight: 700; font-size: 0.9rem;">Comprar Mais <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="history-grid">
+        
+        <!-- JOGOS ATIVOS (Biblioteca + Aprovados) -->
+        <% if(typeof meus_jogos !== 'undefined' && meus_jogos.length > 0) { %>
+            <% meus_jogos.forEach(jogo => { %>
+                <a href="/game/<%= jogo.id %>" class="product-history-card">
+                    <img src="/uploads/games/<%= jogo.capa %>" class="history-thumb" onerror="this.src='https://placehold.co/100x150?text=GAME'">
+                    <div class="history-info">
+                        <span class="history-status status-active"><i class="fas fa-check-circle me-1"></i> Acesso Liberado</span>
+                        <h5 style="margin: 0; font-weight: 800; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= jogo.titulo %></h5>
+                        <p style="font-size: 0.8rem; color: #64748B; margin: 2px 0 0 0;">
+                            <%= jogo.data_aquisicao ? new Date(jogo.data_aquisicao).toLocaleDateString() : 'Recentemente' %>
+                        </p>
+                    </div>
+                </a>
+            <% }) %>
+        <% } %>
+
+        <!-- JOGOS PENDENTES (Em Análise) -->
+        <% if(typeof pedidosJogos !== 'undefined' && pedidosJogos.length > 0) { %>
+            <% pedidosJogos.forEach(pj => { %>
+                <div class="product-history-card card-pending">
+                    <img src="/uploads/games/<%= pj.capa %>" class="history-thumb" style="filter: grayscale(100%); opacity: 0.8;" onerror="this.src='https://placehold.co/100x150?text=GAME'">
+                    <div class="history-info">
+                        <span class="history-status status-pending"><i class="fas fa-clock me-1"></i> Aguardando Aprovação</span>
+                        <h5 style="margin: 0; font-weight: 800; font-size: 1rem; color: #64748B;"><%= pj.titulo %></h5>
+                        <p style="font-size: 0.8rem; color: #94A3B8; margin: 2px 0 0 0;">Pedido Enviado</p>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% if((!meus_jogos || meus_jogos.length == 0) && (!pedidosJogos || pedidosJogos.length == 0)) { %>
+            <div class="empty-state">
+                <i class="fas fa-ghost fa-3x" style="color: #CBD5E1; margin-bottom: 15px;"></i>
+                <p class="fw-bold m-0">Sua biblioteca de jogos está vazia.</p>
+                <a href="/games" style="color: var(--accent); font-weight: 700; font-size: 0.9rem;">Explorar Loja</a>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- 4. CINE KUANDA -->
+    <div class="section-header">
+        <h3><i class="fas fa-play-circle"></i> Cine Kuanda</h3>
+        <a href="/filmes" style="color: var(--accent); font-weight: 700; font-size: 0.9rem;">Ver Catálogo <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="history-grid">
+        
+        <!-- FILMES ATIVOS -->
+        <% if(typeof assinaturas_filmes !== 'undefined' && assinaturas_filmes.length > 0) { %>
+            <% assinaturas_filmes.forEach(filme => { %>
+                <a href="/filme/<%= filme.id %>" class="product-history-card">
+                    <img src="/uploads/filmes/<%= filme.poster %>" class="history-thumb" onerror="this.src='https://placehold.co/100x150?text=CINE'">
+                    <div class="history-info">
+                        <span class="history-status status-active"><i class="fas fa-play me-1"></i> Assistir Agora</span>
+                        <h5 style="margin: 0; font-weight: 800; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= filme.titulo %></h5>
+                        <p style="font-size: 0.8rem; color: #64748B; margin: 2px 0 0 0;">
+                            <%= filme.data_expiracao ? 'Expira: ' + new Date(filme.data_expiracao).toLocaleDateString() : 'Acesso Vitalício' %>
+                        </p>
+                    </div>
+                </a>
+            <% }) %>
+        <% } %>
+
+        <!-- FILMES PENDENTES -->
+        <% if(typeof pedidosFilmes !== 'undefined' && pedidosFilmes.length > 0) { %>
+            <% pedidosFilmes.forEach(pf => { %>
+                <div class="product-history-card card-pending">
+                    <img src="/uploads/filmes/<%= pf.poster %>" class="history-thumb" style="filter: grayscale(100%); opacity: 0.8;" onerror="this.src='https://placehold.co/100x150?text=CINE'">
+                    <div class="history-info">
+                        <span class="history-status status-pending"><i class="fas fa-clock me-1"></i> Em Análise</span>
+                        <h5 style="margin: 0; font-weight: 800; font-size: 1rem; color: #64748B;"><%= pf.titulo %></h5>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% if((!assinaturas_filmes || assinaturas_filmes.length == 0) && (!pedidosFilmes || pedidosFilmes.length == 0)) { %>
+            <div class="empty-state">
+                <i class="fas fa-film fa-3x" style="color: #CBD5E1; margin-bottom: 15px;"></i>
+                <p class="fw-bold m-0">Nenhum filme ou série ativo.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- 5. TABELAS DE DADOS -->
+     
+    <div class="row" style="margin-top: 50px;">
+        <!-- TABELA DE COMPRAS FÍSICAS -->
+        <div class="col-lg-7">
+            <div class="section-header" style="margin-top: 0;">
+                <h3><i class="fas fa-box-open"></i> Compras Marketplace</h3>
+            </div>
+            <div class="premium-table-card">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>ID Pedido</th>
+                            <th>Data</th>
+                            <th>Valor Total</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(typeof pedidos !== 'undefined' && pedidos.length > 0) { %>
+                            <% pedidos.forEach(p => { %>
+                                <tr>
+                                    <td style="font-weight: 800; color: var(--primary);">#<%= p.id %></td>
+                                    <td><%= p.created_at ? new Date(p.created_at).toLocaleDateString() : '--' %></td>
+                                    <td style="font-weight: 800; color: #059669;">Kz <%= parseFloat(p.total).toLocaleString('pt-AO') %></td>
+                                    <td>
+                                        <% let st = p.status ? p.status.toLowerCase() : 'pendente'; %>
+                                        <% if(st === 'entregue' || st === 'concluido') { %>
+                                            <span style="background: #DCFCE7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.7rem;">ENTREGUE</span>
+                                        <% } else if(st === 'cancelado') { %>
+                                            <span style="background: #FEF2F2; color: #991B1B; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.7rem;">CANCELADO</span>
+                                        <% } else { %>
+                                            <span style="background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.7rem;"><%= st.toUpperCase() %></span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <a href="/pedido/<%= p.id %>" style="color: var(--accent); font-weight: 700; font-size: 0.8rem;">Ver <i class="fas fa-chevron-right"></i></a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="5" style="text-align: center; padding: 30px; color: #94A3B8;">Você ainda não realizou compras.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TABELA DE PLANOS -->
+        <div class="col-lg-5">
+            <div class="section-header" style="margin-top: 0;">
+                <h3><i class="fas fa-id-card"></i> Histórico de Planos</h3>
+            </div>
+            <div class="premium-table-card">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>Plano Solicitado</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(typeof assinaturas !== 'undefined' && assinaturas.length > 0) { %>
+                            <% assinaturas.forEach(a => { %>
+                                <tr>
+                                    <td style="font-weight: 700; text-transform: capitalize;"><%= a.tipo.replace('_', ' ') %></td>
+                                    <td><%= a.created_at ? new Date(a.created_at).toLocaleDateString() : '--' %></td>
+                                    <td>
+                                        <% if(a.status === 'aprovado') { %>
+                                            <span style="background: #DCFCE7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.7rem;">ATIVO</span>
+                                        <% } else { %>
+                                            <span style="background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.7rem;">ANÁLISE</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="3" style="text-align: center; padding: 30px; color: #94A3B8;">Nenhum histórico de planos.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. CONFIGURAÇÕES -->
+    <div class="section-header" style="margin-top: 60px;">
+        <h3><i class="fas fa-user-cog"></i> Editar Perfil</h3>
+    </div>
+    <div class="settings-card">
+        <form action="/perfil/atualizar" method="POST">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group-modern">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome" class="input-modern" value="<%= usuario.nome %>" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group-modern">
+                        <label>E-mail (Não alterável)</label>
+                        <input type="email" class="input-modern" value="<%= usuario.email %>" disabled>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group-modern">
+                        <label>Telefone / WhatsApp</label>
+                        <input type="tel" name="telefone" class="input-modern" value="<%= usuario.telefone || '' %>" placeholder="+244 9XX XXX XXX">
+                    </div>
+                </div>
+
+                <% if (usuario.tipo === 'vendedor') { %>
+                    <div class="col-12">
+                        <div style="margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px;">
+                            <h4 style="color: var(--accent); margin-bottom: 20px;"><i class="fas fa-store me-2"></i>Informações da Loja</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group-modern">
+                            <label>Nome da Loja</label>
+                            <input type="text" name="nome_loja" class="input-modern" value="<%= usuario.nome_loja || '' %>">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group-modern">
+                            <label>Descrição da Loja</label>
+                            <textarea name="descricao_loja" class="input-modern" rows="3"><%= usuario.descricao_loja || '' %></textarea>
+                        </div>
+                    </div>
+                <% } %>
+
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn-save-kuanda">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div style="margin: 50px 0; border-top: 1px solid var(--border);"></div>
+
+        <h4 style="font-weight: 800; margin-bottom: 25px; color: var(--primary);"><i class="fas fa-lock me-2"></i>Segurança e Senha</h4>
+        <form action="/perfil/alterar-senha" method="POST">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group-modern">
+                        <label>Senha Atual</label>
+                        <input type="password" name="senha_atual" class="input-modern" required placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group-modern">
+                        <label>Nova Senha</label>
+                        <input type="password" name="nova_senha" class="input-modern" required placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group-modern">
+                        <label>Confirmar Nova Senha</label>
+                        <input type="password" name="confirmar_senha" class="input-modern" required placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn-save-kuanda" style="background: #E2E8F0; color: var(--text-main); border: 1px solid #CBD5E1;">
+                        <i class="fas fa-key"></i> Atualizar Senha
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<!-- SCRIPT ESSENCIAL -->
+<script>
+    // Remove alertas após 5 segundos com animação suave
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert-premium');
+            alerts.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(50px)';
+                el.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                setTimeout(() => el.remove(), 600);
+            });
+        }, 5000);
+    });
+</script>
+
+</body>
+</html>

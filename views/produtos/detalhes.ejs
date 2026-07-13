@@ -1,0 +1,544 @@
+<style>
+    /* =========================================
+       KUANDA PREMIUM DESIGN SYSTEM
+       ========================================= */
+    :root {
+        --k-accent: #E31C25;
+        --k-dark: #09090B;
+        --k-text: #3f3f46;
+        --k-gray-bg: #F8FAFC;
+        --k-white: #FFFFFF;
+        
+        --radius-xl: 24px;
+        --radius-lg: 16px;
+        --radius-sm: 10px;
+        
+        --shadow-soft: 0 8px 30px -6px rgba(0,0,0,0.05);
+        --shadow-hover: 0 20px 40px -10px rgba(0,0,0,0.1);
+        
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        background-color: var(--k-gray-bg);
+        color: var(--k-dark);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* 1. BREADCRUMB MINIMALISTA */
+    .breadcrumb-nav { margin-bottom: 24px; }
+    .breadcrumb-item a { color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: var(--transition); }
+    .breadcrumb-item a:hover { color: var(--k-accent); }
+    .breadcrumb-item.active { color: var(--k-dark); font-weight: 700; font-size: 0.85rem; }
+    .breadcrumb-item + .breadcrumb-item::before { color: #cbd5e1; }
+
+    /* 2. GALERIA ADAPTATIVA (SMART CONTAINER) */
+    .gallery-container {
+        position: sticky; top: 100px;
+    }
+
+    .main-image-wrapper {
+        width: 100%;
+        /* Altura automática baseada na imagem, mas com limites */
+        min-height: 300px; 
+        max-height: 700px;
+        background: var(--k-white);
+        border-radius: var(--radius-xl);
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(0,0,0,0.02);
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .main-img {
+        max-width: 100%;
+        height: auto;
+        max-height: 680px; /* Garante que não estoure a tela */
+        object-fit: contain; /* Mantém a proporção real */
+        display: block;
+        border-radius: var(--radius-lg);
+        cursor: zoom-in;
+    }
+
+    .thumbs-scroll {
+        display: flex; gap: 10px; margin-top: 16px; 
+        overflow-x: auto; padding: 4px;
+        scrollbar-width: none; /* Firefox */
+    }
+    .thumbs-scroll::-webkit-scrollbar { display: none; } /* Chrome */
+
+    .thumb-btn {
+        width: 60px; height: 60px; flex-shrink: 0;
+        border-radius: var(--radius-sm); border: 2px solid transparent;
+        padding: 2px; background: var(--k-white);
+        cursor: pointer; opacity: 0.6; transition: var(--transition);
+    }
+    .thumb-btn.active, .thumb-btn:hover {
+        border-color: var(--k-dark); opacity: 1; transform: translateY(-2px);
+    }
+    .thumb-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+
+    /* 3. INFORMAÇÕES DO PRODUTO */
+    .product-details-col { padding-left: 40px; }
+
+    /* Tags */
+    .tags-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .k-badge {
+        padding: 5px 12px; border-radius: 100px; font-size: 0.7rem; 
+        font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-gray { background: #f1f5f9; color: #64748b; }
+    .badge-dark { background: var(--k-dark); color: #FFD700; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+    /* Título e Preço */
+    .prod-title {
+        font-size: 2rem; font-weight: 800; line-height: 1.2; 
+        color: var(--k-dark); margin-bottom: 12px; letter-spacing: -0.5px;
+    }
+
+    .price-container {
+        display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px;
+    }
+    .price-current { font-size: 2rem; font-weight: 800; color: var(--k-accent); }
+    .price-old { font-size: 1.1rem; text-decoration: line-through; color: #94a3b8; font-weight: 500; }
+    .discount-pill { 
+        background: #ecfdf5; color: #059669; padding: 4px 10px; 
+        border-radius: 6px; font-weight: 700; font-size: 0.8rem; 
+    }
+
+    /* Rating Compacto */
+    .rating-mini { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; font-size: 0.9rem; }
+    .stars-static { color: #fbbf24; }
+
+    /* 4. BOTÕES MINIATURIZADOS (COMPACT ACTION BAR) */
+    .action-bar {
+        display: flex; gap: 12px; align-items: stretch; margin-bottom: 30px;
+    }
+    
+    .btn-compact {
+        flex: 1; /* Ocupam espaço igual */
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px 16px; border-radius: var(--radius-lg);
+        font-weight: 700; font-size: 0.95rem; border: none;
+        transition: var(--transition); text-decoration: none;
+        height: 52px; /* Altura fixa compacta */
+    }
+
+    .btn-cart {
+        background: var(--k-dark); color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .btn-cart:hover:not(:disabled) { background: #27272a; transform: translateY(-2px); color: white; }
+    .btn-cart:disabled { background: #e4e4e7; cursor: not-allowed; color: #a1a1aa; }
+
+    .btn-chat {
+        background: #DCFCE7; color: #15803D; /* Estilo WhatsApp Soft */
+    }
+    .btn-chat:hover { background: #bbf7d0; color: #14532d; transform: translateY(-2px); }
+
+    /* Vendedor Compacto */
+    .seller-compact {
+        display: flex; align-items: center; gap: 15px;
+        padding: 16px; background: white; border-radius: var(--radius-lg);
+        border: 1px solid #e2e8f0; margin-bottom: 30px;
+        transition: var(--transition);
+    }
+    .seller-compact:hover { border-color: #cbd5e1; box-shadow: var(--shadow-soft); }
+    .seller-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+    .seller-data h6 { margin: 0; font-weight: 700; font-size: 0.95rem; }
+    .seller-data span { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 4px; }
+    .link-arrow { margin-left: auto; color: var(--k-dark); opacity: 0.5; transition: 0.2s; }
+    .seller-compact:hover .link-arrow { opacity: 1; transform: translateX(3px); }
+
+    /* 5. AVALIAÇÕES INTEGRADAS (EMBEDDED) */
+    .review-embedded {
+        background: white; border-radius: var(--radius-xl);
+        padding: 30px; box-shadow: var(--shadow-soft); margin-top: 50px;
+    }
+    .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 20px; }
+    
+    .rating-summary-box {
+        display: flex; align-items: center; gap: 20px;
+    }
+    .big-score { font-size: 3rem; font-weight: 800; line-height: 1; letter-spacing: -2px; }
+    
+    /* Formulário Inline Clean */
+    .inline-form-wrapper {
+        background: #f8fafc; padding: 20px; border-radius: var(--radius-lg); margin-bottom: 30px;
+    }
+    .star-rating-input { display: flex; gap: 8px; font-size: 1.5rem; color: #cbd5e1; cursor: pointer; margin-bottom: 15px; }
+    .star-rating-input i.active { color: #fbbf24; transform: scale(1.1); }
+    .input-review {
+        width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
+        font-size: 0.9rem; resize: none; outline: none; transition: 0.2s;
+    }
+    .input-review:focus { border-color: var(--k-dark); background: white; }
+
+    /* Lista de Comentários */
+    .review-item { padding: 20px 0; border-bottom: 1px solid #f1f5f9; }
+    .review-item:last-child { border-bottom: none; }
+    .reviewer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .reviewer-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .review-text { font-size: 0.95rem; color: #4b5563; line-height: 1.6; margin-left: 48px; }
+
+    /* 6. RESPONSIVIDADE */
+    @media (max-width: 991px) {
+        .product-details-col { padding-left: 0; margin-top: 30px; }
+        .gallery-container { position: static; }
+        .prod-title { font-size: 1.6rem; }
+    }
+
+    @media (max-width: 576px) {
+        .main-image-wrapper { min-height: 250px; } /* Menor no mobile */
+        .action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 12px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); margin: 0; z-index: 100; gap: 10px; }
+        .btn-compact { height: 48px; font-size: 0.9rem; }
+        body { padding-bottom: 80px; } /* Espaço para barra fixa */
+        .seller-compact { margin-bottom: 10px; }
+    }
+</style>
+
+<div class="container py-4">
+    
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb-nav">
+        <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/produtos">Loja</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= produto.nome %></li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        
+        <!-- COLUNA DA IMAGEM (ADAPTATIVA) -->
+        <div class="col-lg-7">
+            <div class="gallery-container fade-in">
+                <% 
+                const imagens = [];
+                if (produto.imagem1) imagens.push(produto.imagem1);
+                if (produto.imagem2) imagens.push(produto.imagem2);
+                if (produto.imagem3) imagens.push(produto.imagem3);
+                const mainImg = imagens.length > 0 ? '/uploads/produtos/' + imagens[0] : 'https://via.placeholder.com/800?text=No+Image';
+                %>
+
+                <!-- O container agora não tem aspect-ratio fixo, ele cresce com a imagem até 700px -->
+                <div class="main-image-wrapper">
+                    <img src="<%= mainImg %>" class="main-img" id="mainDisplayImage" alt="<%= produto.nome %>">
+                    
+                    <!-- Botão Expandir Discreto -->
+                    <button onclick="expandImage()" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0" style="width: 40px; height: 40px;">
+                        <i class="fas fa-expand-alt small"></i>
+                    </button>
+                </div>
+
+                <% if (imagens.length > 1) { %>
+                    <div class="thumbs-scroll">
+                        <% imagens.forEach((img, idx) => { %>
+                            <div class="thumb-btn <%= idx===0 ? 'active' : '' %>" onclick="changeImage('/uploads/produtos/<%= img %>', this)">
+                                <img src="/uploads/produtos/<%= img %>">
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- COLUNA DE DETALHES -->
+        <div class="col-lg-5 product-details-col fade-in" style="animation-delay: 0.1s;">
+            
+            <!-- Tags -->
+            <div class="tags-row">
+                <span class="k-badge badge-gray"><%= produto.categoria_nome || 'Produto' %></span>
+                <% if (produto.vip) { %>
+                    <span class="k-badge badge-dark"><i class="fas fa-crown me-1"></i> VIP</span>
+                <% } %>
+            </div>
+
+            <!-- Título -->
+            <h1 class="prod-title"><%= produto.nome %></h1>
+
+            <!-- Rating -->
+            <div class="rating-mini">
+                <div class="stars-static">
+                    <% const media = Math.round(Number(produto.media_classificacao) || 0); %>
+                    <% for(let i=1; i<=5; i++) { %>
+                        <i class="<%= i <= media ? 'fas' : 'far' %> fa-star"></i>
+                    <% } %>
+                </div>
+                <a href="#reviews-anchor" class="text-muted text-decoration-underline" onclick="scrollToReviews()">
+                    <%= produto.total_avaliacoes || 0 %> opiniões
+                </a>
+            </div>
+
+            <!-- Preço -->
+            <% 
+            const preco = Number(produto.preco) || 0;
+            const promo = Number(produto.preco_promocional) || 0;
+            const temPromo = promo > 0;
+            %>
+            <div class="price-container">
+                <span class="price-current"><%= (temPromo ? promo : preco).toLocaleString('pt-AO') %> Kz</span>
+                <% if (temPromo) { %>
+                    <span class="price-old"><%= preco.toLocaleString('pt-AO') %></span>
+                    <span class="discount-pill">-%<%= Math.round(((preco - promo) / preco) * 100) %></span>
+                <% } %>
+            </div>
+
+            <!-- Botões de Ação (MINIATURIZADOS) -->
+            <div class="action-bar">
+                <button class="btn-compact btn-cart" onclick="addToCart(<%= produto.id %>)" <%= (produto.estoque || 0) <= 0 ? 'disabled' : '' %>>
+                    <% if ((produto.estoque || 0) > 0) { %>
+                        <i class="fas fa-shopping-basket"></i> <span>Comprar</span>
+                    <% } else { %>
+                        <i class="fas fa-ban"></i> <span>Esgotado</span>
+                    <% } %>
+                </button>
+
+                <% if (produto.loja_telefone) { %>
+                    <a href="https://wa.me/<%= produto.loja_telefone.replace(/\D/g, '') %>?text=Olá, vi o produto <%= encodeURIComponent(produto.nome) %> no KuandaShop" target="_blank" class="btn-compact btn-chat">
+                        <i class="fab fa-whatsapp fs-5"></i> <span>Conversar</span>
+                    </a>
+                <% } %>
+            </div>
+
+            <!-- Card do Vendedor (Mini) -->
+            <a href="/loja/<%= produto.vendedor_id %>" class="text-decoration-none">
+                <div class="seller-compact">
+                    <% 
+                    let vFoto = produto.vendedor_foto || produto.loja_foto || '';
+                    let vNome = produto.nome_loja || 'Loja Parceira';
+                    %>
+                    <% if (vFoto) { %>
+                        <img src="/uploads/perfil/<%= vFoto %>" class="seller-img" onerror="this.src='https://ui-avatars.com/api/?name=<%= vNome.charAt(0) %>&background=000&color=fff';">
+                    <% } else { %>
+                        <img src="https://ui-avatars.com/api/?name=<%= vNome.charAt(0) %>&background=000&color=fff" class="seller-img">
+                    <% } %>
+                    
+                    <div class="seller-data">
+                        <h6 class="text-dark"><%= vNome %></h6>
+                        <span>Verificado <i class="fas fa-check-circle text-primary" style="font-size: 0.7rem;"></i></span>
+                    </div>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </div>
+            </a>
+
+            <!-- Descrição Curta -->
+            <div class="mt-4">
+                <h6 class="fw-bold mb-2">Sobre o item</h6>
+                <p class="text-secondary small" style="line-height: 1.6;">
+                    <%= produto.descricao || 'Nenhuma descrição fornecida pelo vendedor.' %>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SESSÃO DE AVALIAÇÕES (INTEGRADA) -->
+    <div class="review-embedded fade-in" id="reviews-anchor">
+        <div class="review-header">
+            <div>
+                <h3 class="fw-bold m-0">Avaliações</h3>
+                <p class="text-muted m-0 small">O que as pessoas estão dizendo</p>
+            </div>
+            
+            <div class="rating-summary-box">
+                <div class="big-score"><%= parseFloat(produto.media_classificacao || 0).toFixed(1) %></div>
+                <div>
+                    <div class="text-warning small mb-1">
+                        <% for(let i=1; i<=5; i++) { %>
+                            <i class="<%= i <= Math.round(produto.media_classificacao) ? 'fas' : 'far' %> fa-star"></i>
+                        <% } %>
+                    </div>
+                    <small class="text-muted"><%= produto.total_avaliacoes || 0 %> reviews</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário Inline (Aparece se logado) -->
+        <% if(user) { %>
+            <div class="inline-form-wrapper">
+                <form action="/produto/<%= produto.id %>/avaliar" method="POST">
+                    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                        <span class="fw-bold small text-uppercase">Sua nota:</span>
+                        <div class="star-rating-input">
+                            <% for(let i=1; i<=5; i++) { %>
+                                <i class="far fa-star star-trigger" data-value="<%= i %>"></i>
+                            <% } %>
+                        </div>
+                        <input type="hidden" name="classificacao" id="ratingInput" required>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <textarea class="input-review" name="comentario" rows="1" placeholder="Escreva sua opinião aqui..." required></textarea>
+                        <button type="submit" class="btn btn-dark rounded-3 px-4 fw-bold">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        <% } else { %>
+            <div class="alert alert-light border text-center py-3 mb-4">
+                <small>Faça <a href="/login" class="fw-bold text-dark">login</a> para avaliar este produto.</small>
+            </div>
+        <% } %>
+
+        <!-- Lista de Reviews -->
+        <div class="reviews-list">
+            <% if (avaliacoes && avaliacoes.length > 0) { %>
+                <% avaliacoes.forEach(av => { %>
+                    <div class="review-item">
+                        <div class="reviewer-header">
+                            <% let uPic = av.foto_perfil || av.avatar; %>
+                            <img src="<%= uPic ? '/uploads/perfil/'+uPic : 'https://ui-avatars.com/api/?name='+(av.nome || 'U') %>" class="reviewer-pic" onerror="this.src='https://ui-avatars.com/api/?name=User';">
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold text-dark font-size-sm"><%= av.nome || 'Anônimo' %></span>
+                                    <span class="text-warning small" style="font-size: 0.7rem;">
+                                        <% for(let i=1; i<=5; i++) { %>
+                                            <i class="<%= i <= av.classificacao ? 'fas' : 'far' %> fa-star"></i>
+                                        <% } %>
+                                    </span>
+                                </div>
+                                <span class="text-muted" style="font-size: 0.75rem;"><%= new Date(av.created_at).toLocaleDateString() %></span>
+                            </div>
+                        </div>
+                        <p class="review-text"><%= av.comentario %></p>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="text-center py-4">
+                    <span class="text-muted small">Ainda não há avaliações. Seja o primeiro!</span>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- RELACIONADOS (SIMPLES) -->
+    <% if (produtosSimilares && produtosSimilares.length > 0) { %>
+        <div class="mt-5 fade-in">
+            <h5 class="fw-bold mb-3">Veja também</h5>
+            <div class="row g-3">
+                <% produtosSimilares.forEach(sim => { %>
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <a href="/produto/<%= sim.id %>" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100 overflow-hidden" style="border-radius: 12px;">
+                                <img src="<%= sim.imagem1 ? '/uploads/produtos/'+sim.imagem1 : 'https://via.placeholder.com/300' %>" 
+                                     class="card-img-top" style="height: 140px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <h6 class="text-dark text-truncate small fw-bold mb-1"><%= sim.nome %></h6>
+                                    <div class="text-danger fw-bold small"><%= Number(sim.preco).toLocaleString('pt-AO') %> Kz</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% } %>
+
+</div>
+
+<script>
+    // 1. Galeria: Trocar imagem
+    function changeImage(src, btn) {
+        const main = document.getElementById('mainDisplayImage');
+        main.style.opacity = 0.5;
+        setTimeout(() => {
+            main.src = src;
+            main.style.opacity = 1;
+        }, 150);
+        document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // 2. Expandir (Lightbox)
+    function expandImage() {
+        const src = document.getElementById('mainDisplayImage').src;
+        const modal = document.createElement('div');
+        modal.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(5px);";
+        modal.innerHTML = `<img src="${src}" style="max-width:95%;max-height:95%;border-radius:8px;box-shadow:0 0 40px rgba(0,0,0,0.5);">`;
+        modal.onclick = () => modal.remove();
+        document.body.appendChild(modal);
+    }
+
+    // 3. Adicionar ao Carrinho (AJAX)
+    function addToCart(id) {
+        const btn = document.querySelector('.btn-cart');
+        const originalContent = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        fetch('/carrinho/adicionar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ produto_id: id, quantidade: 1 })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                btn.style.background = '#10B981'; // Verde Sucesso
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                // Atualiza contador do carrinho se existir
+                const badge = document.querySelector('.cart-badge'); 
+                if(badge) badge.innerText = data.quantidade;
+                
+                setTimeout(() => {
+                    btn.style.background = ''; // Volta ao original
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }, 1500);
+            } else {
+                alert(data.message || "Erro ao adicionar");
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        });
+    }
+
+    // 4. Estrelas Interativas (Formulário)
+    document.querySelectorAll('.star-trigger').forEach(star => {
+        star.addEventListener('click', function() {
+            const val = this.dataset.value;
+            document.getElementById('ratingInput').value = val;
+            
+            document.querySelectorAll('.star-trigger').forEach(s => {
+                if(s.dataset.value <= val) {
+                    s.classList.remove('far'); s.classList.add('fas', 'active');
+                } else {
+                    s.classList.remove('fas', 'active'); s.classList.add('far');
+                }
+            });
+        });
+    });
+
+    // 5. Scroll Suave para Reviews
+    function scrollToReviews() {
+        document.getElementById('reviews-anchor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // 6. Fade In Animation
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+    
+    document.querySelectorAll('.fade-in').forEach(el => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+</script>

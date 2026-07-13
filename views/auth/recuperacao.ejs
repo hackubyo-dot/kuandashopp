@@ -1,0 +1,100 @@
+<!-- ARQUIVO: views/auth/recuperacao.ejs -->
+
+<style>
+    /* Reaproveitando estilos do Login para consistência */
+    .auth-wrapper {
+      min-height: 80vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 20px;
+    }
+    .auth-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 32px;
+      box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.1);
+      width: 100%; max-width: 450px;
+      overflow: hidden; position: relative;
+    }
+    .brand-logo-circle {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #E31C25, #B01018);
+      color: white; font-size: 1.8rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 20px; margin: 0 auto 20px;
+      box-shadow: 0 10px 20px rgba(227, 28, 37, 0.3);
+    }
+    .custom-input-group {
+      background: #F3F4F6; border-radius: 16px; padding: 5px;
+      display: flex; align-items: center; margin-bottom: 15px;
+      border: 2px solid transparent; transition: 0.3s;
+    }
+    .custom-input-group:focus-within { background: #FFF; border-color: #E31C25; box-shadow: 0 0 0 4px rgba(227, 28, 37, 0.1); }
+    .input-icon { width: 50px; text-align: center; color: #9CA3AF; font-size: 1.1rem; }
+    .custom-input-group:focus-within .input-icon { color: #E31C25; }
+    .form-control-custom {
+      border: none; background: transparent; height: 45px; width: 100%;
+      color: #1F2937; font-weight: 600; outline: none; padding-right: 15px;
+    }
+    .btn-submit {
+      width: 100%; padding: 15px; border-radius: 16px;
+      background: #0F0F0F; color: white; font-weight: 700; border: none;
+      transition: 0.3s; margin-top: 10px;
+    }
+    .btn-submit:hover { background: #333; transform: translateY(-2px); }
+    .label-custom { font-size: 0.75rem; font-weight: 800; color: #6B7280; margin-bottom: 6px; display: block; margin-left: 5px; text-transform: uppercase; }
+</style>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="card-body p-4 p-md-5">
+      
+      <!-- Cabeçalho -->
+      <div class="text-center mb-4">
+        <div class="brand-logo-circle"><i class="fas fa-lock-open"></i></div>
+        <h2 class="fw-bold text-dark mb-2">Recuperar Senha</h2>
+        <p class="text-muted small px-3">
+            Digite o e-mail associado à sua conta e enviaremos um link seguro para redefinir sua senha.
+        </p>
+      </div>
+
+      <!-- Feedback -->
+      <% if (messages.error && messages.error.length > 0) { %>
+        <div class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+          <i class="fas fa-exclamation-circle me-2"></i> <%= messages.error %>
+        </div>
+      <% } %>
+
+      <!-- Formulário -->
+      <form action="/recuperar-senha" method="POST" id="recoverForm">
+        
+        <div class="mb-4">
+          <label class="label-custom">SEU E-MAIL</label>
+          <div class="custom-input-group">
+            <span class="input-icon"><i class="fas fa-envelope-open-text"></i></span>
+            <input type="email" class="form-control-custom" name="email" required placeholder="exemplo@email.com">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit mb-3">
+          Enviar Link de Recuperação
+        </button>
+
+        <a href="/login" class="btn btn-light w-100 rounded-4 fw-bold py-3 text-muted border-0">
+            <i class="fas fa-arrow-left me-2"></i> Voltar ao Login
+        </a>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Estado de Carregamento
+  document.getElementById('recoverForm').addEventListener('submit', function() {
+      const btn = this.querySelector('button[type="submit"]');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+      btn.style.opacity = '0.8';
+      btn.disabled = true;
+  });
+</script>

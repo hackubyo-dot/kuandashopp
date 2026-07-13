@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-AO" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kuanda OS | Mensagens</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png">
+    
+    <style>
+        :root {
+            --primary: #E31C25;
+            --primary-soft: #FEF2F2;
+            --bg-body: #F3F4F6;
+            --bg-panel: #FFFFFF;
+            --border: #E5E7EB;
+            --text-main: #1F2937;
+            --text-sub: #6B7280;
+            --msg-me: #E31C25;
+            --msg-me-text: #FFFFFF;
+            --msg-other: #F3F4F6;
+            --msg-other-text: #1F2937;
+            --shadow: rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] {
+            --primary: #E31C25;
+            --primary-soft: #2A1215;
+            --bg-body: #111827;
+            --bg-panel: #1F2937;
+            --border: #374151;
+            --text-main: #F9FAFB;
+            --text-sub: #9CA3AF;
+            --msg-me: #E31C25;
+            --msg-me-text: #FFFFFF;
+            --msg-other: #374151;
+            --msg-other-text: #F9FAFB;
+            --shadow: rgba(0,0,0,0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-body); height: 100vh; overflow: hidden; color: var(--text-main); transition: background 0.3s; }
+
+        .k-layout { display: grid; grid-template-columns: 340px 1fr 320px; height: 100vh; max-width: 1920px; margin: 0 auto; background: var(--bg-panel); }
+
+        /* SIDEBAR */
+        .k-sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg-panel); z-index: 10; }
+        
+        .k-header { padding: 20px; border-bottom: 1px solid var(--border); }
+        .k-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .k-title-row h2 { font-size: 20px; font-weight: 700; color: var(--text-main); }
+        
+        .icon-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-sub); transition: 0.2s; background: transparent; border: none; }
+        .icon-btn:hover { background: var(--primary-soft); color: var(--primary); }
+
+        .k-search { background: var(--bg-body); border-radius: 12px; padding: 10px 15px; display: flex; align-items: center; color: var(--text-sub); }
+        .k-search input { border: none; background: transparent; width: 100%; margin-left: 10px; color: var(--text-main); }
+
+        /* STORIES */
+        .k-stories { display: flex; gap: 15px; overflow-x: auto; padding: 15px 20px; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 65px; cursor: pointer; transition: transform 0.2s; }
+        .story-item:hover { transform: translateY(-2px); }
+        .story-ring { width: 56px; height: 56px; border-radius: 50%; padding: 2px; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #8a3ab9); }
+        .story-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--bg-panel); object-fit: cover; background: #fff; }
+        .story-name { font-size: 11px; margin-top: 4px; color: var(--text-main); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 65px; }
+
+        /* LIST */
+        .k-list { flex: 1; overflow-y: auto; }
+        .chat-item { padding: 15px 20px; display: flex; align-items: center; cursor: pointer; border-bottom: 1px solid var(--border); transition: 0.2s; }
+        .chat-item:hover, .chat-item.active { background: var(--primary-soft); }
+        .chat-avatar { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; margin-right: 15px; background: #eee; }
+        .chat-info { flex: 1; min-width: 0; }
+        .chat-name { font-weight: 600; font-size: 14px; color: var(--text-main); margin-bottom: 4px; }
+        .chat-preview { font-size: 13px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: auto; }
+
+        /* MAIN CHAT */
+        .k-chat { 
+            display: flex; flex-direction: column; 
+            background: var(--bg-panel); 
+            height: 100vh; 
+            overflow: hidden; 
+            position: relative; 
+        }
+        
+        .chat-top { 
+            height: 70px; flex-shrink: 0; 
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; 
+            background: var(--bg-panel); z-index: 5;
+        }
+        .user-head { display: flex; align-items: center; gap: 12px; color: var(--text-main); }
+        .user-head img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
+        
+        .msg-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; flex-direction: column; gap: 12px; 
+            background-color: var(--bg-body); 
+            background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px;
+        }
+
+        .msg { max-width: 75%; padding: 12px 18px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; box-shadow: 0 2px 5px var(--shadow); word-wrap: break-word; }
+        .msg-me { align-self: flex-end; background: var(--msg-me); color: var(--msg-me-text); border-bottom-right-radius: 4px; }
+        .msg-other { align-self: flex-start; background: var(--msg-other); color: var(--msg-other-text); border-bottom-left-radius: 4px; }
+        .msg-sys { align-self: center; background: var(--primary-soft); color: var(--primary); font-size: 12px; padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border); }
+        
+        .msg-img { max-width: 250px; border-radius: 10px; margin-bottom: 5px; cursor: pointer; display: block; }
+        .msg-audio { width: 240px; height: 40px; margin: 5px 0; border-radius: 20px; }
+
+        .input-box { 
+            flex-shrink: 0; 
+            padding: 15px 20px; 
+            border-top: 1px solid var(--border); 
+            background: var(--bg-panel); 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        
+        .k-field { flex: 1; padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); font-family: inherit; }
+        .k-btn-round { width: 42px; height: 42px; border-radius: 50%; border: none; background: var(--bg-body); color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
+        .k-btn-round:hover { background: var(--border); color: var(--primary); }
+        .btn-send { background: var(--primary); color: white; }
+        .btn-send:hover { background: #c0151f; color: white; }
+
+        .rec-ui { display: none; flex: 1; align-items: center; gap: 15px; color: var(--primary); font-weight: 600; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* INFO PANEL */
+        .k-info { border-left: 1px solid var(--border); background: var(--bg-panel); display: flex; flex-direction: column; }
+        .info-content { padding: 20px; overflow-y: auto; flex: 1; color: var(--text-main); }
+        
+        .ped-card { background: var(--bg-body); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .item-row { display: flex; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #ccc; }
+        
+        .k-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+        .k-btn.ok { background: #ECFDF5; color: #059669; }
+        .k-btn.bad { background: #FEF2F2; color: #DC2626; }
+
+        /* WIDGET DE NOTIFICAÇÃO */
+        .k-fab { position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; background: #E31C25; color: white; border-radius: 50%; box-shadow: 0 4px 20px rgba(227, 28, 37, 0.4); display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10000; transition: transform 0.2s; }
+        .k-fab:hover { transform: scale(1.05); }
+        .k-badge { position: absolute; top: 0; right: 0; background: #111827; color: white; border: 2px solid #fff; min-width: 22px; height: 22px; border-radius: 11px; font-size: 11px; font-weight: bold; display: flex; justify-content: center; align-items: center; padding: 0 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .k-pop { position: fixed; bottom: 100px; left: 30px; width: 300px; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 10000; display: none; overflow: hidden; border: 1px solid #f0f0f0; animation: kSlideUp 0.4s ease-out; }
+        @keyframes kSlideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .k-pop-head { background: #f9fafb; padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #374151; }
+        .k-pop-body { padding: 15px; color: #4b5563; font-size: 14px; line-height: 1.4; }
+        .k-pop-act { display: block; width: 100%; padding: 10px; text-align: center; background: #E31C25; color: white; text-decoration: none; font-weight: 500; font-size: 13px; }
+
+        /* RESPONSIVE */
+        .back-btn { display: none; }
+        @media (max-width: 1024px) {
+            .k-layout { grid-template-columns: 280px 1fr; }
+            .k-info { position: fixed; right: 0; top: 0; bottom: 0; width: 300px; transform: translateX(100%); transition: 0.3s; z-index: 50; box-shadow: -5px 0 20px rgba(0,0,0,0.2); }
+            .k-info.active { transform: translateX(0); }
+        }
+        @media (max-width: 768px) {
+            .k-layout { grid-template-columns: 1fr; }
+            .k-sidebar { width: 100%; }
+            .k-chat { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; }
+            .k-chat.active { display: flex; }
+            .back-btn { display: flex; margin-right: 10px; cursor: pointer; }
+            .k-fab { display: none; } /* Esconde o botão flutuante na página do chat para não sobrepor */
+        }
+    </style>
+</head>
+<body>
+
+<div class="k-layout">
+    <!-- SIDEBAR -->
+    <div class="k-sidebar" id="sidebar">
+        <div class="k-header">
+            <div class="k-title-row">
+                <h2>Mensagens</h2>
+                <div style="display:flex; gap:10px">
+                    <button class="icon-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
+                    <a href="/" class="icon-btn"><i class="fas fa-home"></i></a>
+                </div>
+            </div>
+            <div class="k-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="qInput" placeholder="Buscar..." onkeyup="loadChats()">
+            </div>
+        </div>
+        <div class="k-stories" id="storiesBar"><div style="font-size:12px; padding:10px; color:var(--text-sub)">Carregando...</div></div>
+        <div class="k-list" id="chatList"></div>
+    </div>
+
+    <!-- MAIN CHAT -->
+    <div class="k-chat" id="mainChat">
+        <div class="chat-top" id="topbar" style="visibility:hidden">
+            <div class="user-head">
+                <i class="fas fa-arrow-left back-btn" onclick="closeChat()"></i>
+                <img src="" id="hImg">
+                <div>
+                    <h4 id="hName" style="margin:0; font-size:15px">...</h4>
+                    <span style="font-size:12px; color:var(--text-sub)">Online</span>
+                </div>
+            </div>
+            <button class="icon-btn" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>
+        </div>
+        <div class="msg-area" id="msgArea">
+            <div style="text-align:center; margin-top:30vh; color:var(--text-sub)">
+                <i class="far fa-comments fa-3x" style="opacity:0.3; margin-bottom:15px"></i>
+                <p>Selecione um contato.</p>
+            </div>
+        </div>
+        <div class="input-box" id="inputBox" style="visibility:hidden">
+            <input type="file" id="fInp" hidden onchange="uploadFile(this)">
+            <button class="k-btn-round" onclick="document.getElementById('fInp').click()"><i class="fas fa-paperclip"></i></button>
+            <div class="rec-ui" id="recUi">
+                <i class="fas fa-circle"></i> Gravando... <span id="recTime">0:00</span>
+                <i class="fas fa-times-circle" onclick="stopRec(false)" style="margin-left:auto; cursor:pointer; color:var(--text-main)"></i>
+                <i class="fas fa-check-circle" onclick="stopRec(true)" style="cursor:pointer; color:var(--primary)"></i>
+            </div>
+            <input type="text" class="k-field" id="msgInp" placeholder="Digite..." autocomplete="off">
+            <button class="k-btn-round" id="micBtn" onclick="startRec()"><i class="fas fa-microphone"></i></button>
+            <button class="k-btn-round btn-send" onclick="send()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- INFO PANEL -->
+    <div class="k-info" id="infoPanel">
+        <div class="k-header" style="display:flex; justify-content:space-between">
+            <strong>Detalhes</strong>
+            <i class="fas fa-times" onclick="toggleInfo()" style="cursor:pointer; color:var(--text-sub)"></i>
+        </div>
+        <div class="info-content" id="infoContent">
+            <div style="text-align:center; margin-top:50px; color:var(--text-sub)">Sem pedido vinculado.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ELEMENTOS DO WIDGET DE NOTIFICAÇÃO (OCULTOS INICIALMENTE) -->
+<div class="k-pop" id="kPop">
+    <div class="k-pop-head">
+        <span id="kFrom">Nova Notificação</span>
+        <i class="fas fa-times" style="cursor:pointer; color:#9ca3af" onclick="closeKPop()"></i>
+    </div>
+    <div class="k-pop-body" id="kText">...</div>
+    <a href="#" onclick="closeKPop(); return false;" class="k-pop-act">Fechar</a>
+</div>
+
+<audio id="kAudio" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+</audio>
+
+<!-- LÓGICA DO CLIENTE (MISTURA CHAT + NOTIFICAÇÕES) -->
+<script>
+    const myId = <%= user.id %>;
+    let currChat = null;
+    let currPed = null;
+    let mediaRec = null;
+    let audioChunks = [];
+    let recInt = null;
+
+    // VARIAVEIS DE NOTIFICAÇÃO
+    let lastUnreadCount = 0;
+    let firstRun = true; // Impede beep no load
+    let popTimeout = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializa Dark Mode
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+
+        // Carrega dados iniciais
+        loadStories();
+        loadChats();
+        monitorNotifications(); // Inicia o monitoramento global
+
+        // Polling do chat aberto e lista
+        setInterval(() => {
+            if(currChat) loadMsgs(currChat, false);
+            loadChats();
+            monitorNotifications(); // Verifica notificações globais a cada ciclo
+        }, 3000);
+
+        // Evento Enter
+        document.getElementById('msgInp').addEventListener('keypress', e => {
+            if(e.key === 'Enter') send();
+        });
+    });
+
+    // =======================================================
+    // FUNÇÕES DE NOTIFICAÇÃO GLOBAL (CORRIGIDAS)
+    // =======================================================
+    async function monitorNotifications() {
+        try {
+            const res = await fetch('/api/chat/check');
+            const data = await res.json();
+            const currentUnread = parseInt(data.unread || 0);
+
+            // Se o número de não lidas AUMENTOU, toca o som e mostra popup
+            // Isso evita beeps repetidos se o número se mantiver igual
+            if (currentUnread > lastUnreadCount) {
+                if (!firstRun) {
+                    playNotificationSound();
+                    showPopup(data.from, data.preview);
+                }
+            }
+
+            // Atualiza o contador anterior
+            lastUnreadCount = currentUnread;
+            firstRun = false;
+
+        } catch (err) {
+            console.error('Erro ao verificar notificações:', err);
+        }
+    }
+
+    function playNotificationSound() {
+        const audio = document.getElementById('kAudio');
+        audio.currentTime = 0; // Reinicia o som se já estiver tocando
+        audio.play().catch(e => console.log('Som bloqueado pelo navegador (falta interação).'));
+    }
+
+    function showPopup(from, text) {
+        const pop = document.getElementById('kPop');
+        document.getElementById('kFrom').innerText = from || 'Kuanda OS';
+        document.getElementById('kText').innerHTML = text || 'Você tem novas mensagens.';
+        
+        pop.style.display = 'block';
+        
+        if (popTimeout) clearTimeout(popTimeout);
+        popTimeout = setTimeout(closeKPop, 5000);
+    }
+
+    window.closeKPop = function() {
+        document.getElementById('kPop').style.display = 'none';
+    }
+
+    // =======================================================
+    // FUNÇÕES DO CHAT
+    // =======================================================
+
+    function toggleTheme() {
+        const cur = document.documentElement.getAttribute('data-theme');
+        const next = cur === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+    }
+
+    async function loadStories() {
+        try {
+            const res = await fetch('/api/chat/usuarios-disponiveis');
+            const users = await res.json();
+            const bar = document.getElementById('storiesBar');
+            bar.innerHTML = '';
+            
+            users.forEach(u => {
+                const img = u.foto_perfil ? `/uploads/perfil/${u.foto_perfil}` : `https://ui-avatars.com/api/?name=${u.nome}&background=random`;
+                bar.innerHTML += `
+                    <div class="story-item" onclick="startChat(${u.id})">
+                        <div class="story-ring"><img src="${img}" class="story-img"></div>
+                        <div class="story-name">${u.nome_loja || u.nome}</div>
+                    </div>
+                `;
+            });
+        } catch(e) {}
+    }
+
+    async function loadChats() {
+        const q = document.getElementById('qInput').value;
+        const res = await fetch(`/api/chat/conversas?q=${q}`);
+        const chats = await res.json();
+        const list = document.getElementById('chatList');
+        
+        // Mantém a seleção visual
+        let html = '';
+        chats.forEach(c => {
+            const active = c.id === currChat ? 'active' : '';
+            const img = c.foto ? `/uploads/perfil/${c.foto}` : `https://ui-avatars.com/api/?name=${c.titulo}&background=random`;
+            const time = new Date(c.data).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const badge = c.nao_lidas > 0 ? `<span class="badge">${c.nao_lidas}</span>` : '';
+            
+            html += `
+                <div class="chat-item ${active}" onclick="openChat(${c.id}, '${c.titulo}', '${img}', ${c.pedido_id})">
+                    <img src="${img}" class="chat-avatar">
+                    <div class="chat-info">
+                        <div class="chat-name">${c.titulo}</div>
+                        <div class="chat-preview">${c.preview}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:11px; color:var(--text-sub)">${time}</div>
+                        ${badge}
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+    }
+
+    async function openChat(id, name, img, pid) {
+        currChat = id;
+        currPed = pid;
+        
+        document.getElementById('hName').innerText = name;
+        document.getElementById('hImg').src = img;
+        document.getElementById('topbar').style.visibility = 'visible';
+        document.getElementById('inputBox').style.visibility = 'visible';
+        document.getElementById('mainChat').classList.add('active');
+
+        // Reseta o contador para esta conversa localmente para evitar beep imediato
+        // O backend marca como lida na chamada loadMsgs
+        await loadMsgs(id, true);
+        if(pid) loadOrder(pid);
+        else document.getElementById('infoContent').innerHTML = '<div style="text-align:center; margin-top:50px; color:var(--text-sub)">Conversa Direta</div>';
+    }
+
+    async function loadMsgs(id, scroll) {
+        const res = await fetch(`/api/chat/mensagens/${id}`);
+        const data = await res.json();
+        const area = document.getElementById('msgArea');
+        // Simplesmente substitui HTML (para produção ideal usar diffing, mas aqui atende)
+        area.innerHTML = '';
+
+        data.forEach(m => {
+            if(m.tipo_acao === 'status' || m.tipo_acao === 'sistema') {
+                area.innerHTML += `<div class="msg msg-sys">${m.conteudo}</div>`;
+            } else if (m.tipo_acao === 'compra') {
+                area.innerHTML += `<div class="msg msg-sys" style="background:#dbeafe; color:#1e40af; border:1px solid #93c5fd;">🛍️ ${m.conteudo}</div>`;
+            } else {
+                const cls = m.remetente_id === myId ? 'msg-me' : 'msg-other';
+                let content = '';
+
+                if(m.anexo_tipo && m.anexo_tipo !== 'null' && m.tipo_acao !== 'texto') {
+                    if(m.anexo_tipo.includes('image')) {
+                        content = `<img src="/uploads/chat/${m.anexo_url}" class="msg-img" onclick="window.open(this.src)">`;
+                        if(m.conteudo) content += `<div style="margin-top:5px">${m.conteudo}</div>`;
+                    } else if(m.anexo_tipo === 'audio') {
+                        content = `<audio controls src="/uploads/chat/${m.anexo_url}" class="msg-audio"></audio>`;
+                    } else {
+                        content = `<a href="/uploads/chat/${m.anexo_url}" target="_blank" style="color:inherit; text-decoration:underline; display:flex; align-items:center; gap:5px"><i class="fas fa-file"></i> ${m.anexo_nome || 'Arquivo'}</a>`;
+                        if(m.conteudo) content += `<div style="margin-top:5px">${m.conteudo}</div>`;
+                    }
+                } else {
+                    content = m.conteudo || ''; 
+                }
+
+                if(content) {
+                    const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                    area.innerHTML += `
+                        <div class="msg ${cls}">
+                            ${content}
+                            <div style="font-size:10px; opacity:0.8; text-align:right; margin-top:5px">${time}</div>
+                        </div>`;
+                }
+            }
+        });
+
+        if(scroll) area.scrollTop = area.scrollHeight;
+    }
+
+    async function loadOrder(pid) {
+        try {
+            const res = await fetch(`/api/chat/pedido-detalhes/${pid}`);
+            const data = await res.json();
+            
+            if(!data) {
+                document.getElementById('infoContent').innerHTML = '<div style="text-align:center; padding:20px;">Pedido não encontrado.</div>';
+                return;
+            }
+
+            const p = data.pedido;
+            const itens = data.itens;
+            
+            let html = `
+                <div class="ped-card">
+                    <div style="display:flex; justify-content:space-between">
+                        <strong>Pedido #${p.id}</strong>
+                        <span style="color:var(--primary); font-weight:bold">${(p.status || 'pendente').toUpperCase()}</span>
+                    </div>
+                    <div style="font-size:13px; color:var(--text-sub); margin-top:5px">Data: ${new Date(p.created_at).toLocaleDateString()}</div>
+                    <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:18px; font-weight:bold; color:var(--text-main)">
+                        Total: ${parseFloat(p.valor_total).toFixed(2)} Kz
+                    </div>
+                </div>
+                <h5>Itens do Pedido</h5>
+                <div style="margin-top:10px">
+            `;
+
+            itens.forEach(i => {
+                let nomeArquivo = i.imagem1;
+                if (nomeArquivo && (typeof nomeArquivo === 'object' || nomeArquivo.toString() === '[object Object]')) {
+                    nomeArquivo = null;
+                }
+                const imgPath = (nomeArquivo && nomeArquivo.trim() !== '') 
+                    ? `/uploads/produtos/${nomeArquivo}` 
+                    : 'https://via.placeholder.com/60?text=Sem+Foto';
+                
+                html += `
+                    <div class="item-row">
+                        <img src="${imgPath}" class="item-img" onerror="this.onerror=null;this.src='https://via.placeholder.com/60?text=Indisponível';">
+                        <div style="flex:1; overflow:hidden;">
+                            <div style="font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${i.nome}
+                            </div>
+                            <div style="font-size:12px; color:var(--text-sub)">
+                                ${i.quantidade}x ${parseFloat(i.preco_unitario || i.preco_real).toFixed(2)} Kz
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>
+                <div style="margin-top:20px">
+                    <button class="k-btn ok" onclick="upStatus('pago')">Confirmar Pagamento</button>
+                    <button class="k-btn" style="background:var(--border); color:var(--text-main)" onclick="upStatus('enviado')">Marcar Enviado</button>
+                    <button class="k-btn bad" onclick="upStatus('cancelado')">Cancelar</button>
+                </div>
+            `;
+            document.getElementById('infoContent').innerHTML = html;
+        } catch (error) {
+            console.error("Erro ao carregar pedido:", error);
+            document.getElementById('infoContent').innerHTML = '<div style="color:red; text-align:center;">Erro ao carregar detalhes.</div>';
+        }
+    }
+
+    async function send() {
+        const inp = document.getElementById('msgInp');
+        const txt = inp.value;
+        if(!txt || !txt.trim()) return;
+
+        const fd = new FormData();
+        fd.append('conversa_id', currChat);
+        fd.append('conteudo', txt);
+        fd.append('tipo_especifico', 'texto');
+
+        await fetch('/api/chat/enviar', { method: 'POST', body: fd });
+        inp.value = '';
+        loadMsgs(currChat, true);
+    }
+
+    async function uploadFile(inp) {
+        if(!inp.files[0]) return;
+        const fd = new FormData();
+        fd.append('conversa_id', currChat);
+        fd.append('anexo', inp.files[0]);
+        await fetch('/api/chat/enviar', { method: 'POST', body: fd });
+        loadMsgs(currChat, true);
+        inp.value = ''; 
+    }
+
+    async function upStatus(st) {
+        if(!confirm('Mudar status para: '+st+'?')) return;
+        await fetch('/api/chat/status', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({pedido_id: currPed, status:st, conversa_id: currChat})
+        });
+        loadOrder(currPed);
+        loadMsgs(currChat, true);
+    }
+
+    async function startChat(uid) {
+        const res = await fetch('/api/chat/iniciar', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({target_id: uid})
+        });
+        const d = await res.json();
+        loadChats();
+        setTimeout(() => {
+            // Clica automaticamente no primeiro chat (o novo)
+            const els = document.querySelectorAll('.chat-item');
+            if(els.length) els[0].click();
+        }, 500);
+    }
+
+    function startRec() {
+        navigator.mediaDevices.getUserMedia({audio:true}).then(s => {
+            mediaRec = new MediaRecorder(s);
+            mediaRec.start();
+            audioChunks = [];
+            document.getElementById('msgInp').style.display='none';
+            document.getElementById('micBtn').style.display='none';
+            document.getElementById('recUi').style.display='flex';
+            let sec = 0;
+            recInt = setInterval(() => { sec++; document.getElementById('recTime').innerText = `0:${sec.toString().padStart(2,'0')}`; }, 1000);
+            mediaRec.ondataavailable = e => audioChunks.push(e.data);
+        });
+    }
+
+    function stopRec(save) {
+        clearInterval(recInt);
+        if(mediaRec) {
+            mediaRec.stop();
+            if(save) {
+                mediaRec.onstop = async () => {
+                    const blob = new Blob(audioChunks, {type:'audio/webm'});
+                    const fd = new FormData();
+                    fd.append('conversa_id', currChat);
+                    fd.append('anexo', blob, 'audio.webm');
+                    fd.append('tipo_especifico', 'audio');
+                    await fetch('/api/chat/enviar', {method:'POST', body:fd});
+                    loadMsgs(currChat, true);
+                }
+            }
+        }
+        document.getElementById('recUi').style.display='none';
+        document.getElementById('msgInp').style.display='block';
+        document.getElementById('micBtn').style.display='block';
+    }
+
+    function closeChat() { document.getElementById('mainChat').classList.remove('active'); }
+    function toggleInfo() { document.getElementById('infoPanel').classList.toggle('active'); }
+</script>
+</body>
+</html>

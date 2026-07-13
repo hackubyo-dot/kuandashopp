@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Erro no Servidor | KuandaShop</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --k-red: #E31C25;
+            --k-black: #0F0F0F;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #1a1a1a; /* Fundo escuro para erro de servidor */
+            background-image: radial-gradient(circle at 50% 50%, #2a2a2a 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: white;
+        }
+
+        .error-container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .icon-wrapper {
+            font-size: 4rem; color: var(--k-red); margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(227, 28, 37, 0.5);
+        }
+
+        .error-heading {
+            font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;
+        }
+        .error-sub {
+            color: #888; font-size: 1.1rem; margin-bottom: 40px;
+        }
+
+        /* Terminal de Erro */
+        .terminal-window {
+            background: #000;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+            text-align: left;
+            border: 1px solid #333;
+            margin-bottom: 40px;
+        }
+
+        .terminal-header {
+            background: #222; padding: 10px 15px;
+            display: flex; gap: 8px; align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #FF5F56; }
+        .dot-yellow { background: #FFBD2E; }
+        .dot-green { background: #27C93F; }
+        .terminal-title { margin-left: 10px; font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #888; }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #ddd;
+            overflow-x: auto;
+            max-height: 300px;
+            white-space: pre-wrap;
+        }
+        .log-error { color: #FF5F56; }
+        .log-info { color: #888; }
+
+        /* Botões */
+        .btn-group-custom { display: flex; justify-content: center; gap: 15px; }
+        
+        .btn-action {
+            padding: 12px 30px; border-radius: 50px; font-weight: 700;
+            text-decoration: none; transition: 0.3s; border: none;
+        }
+        .btn-primary-custom {
+            background: white; color: black;
+        }
+        .btn-primary-custom:hover { background: #ddd; transform: translateY(-2px); }
+        
+        .btn-outline-custom {
+            background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-outline-custom:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="error-container">
+        
+        <div class="icon-wrapper">
+            <i class="fas fa-server"></i>
+        </div>
+        
+        <h1 class="error-heading">Erro Interno do Servidor</h1>
+        <p class="error-sub">Algo deu errado do nosso lado. Nossa equipe técnica foi notificada.</p>
+
+        <!-- Log Visualizador (Só mostra se houver erro passado) -->
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+                <span class="terminal-title">server_log.txt</span>
+            </div>
+            <div class="terminal-body">
+                <span class="log-info">> Iniciando diagnóstico...</span><br>
+                <span class="log-info">> Status: 500 Internal Server Error</span><br>
+                <span class="log-error">> Detalhes do erro:</span><br>
+                <!-- Renderiza o erro passado pelo backend, ou mensagem padrão -->
+                <%= typeof error !== 'undefined' ? (error.stack || error) : 'Nenhum detalhe adicional disponível.' %>
+            </div>
+        </div>
+
+        <div class="btn-group-custom">
+            <a href="/" class="btn-action btn-primary-custom">
+                <i class="fas fa-sync-alt me-2"></i> Tentar Novamente
+            </a>
+            <a href="mailto:suporte@kuandashop.ao" class="btn-action btn-outline-custom">
+                <i class="fas fa-envelope me-2"></i> Contatar Suporte
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

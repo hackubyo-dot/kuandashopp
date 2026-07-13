@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido #<%= pedido.codigo || pedido.id %> | KuandaShop</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Raleway:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* =========================================
+           SISTEMA DE DESIGN APP LAUNCHER (LIGHT)
+           ========================================= */
+        :root {
+            --bg: #F2F4F7;
+            --primary: #0F0F0F;
+            --accent: #E31C25; 
+            --surface: #FFFFFF;
+            --text-main: #1A1A1B;
+            --text-dim: #8E8E93;
+            --radius-app: 28px;
+            --shadow-app: 0 12px 30px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            --success: #34C759;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            padding-bottom: 100px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none !important; color: inherit; }
+
+        /* 1. APP LAUNCHER HEADER (MODERNO) */
+        .app-launcher-header {
+            padding: 40px 0 30px;
+            text-align: center;
+        }
+        .launcher-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--surface);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-app);
+            margin: 0 auto 15px;
+        }
+
+        /* 2. HERO CAROUSEL INTEGRADO */
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto 35px;
+            padding: 0 15px;
+        }
+        .hero-carousel-wrap {
+            border-radius: var(--radius-app);
+            overflow: hidden;
+            box-shadow: var(--shadow-app);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .hero-img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+        }
+
+        /* 3. TRACKING CARD (NEOMORFISMO SUAVE) */
+        .track-card {
+            background: var(--surface);
+            border-radius: var(--radius-app);
+            padding: 30px;
+            box-shadow: var(--shadow-app);
+            margin-bottom: 25px;
+        }
+        .pro-track { display: flex; justify-content: space-between; position: relative; margin: 30px 0 10px; }
+        .pro-track::before {
+            content: ''; position: absolute; top: 25px; left: 10%; width: 80%; height: 3px;
+            background: #F1F5F9; z-index: 1;
+        }
+        .track-item { position: relative; z-index: 2; text-align: center; width: 25%; }
+        .track-dot {
+            width: 50px; height: 50px; background: white; border: 4px solid #F1F5F9;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px; transition: 0.4s; color: #cbd5e1;
+        }
+        .track-item.active .track-dot { border-color: var(--success); background: #f0fdf4; color: var(--success); transform: scale(1.1); }
+        .track-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); }
+        .track-item.active .track-label { color: var(--text-main); }
+
+        /* 4. ITEMS MATRIX (3X3 MOBILE COMPATIBLE) */
+        .glass-card {
+            background: var(--surface);
+            border-radius: var(--radius-app);
+            box-shadow: var(--shadow-app);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        .card-title-bar {
+            padding: 20px 25px;
+            background: #FAFBFE;
+            border-bottom: 1px solid #F1F5F9;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .items-matrix-mobile {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px;
+        }
+        .item-tile {
+            background: #F8FAFC;
+            padding: 10px;
+            border-radius: 18px;
+            text-align: center;
+            border: 1px solid #F1F5F9;
+        }
+        .tile-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .tile-name {
+            font-size: 0.6rem;
+            font-weight: 700;
+            display: block;
+            height: 28px;
+            overflow: hidden;
+            line-height: 1.2;
+        }
+        .tile-price { font-size: 0.7rem; font-weight: 800; color: var(--accent); }
+
+        /* 5. INFO PANELS */
+        .info-panel {
+            background: white;
+            border-radius: var(--radius-app);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-app);
+        }
+        .panel-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .btn-whatsapp-lux {
+            background: #25D366;
+            color: white;
+            width: 100%;
+            padding: 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.2);
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 768px) {
+            .hero-img { height: 180px; }
+            .track-card { padding: 20px 10px; }
+            .order-code { font-size: 1.5rem; }
+            .track-label { font-size: 0.5rem; }
+            .track-dot { width: 40px; height: 40px; font-size: 0.8rem; }
+            .items-matrix-mobile { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+        }
+
+        /* Oculta tabela em telas pequenas */
+        @media (max-width: 600px) { .desktop-table { display: none; } }
+        @media (min-width: 601px) { .items-matrix-mobile { display: none; } }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-2">
+    <header class="app-launcher-header">
+        <!-- Link para /index envolvendo o ícone -->
+        <a href="/" style="text-decoration: none;">
+            <div class="launcher-icon">
+                <!-- Ícone de Home (3D Fluency) do Icons8 -->
+                <img src="https://img.icons8.com/?size=100&id=e40ERdqR9nQr&format=png&color=000000" width="45" alt="Home">
+            </div>
+        </a>
+        <h1 class="order-code mb-1 fw-900">Pedido #<%= pedido.codigo || pedido.id %></h1>
+        <p class="text-muted fw-600 small">Atualizado em tempo real pela KuandaShop</p>
+    </header>
+<div class="hero-container">
+
+
+
+  <div class="hero-carousel-wrap">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+      <div class="carousel-inner">
+
+        <!-- BANNER 1 -->
+        <div class="carousel-item active" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/filme/14" target="_blank">
+            <img
+              src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767361160596-862867324.webp"
+              class="hero-img w-100"
+              alt="Banner 1"
+            >
+          </a>
+        </div>
+
+        <!-- BANNER 2 -->
+        <div class="carousel-item" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/game/12" target="_blank">
+            <img
+              src="https://i.ytimg.com/vi/J-EHvQ7HgUM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBw-3r8GaFvFTtsTsq3n85_K2d8rQ"
+              class="hero-img w-100"
+              alt="Banner 2"
+            >
+          </a>
+        </div>
+
+        <!-- BANNER 3 -->
+        <div class="carousel-item" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/produto/7" target="_blank">
+            <img
+              src="/images/site.jpg"
+              class="hero-img w-100"
+              alt="Banner 3"
+            >
+          </a>
+        </div>
+
+        <!-- BANNER 4 -->
+        <div class="carousel-item" data-bs-interval="4000">
+          <a href="https://kuanda.onrender.com/filme/2" target="_blank">
+            <img
+              src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767379440078-175525311.jpeg"
+              class="hero-img w-100"
+              alt="Banner 4"
+            >
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
+                
+                <% if (pedido.status !== 'cancelado') { %>
+                    <div class="track-card">
+                        <span class="panel-label">Status do Rastreio</span>
+                        <% 
+                            let s1='', s2='', s3='', s4='';
+                            if(['pendente', 'confirmado', 'enviado', 'entregue'].includes(pedido.status)) s1='active';
+                            if(['confirmado', 'enviado', 'entregue'].includes(pedido.status)) s2='active';
+                            if(['enviado', 'entregue'].includes(pedido.status)) s3='active';
+                            if(['entregue'].includes(pedido.status)) s4='active';
+                        %>
+                        <div class="pro-track">
+                            <div class="track-item <%= s1 %>">
+                                <div class="track-dot"><i class="fas fa-check"></i></div>
+                                <span class="track-label">Pedido</span>
+                            </div>
+                            <div class="track-item <%= s2 %>">
+                                <div class="track-dot"><i class="fas fa-box"></i></div>
+                                <span class="track-label">Preparo</span>
+                            </div>
+                            <div class="track-item <%= s3 %>">
+                                <div class="track-dot"><i class="fas fa-truck"></i></div>
+                                <span class="track-label">Caminho</span>
+                            </div>
+                            <div class="track-item <%= s4 %>">
+                                <div class="track-dot"><i class="fas fa-home"></i></div>
+                                <span class="track-label">Entregue</span>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <div class="glass-card">
+                    <div class="card-title-bar">
+                        <img src="https://img.icons8.com/?size=100&id=s4MzQ849Sdas&format=png&color=000000" width="30">
+                        Itens no Pedido
+                    </div>
+
+                    <div class="items-matrix-mobile">
+                        <% itens.forEach(item => { %>
+                            <div class="item-tile">
+                                <img src="/uploads/produtos/<%= item.imagem1 || item.produto_imagem %>" class="tile-img" onerror="this.src='https://via.placeholder.com/150'">
+                                <span class="tile-name"><%= item.produto_nome %></span>
+                                <span class="tile-price"><%= (item.preco_unitario * item.quantidade).toLocaleString() %> Kz</span>
+                            </div>
+                        <% }) %>
+                    </div>
+
+                    <div class="desktop-table table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="text-uppercase small fw-bold text-muted">
+                                    <th class="ps-4 py-3">Produto</th>
+                                    <th class="text-center">Qtd</th>
+                                    <th class="text-end pe-4">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% itens.forEach(item => { %>
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <img src="/uploads/produtos/<%= item.imagem1 || item.produto_imagem %>" width="55" class="rounded-3 border">
+                                                <div class="fw-700"><%= item.produto_nome %></div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center fw-700">x<%= item.quantidade %></td>
+                                        <td class="text-end pe-4 fw-800"><%= (item.preco_unitario * item.quantidade).toLocaleString() %> Kz</td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-4 bg-dark text-white d-flex justify-content-between align-items-center">
+                        <span class="fw-600 opacity-75">Total Pago</span>
+                        <h3 class="mb-0 fw-900"><%= parseFloat(pedido.total).toLocaleString() %> Kz</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="info-panel text-center">
+                    <span class="panel-label">Vendedor</span>
+                    <div class="launcher-icon shadow-none border" style="width: 60px; height: 60px; border-radius: 50%;">
+                        <img src="https://img.icons8.com/3d-fluency/94/shop.png" width="35">
+                    </div>
+                    <h5 class="fw-800 mb-1"><%= pedido.nome_loja %></h5>
+                    <p class="small text-muted mb-4">Loja Verificada pela KuandaShop</p>
+                    
+                    <% if (pedido.vendedor_telefone) { %>
+                        <a href="https://wa.me/<%= pedido.vendedor_telefone.replace(/\D/g, '') %>" class="btn-whatsapp-lux">
+                            <i class="fab fa-whatsapp fs-4"></i> Suporte via Chat
+                        </a>
+                    <% } %>
+                </div>
+
+                <div class="info-panel">
+                    <span class="panel-label">Destino de Entrega</span>
+                    <div class="d-flex gap-3">
+                        <i class="fas fa-map-marker-alt text-danger mt-1"></i>
+                        <div class="small fw-600">
+                            <%= pedido.endereco_entrega %><br>
+                            <% if(pedido.ponto_referencia) { %>
+                                <span class="text-muted fw-400">Ref: <%= pedido.ponto_referencia %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (pedido.status === 'pendente') { %>
+                    <form action="/pedido/<%= pedido.id %>/cancelar" method="POST" onsubmit="return confirm('Confirmar cancelamento?');">
+                        <button type="submit" class="btn btn-link text-danger w-100 fw-800 small text-decoration-none">
+                            <i class="fas fa-times-circle"></i> Cancelar Pedido
+                        </button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

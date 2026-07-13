@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-ao">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - KuandaShop</title>
+    
+    <!-- Fontes e Ícones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.png">
+
+    <style>
+        :root {
+            --primary: #E31C25;
+            --primary-dark: #b9151c;
+            --primary-light: #fff0f0;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --bg-input: #F9FAFB;
+            --focus-ring: rgba(227, 28, 37, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #fff;
+            height: 100vh;
+            overflow: hidden; /* Mantido seu design original */
+            display: flex;
+        }
+
+        /* === CORREÇÃO CRÍTICA PARA O SWEETALERT NÃO QUEBRAR O LAYOUT === */
+        /* Isso impede que o modal adicione scroll e distorça seu layout dividido */
+        body.swal2-shown {
+            height: 100vh !important;
+            overflow-y: hidden !important;
+            padding-right: 0 !important;
+        }
+        
+        /* Garante que o alerta fique acima do overlay da marca */
+        div.swal2-container {
+            z-index: 99999 !important;
+        }
+
+        /* === LADO ESQUERDO (VISUAL) === */
+        .brand-section {
+            flex: 1;
+            background: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Imagem de Fundo com Overlay */
+        .brand-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://cdn.dribbble.com/userupload/4952106/file/original-c3ab09571a72fcc49479856d9df17b86.png?resize=1600x1200&vertical=center');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6;
+            z-index: 1;
+        }
+        
+        .brand-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(227,28,37,0.4) 100%);
+            z-index: 2;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 3;
+            max-width: 480px;
+        }
+
+        .brand-badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .brand-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* === LADO DIREITO (FORMULÁRIO) === */
+        .login-section {
+            flex: 0 0 550px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .logo-mobile { display: none; }
+
+        .header-text h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-text p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        /* Inputs Flutuantes Modernos */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 56px;
+            padding: 0 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-input);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .input-label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            background: transparent;
+            padding: 0 4px;
+        }
+
+        /* Estados de Foco/Preenchido */
+        .input-field:focus,
+        .input-field:not(:placeholder-shown) {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        .input-field:focus ~ .input-label,
+        .input-field:not(:placeholder-shown) ~ .input-label {
+            top: 0;
+            background: white;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Ícone e Botão Senha */
+        .input-icon-right {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+        .input-icon-right:hover { color: var(--text-main); }
+
+        /* Links e Checkbox */
+        .actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-link {
+            color: var(--text-main);
+            font-weight: 600;
+            text-decoration: none;
+            position: relative;
+        }
+        .forgot-link::after {
+            content: ''; position: absolute; width: 100%; height: 2px;
+            bottom: -2px; left: 0; background: var(--primary);
+            transform: scaleX(0); transition: 0.3s; transform-origin: right;
+        }
+        .forgot-link:hover::after { transform: scaleX(1); transform-origin: left; }
+        .forgot-link:hover { color: var(--primary); }
+
+        /* Botão Principal */
+        .btn-primary {
+            width: 100%;
+            height: 56px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(227, 28, 37, 0.25);
+        }
+
+        .btn-primary:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Divisor */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .divider span { padding: 0 16px; }
+
+        /* Botão Google */
+        .btn-google {
+            width: 100%;
+            height: 56px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-google:hover {
+            background: var(--bg-input);
+            border-color: #d1d5db;
+        }
+
+        /* Rodapé */
+        .footer-text {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        .footer-text a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .footer-text a:hover { text-decoration: underline; }
+
+        /* Barra de Loading */
+        .loading-bar {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), #ff8f95);
+            display: none;
+            z-index: 10;
+            animation: progress 1.5s infinite ease-in-out;
+        }
+        @keyframes progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .brand-section { display: none; }
+            .login-section { flex: 1; padding: 20px; }
+            body { background: var(--bg-input); }
+            
+            .login-container {
+                background: white;
+                padding: 40px;
+                border-radius: 24px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            }
+            
+            .logo-mobile {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 24px;
+            }
+            .logo-circle {
+                width: 50px; height: 50px;
+                background: var(--primary);
+                color: white;
+                border-radius: 14px;
+                display: flex; align-items: center; justify-content: center;
+                font-weight: 800; font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container { padding: 24px; box-shadow: none; background: transparent; }
+            .login-section { align-items: flex-start; padding-top: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de carregamento superior -->
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- Lado Esquerdo: Marca (Apenas Desktop) -->
+    <div class="brand-section">
+        <div class="brand-bg"></div>
+        <div class="brand-overlay"></div>
+        
+        <div class="brand-content">
+            <div class="brand-badge">
+                <i class="fas fa-star" style="color: #FFD700;"></i> Marketplace Nº 1
+            </div>
+            <h1 class="brand-title">Sua jornada de compras começa aqui.</h1>
+            <p class="brand-text">Acesse milhares de produtos, gerencie sua loja e conecte-se com vendedores de toda Angola na plataforma mais moderna do país.</p>
+        </div>
+
+        <div class="brand-content">
+            <div style="display: flex; gap: 10px; opacity: 0.7;">
+                <div style="height: 4px; width: 40px; background: white; border-radius: 2px;"></div>
+                <div style="height: 4px; width: 10px; background: white; border-radius: 2px;"></div>
+                <div style="height: 4px; width: 10px; background: white; border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lado Direito: Login -->
+    <div class="login-section">
+        <div class="login-container">
+            
+            <div class="logo-mobile">
+                <div class="logo-circle">K</div>
+            </div>
+
+            <div class="header-text">
+                <h1>Bem-vindo de volta!</h1>
+                <p>Insira seus dados para acessar sua conta.</p>
+            </div>
+
+            <form action="/login" method="POST" id="loginForm" novalidate>
+                
+                <!-- Input Email -->
+                <div class="input-group" id="emailGroup">
+                    <!-- ADICIONADO: autocomplete para evitar aviso do navegador -->
+                    <input type="email" class="input-field" name="email" id="email" placeholder=" " autocomplete="username" required>
+                    <label class="input-label" for="email">Endereço de E-mail</label>
+                </div>
+
+                <!-- Input Senha -->
+                <div class="input-group" id="passwordGroup">
+                    <!-- ADICIONADO: autocomplete para evitar aviso do navegador -->
+                    <input type="password" class="input-field" name="senha" id="senha" placeholder=" " autocomplete="current-password" required>
+                    <label class="input-label" for="senha">Sua Senha</label>
+                    <button type="button" class="input-icon-right" id="togglePassword" aria-label="Mostrar senha">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+
+                <div class="actions-row">
+                    <!-- CORRIGIDO: Checkbox estruturado para evitar erro de label solta -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="lembrar" id="lembrar" style="accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer;">
+                        <label for="lembrar" style="color: var(--text-muted); cursor: pointer; user-select: none;">Lembrar-me</label>
+                    </div>
+                    <a href="/recuperar-senha" class="forgot-link">Esqueceu a senha?</a>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <span id="btnText">Entrar na Plataforma</span>
+                    <span id="btnLoading" style="display: none;">
+                        <i class="fas fa-circle-notch fa-spin"></i> Autenticando...
+                    </span>
+                    <i class="fas fa-arrow-right" id="btnIcon" style="font-size: 0.9rem;"></i>
+                </button>
+
+                <div class="divider">
+                    <span>ou entre com</span>
+                </div>
+
+                <a href="/auth/google" class="btn-google">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="G">
+                    Continuar com Google
+                </a>
+
+                <div class="footer-text">
+                    Não tem uma conta? <a href="/registro">Cadastre-se agora</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- SCRIPT VENOM: PROTOCOLO COMPLETO DE FEEDBACK -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Dicionário de Erros (Tradução amigável)
+    const errorMap = {
+        'credenciais_invalidas': 'E-mail ou senha incorretos. Tente novamente.',
+        'usuario_nao_encontrado': 'Este e-mail não está cadastrado em nosso sistema.',
+        'senha_incorreta': 'A senha informada está incorreta.',
+        'conta_google': 'Esta conta usa login social. Clique em "Continuar com Google".',
+        'email_nao_verificado': 'Sua conta ainda não foi ativada. Verifique seu e-mail.',
+        'loja_inativa': 'Sua loja está suspensa ou inativa. Contate o suporte.',
+        'erro_interno': 'Ocorreu um erro no servidor. Tente mais tarde.',
+        'sessao_expirada': 'Sua sessão expirou. Faça login novamente.',
+        'email_vazio': 'Por favor, preencha o campo de e-mail.',
+        'use_senha': 'Este e-mail usa senha. Digite sua senha ou recupere o acesso.'
+    };
+
+    const successMap = {
+        'logout': 'Você saiu da conta com sucesso.',
+        'conta_criada': 'Conta criada! Faça login para continuar.',
+        'senha_redefinida': 'Senha alterada com sucesso.',
+        'email_enviado': 'Link de recuperação enviado para o seu e-mail.'
+    };
+
+    // 2. Captura Híbrida (Tenta EJS -> Se falhar, URL)
+    let serverMessages = {};
+    try {
+        // O "locals.messages" garante que não dê erro se o backend falhar
+        serverMessages = <%- JSON.stringify(locals.messages || messages || {}) %>;
+    } catch (e) {
+        // Silencioso se falhar, pois o fallback da URL vai assumir
+    }
+
+    // 3. Captura via URL (A "Infiltração")
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlError = urlParams.get('error'); 
+    const urlSuccess = urlParams.get('success');
+
+    // --- CONFIGURAÇÃO VISUAL DO ALERTA (CORREÇÃO DE DISTORÇÃO) ---
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
+    let disparou = false;
+
+    // A. LOGICA DE SUCESSO (Com correção visual heightAuto)
+    if (urlSuccess === 'conta_criada') {
+        // Modal centralizado para "Conta Criada" (Impacto maior)
+        Swal.fire({
+            icon: 'success',
+            title: 'Bem-vindo!',
+            text: 'Sua conta foi criada com sucesso. Verifique seu e-mail para ativar e depois faça login.',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#E31C25',
+            backdrop: 'rgba(0,0,0,0.7)', // Fundo escuro
+            heightAuto: false, // <--- CRUCIAL: Impede que o SweetAlert quebre o layout 100vh
+            allowOutsideClick: false,
+            padding: '2rem'
+        });
+        disparou = true;
+    } 
+    else if (urlSuccess) {
+        // Toasts normais para outros sucessos
+        const msg = successMap[urlSuccess] || urlSuccess;
+        Toast.fire({ icon: 'success', title: 'Sucesso', text: msg });
+        disparou = true;
+    }
+    else if (serverMessages.success && serverMessages.success.length > 0) {
+        Toast.fire({ icon: 'success', title: 'Sucesso', text: serverMessages.success[0] });
+        disparou = true;
+    }
+
+    // B. LOGICA DE ERRO
+    if (!disparou) {
+        if (urlError) {
+            const msg = errorMap[urlError] || 'Ocorreu um erro na autenticação.';
+            Toast.fire({ icon: 'error', title: 'Atenção', text: msg });
+            highlightErrorFields();
+        } 
+        else if (serverMessages.error && serverMessages.error.length > 0) {
+            Toast.fire({ icon: 'error', title: 'Atenção', text: serverMessages.error[0] });
+            highlightErrorFields();
+        }
+    }
+
+    // C. Limpeza de Rastros (URL Limpa)
+    if (urlError || urlSuccess) {
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: newUrl}, '', newUrl);
+    }
+
+    // --- FUNÇÕES DE UX ---
+    
+    // Toggle Senha
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const input = document.getElementById('senha');
+        const icon = this.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'far fa-eye-slash';
+            this.style.color = '#E31C25';
+        } else {
+            input.type = 'password';
+            icon.className = 'far fa-eye';
+            this.style.color = '#9CA3AF';
+        }
+    });
+
+    // Animação de Erro (Shake + Vermelho)
+    function highlightErrorFields() {
+        const inputs = document.querySelectorAll('.input-field');
+        inputs.forEach(input => {
+            input.style.borderColor = '#EF4444';
+            input.style.backgroundColor = '#FEF2F2';
+            input.animate([
+                { transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, 
+                { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
+            ], { duration: 400 });
+            
+            input.addEventListener('input', function() {
+                this.style.borderColor = ''; this.style.backgroundColor = '';
+            }, { once: true });
+        });
+    }
+
+    // Loading no Botão
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const email = document.getElementById('email').value.trim();
+        const senha = document.getElementById('senha').value;
+        
+        if (!email || !senha) {
+            e.preventDefault();
+            highlightErrorFields();
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        const txt = document.getElementById('btnText');
+        const load = document.getElementById('btnLoading');
+        const bar = document.getElementById('loadingBar');
+
+        btn.disabled = true;
+        txt.style.display = 'none';
+        if(document.getElementById('btnIcon')) document.getElementById('btnIcon').style.display = 'none';
+        load.style.display = 'inline-block';
+        if(bar) bar.style.display = 'block';
+    });
+});
+</script>
+
+</body>
+</html>

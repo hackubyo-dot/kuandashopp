@@ -1,0 +1,42 @@
+<!-- ARQUIVO: views/auth/resetar.ejs -->
+<style>
+    .auth-wrapper {
+      min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+    }
+    .auth-card {
+      background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      width: 100%; max-width: 450px; padding: 40px;
+    }
+    .btn-submit {
+      width: 100%; padding: 15px; border-radius: 12px; background: #0F0F0F; color: white;
+      font-weight: bold; border: none; margin-top: 20px;
+    }
+    .form-control-custom {
+      width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px;
+    }
+</style>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold">Criar Nova Senha</h3>
+        <p class="text-muted small">Digite sua nova senha abaixo.</p>
+    </div>
+
+    <!-- MENSAGENS DE ERRO -->
+    <% if (messages.error) { %>
+        <div class="alert alert-danger"><%= messages.error %></div>
+    <% } %>
+
+    <form action="/resetar-senha/<%= token %>" method="POST">
+        
+        <label class="small fw-bold text-muted mb-1">NOVA SENHA</label>
+        <input type="password" name="senha" class="form-control-custom" required placeholder="Mínimo 6 caracteres">
+
+        <label class="small fw-bold text-muted mb-1">CONFIRMAR SENHA</label>
+        <input type="password" name="confirmar_senha" class="form-control-custom" required placeholder="Repita a senha">
+
+        <button type="submit" class="btn-submit">Alterar Senha</button>
+    </form>
+  </div>
+</div>

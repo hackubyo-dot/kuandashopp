@@ -1,0 +1,246 @@
+
+  <style>
+    /* =========================================
+       KUANDA BANNER STUDIO CSS
+       ========================================= */
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --card-radius: 24px;
+      --bg-soft: #F9FAFB;
+    }
+
+    body { background-color: var(--bg-soft); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* Header */
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+    }
+    .page-title { font-weight: 800; color: var(--k-black); margin: 0; display: flex; align-items: center; gap: 10px; }
+    
+    .btn-back, .btn-delete {
+      background: white; border: 1px solid #ddd; color: #666; padding: 10px 20px;
+      border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.2s;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-back:hover { background: #eee; color: var(--k-black); }
+    .btn-delete { background: #E31C25; color: white; border: none; }
+    .btn-delete:hover { background: #b0151a; }
+
+    /* Layout Split */
+    .studio-wrapper { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; }
+
+    /* Cards */
+    .studio-card {
+      background: white; border-radius: var(--card-radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03);
+      padding: 30px; margin-bottom: 25px;
+    }
+    .card-label {
+      font-size: 0.8rem; font-weight: 800; color: #999; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 20px; display: block;
+    }
+
+    /* 1. DROPZONE DE UPLOAD */
+    .upload-zone {
+      width: 100%; aspect-ratio: 16/7;
+      background: #F8F9FA; border: 2px dashed #ccc; border-radius: 20px;
+      position: relative; overflow: hidden; transition: 0.3s;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; text-align: center;
+    }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--k-red); background: #FFF5F5; }
+    
+    .upload-content { pointer-events: none; transition: 0.3s; }
+    .upload-icon { font-size: 3rem; color: #ddd; margin-bottom: 15px; }
+    .upload-text { font-weight: 600; color: #666; margin-bottom: 5px; }
+    .upload-hint { font-size: 0.8rem; color: #999; }
+
+    /* Imagem Preview no Upload */
+    .uploaded-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; display: none; }
+    .upload-actions { position: absolute; bottom: 15px; right: 15px; z-index: 3; display: none; gap: 10px; }
+    .btn-change-img { background: rgba(0,0,0,0.7); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; backdrop-filter: blur(5px); }
+
+    /* Inputs */
+    .form-group { margin-bottom: 20px; }
+    .input-label { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; color: var(--k-black); display: block; }
+    .custom-input { width: 100%; padding: 12px 15px; border-radius: 12px; background: #F8F9FA; border: 1px solid transparent; font-weight: 500; transition: 0.2s; outline: none; }
+    .custom-input:focus { background: white; border-color: var(--k-black); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+    /* Switch iOS */
+    .switch-wrapper { display: flex; align-items: center; justify-content: space-between; background: #F8F9FA; padding: 15px; border-radius: 15px; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #10B981; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* PREVIEW CARD (STICKY) */
+    .preview-container { position: sticky; top: 30px; }
+    .live-preview-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #eee; }
+    .lp-header { padding: 15px 20px; border-bottom: 1px solid #eee; background: #fafafa; font-weight: 700; color: #888; font-size: 0.8rem; text-transform: uppercase; display: flex; justify-content: space-between; }
+    .lp-banner-area { position: relative; height: 180px; background: #333; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .lp-banner-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+    .lp-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.7), transparent); display: flex; flex-direction: column; justify-content: center; padding: 20px; }
+    .lp-title { font-size: 1.5rem; font-weight: 800; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3); max-width: 80%; line-height: 1.1; }
+    .lp-btn { margin-top: 15px; background: white; color: black; padding: 8px 20px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; width: fit-content; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+    /* Botão Salvar */
+    .btn-save { width: 100%; background: var(--k-black); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: 700; font-size: 1rem; margin-top: 20px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    .btn-save:hover { transform: translateY(-3px); background: #333; }
+
+    @media (max-width: 991px) {
+      .studio-wrapper { grid-template-columns: 1fr; }
+      .preview-container { position: static; order: -1; margin-bottom: 30px; }
+    }
+  </style>
+
+<div class="container py-4">
+  <div class="page-header">
+    <h2 class="page-title">
+        <i class="fas fa-<%= banner ? 'pen-nib' : 'magic' %> text-warning"></i>
+        <%= banner ? 'Editar Banner' : 'Criar Banner' %>
+    </h2>
+    <div>
+      <a href="/admin/banners" class="btn-back"><i class="fas fa-arrow-left"></i> Cancelar</a>
+      <% if(banner) { %>
+        <form action="/admin/banners/<%= banner.id %>?_method=DELETE" method="POST" style="display:inline">
+          <button type="submit" class="btn-delete"><i class="fas fa-trash"></i> Excluir</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+
+  <form action="<%= banner ? `/admin/banners/${banner.id}?_method=PUT` : '/admin/banners' %>" method="POST" enctype="multipart/form-data" id="bannerForm">
+    
+    <div class="studio-wrapper">
+
+        <!-- COLUNA ESQUERDA -->
+        <div class="studio-controls">
+
+            <!-- Upload -->
+            <div class="studio-card">
+                <span class="card-label">Mídia do Banner</span>
+                <div class="upload-zone" id="dropZone">
+                    <div class="upload-content" id="uploadPlaceholder">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <div class="upload-text">Clique ou arraste a imagem aqui</div>
+                        <div class="upload-hint">1200x400px recomendado (JPG, PNG)</div>
+                    </div>
+                    <img id="imagePreview" class="uploaded-img" src="<%= banner && banner.imagem ? '/uploads/banners/' + banner.imagem : '' %>" style="<%= banner && banner.imagem ? 'display:block' : 'display:none' %>">
+                    <div class="upload-actions" id="uploadActions" style="<%= banner && banner.imagem ? 'display:flex' : 'display:none' %>">
+                        <button type="button" class="btn-change-img"><i class="fas fa-camera"></i> Alterar</button>
+                    </div>
+                    <input type="file" id="imagem" name="imagem" accept="image/*" style="display:none" <%= banner ? '' : 'required' %>>
+                </div>
+            </div>
+
+            <!-- Configurações -->
+            <div class="studio-card">
+                <span class="card-label">Configurações</span>
+                <div class="form-group">
+                    <label class="input-label">Título (Opcional)</label>
+                    <input type="text" class="custom-input" id="titulo" name="titulo" value="<%= banner ? banner.titulo : '' %>" placeholder="Ex: Ofertas de Verão" oninput="updatePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Link de Destino</label>
+                    <input type="url" class="custom-input" id="link" name="link" value="<%= banner ? banner.link : '' %>" placeholder="https://...">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="input-label">Ordem</label>
+                            <input type="number" class="custom-input" name="ordem" value="<%= banner ? banner.ordem : 0 %>" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="input-label">Status</label>
+                            <div class="switch-wrapper">
+                                <span id="statusLabel" class="fw-bold small <%= (banner && banner.ativo) ? 'text-success' : 'text-muted' %>">
+                                  <%= (banner && banner.ativo) ? 'Ativo' : 'Inativo' %>
+                                </span>
+                                <label class="switch">
+                                    <input type="checkbox" name="ativo" id="ativoSwitch" <%= (!banner || banner.ativo) ? 'checked' : '' %> onchange="toggleStatusLabel()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save"><i class="fas fa-save me-2"></i> <%= banner ? 'Salvar Alterações' : 'Publicar Banner' %></button>
+        </div>
+
+        <!-- COLUNA DIREITA: PREVIEW -->
+        <div class="preview-container">
+            <div class="live-preview-card">
+                <div class="lp-header">
+                    <span><i class="fas fa-eye"></i> Visualização</span>
+                    <span>Desktop</span>
+                </div>
+                <div class="lp-banner-area">
+                    <img id="lpImage" src="<%= banner && banner.imagem ? '/uploads/banners/' + banner.imagem : '' %>" style="<%= banner && banner.imagem ? '' : 'display:none' %>">
+                    <div class="lp-overlay">
+                        <div class="lp-title" id="lpTitle"><%= banner ? banner.titulo : 'Seu Título Aqui' %></div>
+                        <div class="lp-btn">Ver Ofertas <i class="fas fa-arrow-right ms-1"></i></div>
+                    </div>
+                </div>
+                <div class="p-3 bg-light text-center text-muted small border-top">Este é um exemplo de como o banner aparecerá na página inicial.</div>
+            </div>
+        </div>
+
+    </div>
+  </form>
+</div>
+
+<script>
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('imagem');
+  const preview = document.getElementById('imagePreview');
+  const lpImage = document.getElementById('lpImage');
+  const placeholder = document.getElementById('uploadPlaceholder');
+  const actions = document.getElementById('uploadActions');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  document.querySelector('.btn-change-img')?.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', function() { handleFiles(this.files); });
+
+  ['dragenter','dragover','dragleave','drop'].forEach(event => dropZone.addEventListener(event, e => { e.preventDefault(); e.stopPropagation(); }));
+  ['dragenter','dragover'].forEach(event => dropZone.addEventListener(event, () => dropZone.classList.add('dragover')));
+  ['dragleave','drop'].forEach(event => dropZone.addEventListener(event, () => dropZone.classList.remove('dragover')));
+  dropZone.addEventListener('drop', e => { fileInput.files = e.dataTransfer.files; handleFiles(e.dataTransfer.files); });
+
+  function handleFiles(files) {
+    const file = files[0];
+    if(file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result; preview.style.display = 'block';
+        placeholder.style.opacity = '0'; actions.style.display = 'flex';
+        lpImage.src = e.target.result; lpImage.style.display = 'block';
+      }
+      reader.readAsDataURL(file);
+    } else alert('Por favor, selecione uma imagem válida.');
+  }
+
+  function updatePreview() {
+    const title = document.getElementById('titulo').value;
+    document.getElementById('lpTitle').textContent = title || 'Seu Título Aqui';
+  }
+
+  function toggleStatusLabel() {
+    const isChecked = document.getElementById('ativoSwitch').checked;
+    const label = document.getElementById('statusLabel');
+    label.textContent = isChecked ? 'Ativo' : 'Inativo';
+    label.className = 'fw-bold small ' + (isChecked ? 'text-success' : 'text-muted');
+  }
+
+  document.addEventListener('DOMContentLoaded', toggleStatusLabel);
+</script>
+

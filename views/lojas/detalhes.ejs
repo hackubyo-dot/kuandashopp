@@ -1,0 +1,708 @@
+  <style>
+    /* =========================================
+       KUANDA STORE SYSTEM - MATRIX EDITION
+       ========================================= */
+    
+    :root {
+      --k-red: #E31C25;
+      --k-black: #0F0F0F;
+      --glass-surface: rgba(255, 255, 255, 0.95);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+      --card-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    }
+
+    /* 1. HERO SECTION (BANNER) */
+    .store-header-wrapper {
+      position: relative;
+      width: 100%;
+      background: #f8f9fa;
+    }
+
+    .store-banner-bg {
+      width: 100%;
+      height: 380px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    
+    .store-banner-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
+    }
+
+    /* 2. CARD DA LOJA (SOBREPOSIÇÃO) */
+    .store-card-overlap {
+      margin-top: -100px;
+      position: relative;
+      z-index: 10;
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: var(--glass-border);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 30px;
+    }
+
+    .store-card-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 30px;
+      align-items: center;
+    }
+
+    /* Avatar */
+    .store-avatar-frame {
+      width: 140px; height: 140px;
+      border-radius: 24px;
+      background: white;
+      padding: 5px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .store-avatar-frame img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 20px;
+    }
+    .store-avatar-placeholder {
+      width: 100%; height: 100%; border-radius: 20px;
+      background: var(--k-black); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; font-weight: 800;
+    }
+
+    /* Informações */
+    .store-name { font-size: 2.2rem; font-weight: 800; line-height: 1.1; margin-bottom: 8px; color: var(--k-black); }
+    .store-desc { color: #555; font-size: 0.95rem; line-height: 1.5; max-width: 600px; }
+    
+    .store-meta-row {
+      display: flex; gap: 20px; margin-top: 15px;
+    }
+    .store-stat { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; color: #444; }
+
+    /* Botões de Ação */
+    .store-actions {
+      display: flex; flex-direction: column; gap: 10px; min-width: 200px;
+    }
+    .btn-action-store {
+      width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700;
+      transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-follow { background: var(--k-black); color: white; }
+    .btn-follow.active { background: white; color: var(--k-black); border: 2px solid var(--k-black); }
+    .btn-whatsapp { background: #25D366; color: white; }
+
+    /* 3. MENU STORIES (MOBILE) */
+    .mobile-cat-scroll {
+      display: none; /* Desktop hidden */
+      overflow-x: auto;
+      gap: 12px;
+      padding: 10px 0 20px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .mobile-cat-scroll::-webkit-scrollbar { display: none; }
+
+    .story-item {
+      display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 70px;
+      cursor: pointer;
+    }
+    .story-circle {
+      width: 55px; height: 55px; border-radius: 20px;
+      background: white; border: 1px solid #eee;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; color: var(--k-red);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s;
+    }
+    .story-item.active .story-circle {
+      background: var(--k-red); color: white; border-color: var(--k-red);
+    }
+    .story-label { font-size: 0.7rem; font-weight: 600; color: #333; text-align: center; line-height: 1.1; }
+
+    /* 4. LAYOUT DE PRODUTOS */
+    .filters-sidebar {
+      background: white; border-radius: 20px; padding: 25px;
+      border: 1px solid #eee; position: sticky; top: 100px;
+    }
+    
+    .filter-input {
+      background: #F8F9FA; border: 1px solid transparent; border-radius: 12px;
+      padding: 10px 15px; width: 100%; font-weight: 500; outline: none; transition: 0.2s;
+    }
+
+    /* GRID PRINCIPAL (DESKTOP) */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+    }
+
+    /* CARD DE PRODUTO (BASE) */
+    .prod-card {
+      background: white; border-radius: 20px; overflow: hidden;
+      border: 1px solid #f0f0f0; transition: all 0.3s;
+      position: relative; display: flex; flex-direction: column;
+    }
+    .prod-card:hover {
+      transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    }
+
+    .prod-img-box {
+      position: relative; padding-top: 100%; /* Quadrado */
+      background: #f4f4f4; overflow: hidden;
+    }
+    .prod-img-box img {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; transition: transform 0.6s ease;
+    }
+    .prod-card:hover .prod-img-box img { transform: scale(1.08); }
+
+    .prod-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+    .prod-cat { font-size: 0.7rem; text-transform: uppercase; color: #999; font-weight: 700; margin-bottom: 4px; }
+    .prod-title {
+      font-size: 1rem; font-weight: 700; color: var(--k-black); margin-bottom: 8px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      text-decoration: none; line-height: 1.3;
+    }
+    
+    .prod-price-box { margin-top: auto; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .prod-price { font-size: 1.1rem; font-weight: 800; color: var(--k-black); }
+    .prod-old-price { font-size: 0.85rem; text-decoration: line-through; color: #ccc; }
+
+    .btn-add-minimal {
+      width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--k-black);
+      background: transparent; color: var(--k-black); font-weight: 700; transition: 0.2s;
+    }
+    .btn-add-minimal:hover { background: var(--k-black); color: white; }
+
+    /* Badges */
+    .badge-float {
+      position: absolute; top: 10px; z-index: 2;
+      padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800;
+    }
+    .badge-vip { left: 10px; background: #000; color: #FFD700; }
+    .badge-sale { right: 10px; background: var(--k-red); color: white; }
+
+    /* =========================================
+       MEDIA QUERIES (A MÁGICA 3x3 E MOBILE)
+       ========================================= */
+    @media (max-width: 991px) {
+      .store-banner-bg { height: 200px; }
+      
+      .store-card-overlap {
+        margin-top: -60px; padding: 20px;
+        text-align: center; border-radius: 20px;
+      }
+      
+      .store-card-grid { grid-template-columns: 1fr; gap: 15px; justify-items: center; }
+      .store-avatar-frame { width: 100px; height: 100px; }
+      .store-name { font-size: 1.5rem; }
+      .store-meta-row { justify-content: center; }
+      .store-actions { width: 100%; flex-direction: row; }
+      
+      /* Menu Stories visível no Mobile */
+      .mobile-cat-scroll { display: flex; }
+      .filters-sidebar { display: none; } /* Esconde sidebar normal */
+
+      /* GRID 3x3 APERTADINHA */
+      .products-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      /* Estilização Miniatura para o Card */
+      .prod-card { border-radius: 12px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+      
+      .prod-info { padding: 8px; }
+      
+      .prod-cat { display: none; } /* Esconde categoria */
+      
+      .prod-title {
+        font-size: 0.7rem; /* Fonte pequena */
+        line-height: 1.1;
+        margin-bottom: 4px;
+        height: 2.2em; /* Altura fixa para alinhar */
+      }
+      
+      .prod-price-box { margin-bottom: 4px; flex-wrap: wrap; gap: 2px; }
+      .prod-price { font-size: 0.85rem; }
+      .prod-old-price { display: none; } /* Esconde preço antigo se não couber */
+      
+      /* Botão Flutuante Redondo (+) no Mobile */
+      .btn-add-minimal {
+        position: absolute;
+        bottom: 6px; right: 6px;
+        width: 28px; height: 28px;
+        padding: 0; border-radius: 50%;
+        background: var(--k-black); color: white;
+        border: none;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+      /* Esconde o texto "Adicionar" e mostra só ícone */
+      .btn-add-minimal span { display: none; }
+      .btn-add-minimal i { font-size: 0.8rem; margin: 0 !important; }
+      
+      /* Ajuste dos Badges */
+      .badge-float { font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; top: 5px; }
+      .badge-vip { left: 5px; } .badge-sale { right: 5px; }
+    }
+
+        /* Adicione ao seu CSS existente */
+    .filter-input:focus {
+      border-color: var(--k-red) !important;
+      box-shadow: 0 0 0 3px rgba(227, 28, 37, 0.1);
+    }
+
+    /* Animação para transição de produtos */
+    .products-grid {
+      transition: opacity 0.3s ease;
+    }
+
+    /* Loading spinner */
+    .spinner-border.text-danger {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    /* Estilo para mobile filters ativos */
+    .story-item.active {
+      transform: scale(1.05);
+    }
+  </style>
+
+<!-- BANNER DA LOJA (ÁREA DO HEADER) -->
+<div class="store-header-wrapper">
+    <% 
+       let estiloBackground = '';
+       
+       // 1. Verifica se a loja tem um banner salvo no banco
+       if (loja && loja.banner_loja) {
+           
+           // 2. Define o caminho. 
+           // NOTA: Se você usou o meu código de backend anterior, a imagem está em '/uploads/banners/'.
+           // Se você não usou, ela pode estar em '/uploads/perfil/'. Teste trocar se precisar.
+           let caminhoImagem = '/uploads/banners/' + loja.banner_loja;
+           
+           // 3. Monta o CSS (Aspas simples dentro das aspas duplas para não quebrar)
+           estiloBackground = "background-image: url('" + caminhoImagem + "');";
+           
+       } else {
+           // 4. Se não tiver banner, usa o gradiente padrão
+           estiloBackground = "background: linear-gradient(135deg, #0F0F0F 0%, #3a0000 100%);";
+       }
+    %>
+
+    <!-- APLICAÇÃO DO ESTILO -->
+    <!-- Adicionei height e width explícitos para garantir que apareça -->
+    <div class="store-banner-bg" style="<%= estiloBackground %> width: 100%; height: 380px; background-size: cover; background-position: center; position: relative;">
+        
+        <!-- Overlay escuro para melhorar leitura -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25);"></div>
+        
+    </div>
+</div>
+
+  <div class="container pb-5">
+    
+    <!-- 2. CARD DA LOJA -->
+    <div class="store-card-overlap">
+      <div class="store-card-grid">
+        
+        <!-- Avatar -->
+        <div class="store-avatar-frame">
+           <% 
+            let lojaFoto = loja.foto_perfil || loja.foto_vendedor || loja.avatar;
+            let lojaNome = loja.nome_loja || 'Loja Parceira';
+           %>
+           <% if (lojaFoto) { %>
+               <img src="/uploads/perfil/<%= lojaFoto %>" onerror="this.src='https://ui-avatars.com/api/?name=<%= lojaNome.charAt(0) %>&background=000&color=fff&size=200';">
+           <% } else { %>
+               <div class="store-avatar-placeholder"><%= lojaNome.charAt(0).toUpperCase() %></div>
+           <% } %>
+        </div>
+
+        <!-- Info -->
+        <div class="store-info-content">
+          <h1 class="store-name"><%= lojaNome %> <i class="fas fa-check-circle text-primary fs-6 align-top"></i></h1>
+          <p class="store-desc d-none d-md-block">
+            <%= loja.descricao_loja || 'Loja oficial no KuandaShop. Produtos de qualidade e entrega rápida.' %>
+          </p>
+
+          <div class="store-meta-row">
+            <div class="store-stat">
+               <i class="fas fa-star text-warning"></i>
+               <%= parseFloat(loja.media_classificacao || 0).toFixed(1) %>
+            </div>
+            <div class="store-stat">
+               <i class="fas fa-box text-muted"></i>
+               <%= loja.total_produtos || 0 %>
+            </div>
+            <div class="store-stat">
+               <i class="fas fa-users text-muted"></i>
+               <%= loja.total_seguidores || 0 %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="store-actions">
+           <% if (user && user.id !== loja.id) { %>
+              <form action="/loja/<%= loja.id %>/seguir" method="POST" style="width:100%">
+                 <button class="btn-action-store btn-follow <%= seguindo ? 'active' : '' %>">
+                    <%= seguindo ? 'Seguindo' : 'Seguir' %>
+                 </button>
+              </form>
+           <% } %>
+
+           <% if (loja.telefone) { %>
+              <a href="https://wa.me/<%= loja.telefone.replace(/\D/g, '') %>" target="_blank" class="btn-action-store btn-whatsapp">
+                 <i class="fab fa-whatsapp"></i> <span class="d-none d-md-inline">WhatsApp</span>
+              </a>
+           <% } %>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. MENU "STORIES" (MOBILE APENAS) -->
+    <div class="mobile-cat-scroll d-lg-none">
+        <!-- Item "Todos" -->
+        <div class="story-item <%= !filtros.categoria ? 'active' : '' %>" onclick="window.location.href='/loja/<%= loja.id %>'">
+            <div class="story-circle"><i class="fas fa-th-large"></i></div>
+            <span class="story-label">Tudo</span>
+        </div>
+        <!-- Categorias Dinâmicas -->
+        <% categorias.forEach(cat => { %>
+            <div class="story-item <%= filtros.categoria == cat.id ? 'active' : '' %>" onclick="window.location.href='/loja/<%= loja.id %>?categoria=<%= cat.id %>'">
+                <div class="story-circle">
+                    <!-- Ícone baseado na primeira letra ou fixo -->
+                    <i class="fas fa-tag"></i>
+                </div>
+                <span class="story-label"><%= cat.nome.split(' ')[0] %></span>
+            </div>
+        <% }) %>
+    </div>
+
+    <!-- 4. LAYOUT PRINCIPAL -->
+    <div class="row g-4 mt-1">
+      
+      <!-- Sidebar Desktop -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="filters-sidebar">
+           <h5 class="fw-bold mb-4"><i class="fas fa-sliders-h me-2"></i>Filtros</h5>
+           <form method="GET">
+              <div class="mb-3">
+                 <input type="text" class="filter-input" name="busca" value="<%= filtros.busca || '' %>" placeholder="Buscar na loja...">
+              </div>
+              <div class="mb-3">
+                 <select class="filter-input" name="categoria" onchange="this.form.submit()">
+                    <option value="">Categorias</option>
+                    <% categorias.forEach(cat => { %>
+                       <option value="<%= cat.id %>" <%= filtros.categoria == cat.id ? 'selected' : '' %>><%= cat.nome %></option>
+                    <% }) %>
+                 </select>
+              </div>
+              <button class="btn btn-dark w-100 rounded-pill fw-bold">Filtrar</button>
+           </form>
+        </div>
+      </div>
+
+      <!-- Grid de Produtos -->
+      <div class="col-lg-9">
+         <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold m-0">Produtos (<%= produtos.length %>)</h5>
+            <!-- Select Ordenar Mobile/Desktop -->
+            <form method="GET" class="d-inline-block">
+                <select name="ordenar" class="form-select form-select-sm bg-transparent border-0 fw-bold text-end" onchange="this.form.submit()" style="width: auto; cursor:pointer;">
+                    <option value="">Relevância</option>
+                    <option value="preco_asc" <%= filtros.ordenar==='preco_asc'?'selected':'' %>>Menor Preço</option>
+                    <option value="preco_desc" <%= filtros.ordenar==='preco_desc'?'selected':'' %>>Maior Preço</option>
+                </select>
+            </form>
+         </div>
+
+         <% if (produtos.length === 0) { %>
+            <div class="text-center py-5 bg-light rounded-4">
+               <i class="fas fa-search fa-2x text-muted mb-2"></i>
+               <p class="text-muted small">Nada encontrado nesta loja.</p>
+               <a href="/loja/<%= loja.id %>" class="text-danger fw-bold small text-decoration-none">Ver tudo</a>
+            </div>
+         <% } else { %>
+            
+            <div class="products-grid">
+               <% produtos.forEach(prod => { 
+                  const preco = Number(prod.preco) || 0;
+                  const promo = Number(prod.preco_promocional) || 0;
+                  const temPromo = promo > 0;
+               %>
+                  <div class="prod-card">
+                     <% if (prod.vip) { %><span class="badge-float badge-vip">VIP</span><% } %>
+                     <% if (temPromo) { %><span class="badge-float badge-sale">%</span><% } %>
+
+                     <a href="/produto/<%= prod.id %>" class="prod-img-box">
+                        <% let img = prod.imagem1 || prod.imagem2; %>
+                        <% if(img) { %>
+                           <img src="/uploads/produtos/<%= img %>" alt="<%= prod.nome %>" loading="lazy">
+                        <% } else { %>
+                           <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fas fa-image"></i></div>
+                        <% } %>
+                     </a>
+
+                     <div class="prod-info">
+                        <span class="prod-cat"><%= prod.categoria_nome || 'Geral' %></span>
+                        <a href="/produto/<%= prod.id %>" class="prod-title"><%= prod.nome %></a>
+                        
+                        <div class="prod-price-box">
+                           <span class="prod-price"><%= (temPromo ? promo : preco).toLocaleString('pt-AO') %> Kz</span>
+                           <% if (temPromo) { %>
+                              <span class="prod-old-price"><%= preco.toLocaleString('pt-AO') %></span>
+                           <% } %>
+                        </div>
+
+                        <!-- Botão Híbrido (Texto Desktop / Ícone Mobile) -->
+                        <button class="btn-add-minimal" onclick="addToCart(<%= prod.id %>, '<%= prod.nome.replace(/'/g, "\\'") %>')">
+                           <span class="d-none d-lg-inline">Adicionar</span>
+                           <i class="fas fa-plus"></i>
+                        </button>
+                     </div>
+                  </div>
+               <% }) %>
+            </div>
+         <% } %>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function addToCart(id, nome) {
+        // Feedback visual simples
+        const btn = event.target.closest('button');
+        const icon = btn.querySelector('i');
+        const oldClass = icon.className;
+        
+        icon.className = 'fas fa-spinner fa-spin';
+        
+        fetch('/carrinho/adicionar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `produto_id=${id}&quantidade=1`
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                icon.className = 'fas fa-check';
+                setTimeout(() => icon.className = oldClass, 1500);
+                // Tenta atualizar o contador global se a função existir
+                if(window.CartManager) window.CartManager.updateCount();
+            } else {
+                alert(data.message);
+                icon.className = oldClass;
+            }
+        })
+        .catch(e => {
+            console.error(e);
+            icon.className = oldClass;
+        });
+    }
+  </script>
+
+  <script>
+// Variável para controlar o debounce (evitar muitas requisições)
+let filterTimeout;
+let isFiltering = false;
+
+async function applyFilters() {
+  // Cancelar timeout anterior
+  if (filterTimeout) clearTimeout(filterTimeout);
+  
+  // Debounce: aguardar 300ms após a última tecla pressionada
+  filterTimeout = setTimeout(async () => {
+    if (isFiltering) return;
+    
+    isFiltering = true;
+    
+    try {
+      // Coletar valores dos filtros
+      const filters = {
+        busca: document.getElementById('filterBusca')?.value || '',
+        categoria: document.getElementById('filterCategoria')?.value || '',
+        ordenar: document.getElementById('filterOrdenar')?.value || ''
+      };
+      
+      // Mostrar loader
+      showLoading();
+      
+      // Fazer requisição AJAX
+      const response = await fetch(`/loja/<%= loja.id %>/produtos-filtrados`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(filters)
+      });
+      
+      if (!response.ok) throw new Error('Erro na requisição');
+      
+      const data = await response.json();
+      
+      // Atualizar apenas os produtos
+      updateProducts(data.produtos);
+      
+      // Atualizar contador
+      updateProductCount(data.total || data.produtos.length);
+      
+    } catch (error) {
+      console.error('Erro ao filtrar:', error);
+      showError('Erro ao aplicar filtros. Tente novamente.');
+    } finally {
+      isFiltering = false;
+      hideLoading();
+    }
+  }, 300);
+}
+
+// Função para mostrar loading
+function showLoading() {
+  const container = document.getElementById('productsContainer');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="text-center py-5">
+      <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <p class="mt-2 text-muted small">Aplicando filtros...</p>
+    </div>
+  `;
+}
+
+// Função para esconder loading
+function hideLoading() {
+  // Removido automaticamente ao atualizar produtos
+}
+
+// Função para atualizar produtos
+function updateProducts(produtos) {
+  const container = document.getElementById('productsContainer');
+  if (!container) return;
+  
+  if (produtos.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-5 bg-light rounded-4">
+        <i class="fas fa-search fa-2x text-muted mb-2"></i>
+        <p class="text-muted small">Nenhum produto encontrado com esses filtros.</p>
+        <button class="btn btn-sm btn-outline-danger" onclick="resetFilters()">
+          Limpar filtros
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Gerar HTML dos produtos
+  let productsHTML = '<div class="products-grid">';
+  
+  produtos.forEach(prod => {
+    const preco = Number(prod.preco) || 0;
+    const promo = Number(prod.preco_promocional) || 0;
+    const temPromo = promo > 0;
+    
+    productsHTML += `
+      <div class="prod-card">
+        ${prod.vip ? '<span class="badge-float badge-vip">VIP</span>' : ''}
+        ${temPromo ? '<span class="badge-float badge-sale">%</span>' : ''}
+        
+        <a href="/produto/${prod.id}" class="prod-img-box">
+          ${prod.imagem1 ? 
+            `<img src="/uploads/produtos/${prod.imagem1}" alt="${prod.nome}" loading="lazy">` :
+            `<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted">
+              <i class="fas fa-image"></i>
+            </div>`
+          }
+        </a>
+        
+        <div class="prod-info">
+          <span class="prod-cat">${prod.categoria_nome || 'Geral'}</span>
+          <a href="/produto/${prod.id}" class="prod-title">${prod.nome}</a>
+          
+          <div class="prod-price-box">
+            <span class="prod-price">${(temPromo ? promo : preco).toLocaleString('pt-AO')} Kz</span>
+            ${temPromo ? 
+              `<span class="prod-old-price">${preco.toLocaleString('pt-AO')}</span>` : 
+              ''
+            }
+          </div>
+          
+          <button class="btn-add-minimal" onclick="addToCart(${prod.id}, '${prod.nome.replace(/'/g, "\\'")}')">
+            <span class="d-none d-lg-inline">Adicionar</span>
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  
+  productsHTML += '</div>';
+  container.innerHTML = productsHTML;
+}
+
+// Função para atualizar contador
+function updateProductCount(count) {
+  const countElement = document.querySelector('h5.fw-bold');
+  if (countElement) {
+    countElement.textContent = `Produtos (${count})`;
+  }
+}
+
+// Função para resetar filtros
+function resetFilters() {
+  document.getElementById('filterBusca').value = '';
+  document.getElementById('filterCategoria').value = '';
+  document.getElementById('filterOrdenar').value = '';
+  applyFilters();
+}
+
+// Função para mostrar erro
+function showError(message) {
+  const container = document.getElementById('productsContainer');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      ${message}
+    </div>
+  `;
+}
+
+// Inicializar eventos
+document.addEventListener('DOMContentLoaded', function() {
+  // Adicionar data-cat-id aos itens do menu mobile
+  document.querySelectorAll('.story-item').forEach((item, index) => {
+    if (index === 0) {
+      item.setAttribute('data-cat-id', '');
+    } else {
+      const catId = item.getAttribute('onclick')?.match(/categoria=(\d+)/)?.[1] || '';
+      item.setAttribute('data-cat-id', catId);
+    }
+    
+    // Remover onclick original
+    item.removeAttribute('onclick');
+    
+    // Adicionar novo evento
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const catId = this.getAttribute('data-cat-id') || '';
+      document.getElementById('filterCategoria').value = catId;
+      
+      // Ativar visualmente o item clicado
+      document.querySelectorAll('.story-item').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+      
+      applyFilters();
+    });
+  });
+});
+</script>

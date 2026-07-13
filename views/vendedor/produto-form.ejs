@@ -1,0 +1,391 @@
+<style>
+  /* =========================================
+     KUANDA PRODUCT STUDIO CSS
+     ========================================= */
+  :root {
+    --k-red: #E31C25;
+    --k-black: #0F0F0F;
+    --glass-bg: #FFFFFF;
+    --radius-card: 20px;
+  }
+
+  /* Título e Ações */
+  .page-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+  }
+  .page-title { font-weight: 800; color: var(--k-black); margin: 0; display: flex; align-items: center; gap: 10px; }
+  
+  /* Cards de Seção */
+  .studio-card {
+    background: white; border-radius: var(--radius-card);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+    overflow: hidden; margin-bottom: 30px;
+  }
+  .card-head {
+    padding: 20px 25px; border-bottom: 1px solid #f0f0f0;
+    font-weight: 700; color: var(--k-black); display: flex; align-items: center; gap: 10px;
+  }
+  .card-body-custom { padding: 25px; }
+
+  /* Inputs Customizados */
+  .form-label-custom {
+    font-size: 0.75rem; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block;
+  }
+  
+  .input-custom {
+    width: 100%; padding: 12px 15px; border-radius: 12px;
+    background: #F8F9FA; border: 1px solid transparent; font-weight: 500;
+    transition: 0.2s; outline: none;
+  }
+  .input-custom:focus {
+    background: white; border-color: var(--k-black); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+  
+  .textarea-custom { resize: vertical; min-height: 120px; line-height: 1.6; }
+
+  /* Upload Grid */
+  .upload-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+  }
+  
+  .upload-box {
+    aspect-ratio: 1/1; background: #F8F9FA; border: 2px dashed #ddd; border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+  }
+  .upload-box:hover { border-color: var(--k-red); background: #FFF5F5; }
+  
+  .upload-icon { font-size: 1.5rem; color: #ccc; margin-bottom: 5px; }
+  .upload-label { font-size: 0.7rem; color: #888; font-weight: 600; }
+  
+  /* Preview Imagem no Upload */
+  .img-preview-box {
+    width: 100%; height: 100%; position: absolute; top:0; left:0;
+    display: none; /* Hidden by default */
+  }
+  .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+  .btn-remove-img {
+    position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white;
+    width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 5;
+  }
+
+  /* Card Preview ao Vivo */
+  .live-preview-wrapper {
+    position: sticky; top: 100px;
+  }
+  .preview-card {
+    background: white; border-radius: 20px; overflow: hidden; border: 1px solid #eee;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08); max-width: 320px; margin: 0 auto;
+  }
+  .preview-img {
+    height: 250px; background: #f4f4f4; display: flex; align-items: center; justify-content: center;
+    color: #ccc; font-size: 3rem; overflow: hidden;
+  }
+  .preview-img img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .preview-body { padding: 20px; }
+  .preview-title { font-weight: 700; margin-bottom: 5px; font-size: 1.1rem; }
+  .preview-cat { font-size: 0.7rem; text-transform: uppercase; color: #999; font-weight: 700; margin-bottom: 10px; display: block; }
+  .preview-price { font-size: 1.2rem; font-weight: 800; color: var(--k-black); }
+  .preview-old { text-decoration: line-through; color: #ccc; font-size: 0.9rem; margin-left: 5px; }
+
+  /* Botões */
+  .btn-save {
+    background: var(--k-black); color: white; border: none; padding: 12px 30px;
+    border-radius: 50px; font-weight: 700; transition: 0.3s;
+  }
+  .btn-save:hover { background: #333; transform: translateY(-2px); color: white; }
+  
+  .btn-cancel {
+    background: white; border: 1px solid #ddd; color: #666; padding: 12px 25px;
+    border-radius: 50px; font-weight: 600; text-decoration: none; display: inline-block;
+  }
+  .btn-cancel:hover { background: #f5f5f5; color: #333; }
+
+  /* Responsivo */
+  @media (max-width: 991px) {
+    .live-preview-wrapper { position: static; margin-bottom: 40px; }
+    .upload-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+
+<div class="container py-4">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <h2 class="page-title">
+      <i class="fas fa-<%= produto ? 'pen' : 'magic' %> text-warning"></i> 
+      <%= produto ? 'Editar Produto' : 'Criar Produto' %>
+    </h2>
+    <div class="d-flex gap-2">
+        <a href="/vendedor/produtos" class="btn-cancel">Cancelar</a>
+        <button form="productForm" type="submit" class="btn-save">
+            <i class="fas fa-check me-2"></i>Salvar
+        </button>
+    </div>
+  </div>
+
+  <div class="row">
+    
+    <!-- COLUNA ESQUERDA: FORMULÁRIO -->
+    <div class="col-lg-8">
+        
+        <form action="<%= produto ? `/vendedor/produto/${produto.id}?_method=PUT` : '/vendedor/produto' %>" method="POST" enctype="multipart/form-data" id="productForm">
+            
+            <!-- 1. Informações Básicas -->
+            <div class="studio-card">
+                <div class="card-head"><i class="fas fa-info-circle text-primary"></i> Informações Básicas</div>
+                <div class="card-body-custom">
+                    
+                    <div class="mb-3">
+                        <label class="form-label-custom">Nome do Produto</label>
+                        <input type="text" class="input-custom" id="nome" name="nome" value="<%= produto ? produto.nome : '' %>" required placeholder="Ex: Tênis Nike Air Max" oninput="updatePreview()">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-custom">Categoria</label>
+                            <select class="input-custom" id="categoria_id" name="categoria_id" required onchange="updatePreview()">
+                                <option value="">Selecione...</option>
+                                <% categorias.forEach(cat => { %>
+                                    <option value="<%= cat.id %>" <%= produto && produto.categoria_id == cat.id ? 'selected' : '' %> data-name="<%= cat.nome %>"><%= cat.nome %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-custom">Estoque</label>
+                            <input type="number" class="input-custom" id="estoque" name="estoque" value="<%= produto ? produto.estoque : '' %>" required min="0" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="form-label-custom">Descrição Detalhada</label>
+                        <textarea class="input-custom textarea-custom" id="descricao" name="descricao" placeholder="Descreva os detalhes, material, tamanho..."><%= produto ? produto.descricao : '' %></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 2. Preços -->
+            <div class="studio-card">
+                <div class="card-head"><i class="fas fa-tag text-success"></i> Preço e Oferta</div>
+                <div class="card-body-custom">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-custom">Preço Normal (Kz)</label>
+                            <input type="number" class="input-custom" id="preco" name="preco" value="<%= produto ? produto.preco : '' %>" required min="0" step="0.01" placeholder="0.00" oninput="updatePreview()">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-custom">Preço Promocional (Opcional)</label>
+                            <input type="number" class="input-custom" id="preco_promocional" name="preco_promocional" value="<%= produto ? produto.preco_promocional : '' %>" min="0" step="0.01" placeholder="0.00" oninput="updatePreview()">
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0"><i class="fas fa-info-circle me-1"></i> Se preencher o preço promocional, o produto aparecerá com badge de "Oferta".</p>
+                </div>
+            </div>
+
+            <!-- 3. Galeria de Imagens -->
+            <div class="studio-card">
+                <div class="card-head"><i class="fas fa-images text-danger"></i> Galeria</div>
+                <div class="card-body-custom">
+                    <div class="upload-grid">
+                        
+                        <!-- Upload 1 (Principal) -->
+                        <div class="upload-box" onclick="triggerUpload('imagem1')">
+                            <div class="upload-content text-center">
+                                <i class="fas fa-camera upload-icon"></i>
+                                <div class="upload-label">Principal</div>
+                            </div>
+                            <!-- Preview Layer -->
+                            <div class="img-preview-box" id="prev_box_1" style="<%= (produto && produto.imagem1) ? 'display:block' : '' %>">
+                                <img id="preview_1" src="<%= (produto && produto.imagem1) ? '/uploads/produtos/'+produto.imagem1 : '' %>">
+                                <div class="btn-remove-img" onclick="removeImage(1, event)"><i class="fas fa-times"></i></div>
+                            </div>
+                            <input type="file" class="d-none" id="imagem1" name="imagem1" accept="image/*" onchange="handleFileSelect(this, 1)">
+                        </div>
+
+                        <!-- Upload 2 -->
+                        <div class="upload-box" onclick="triggerUpload('imagem2')">
+                            <div class="upload-content text-center">
+                                <i class="fas fa-plus upload-icon"></i>
+                                <div class="upload-label">Foto 2</div>
+                            </div>
+                            <div class="img-preview-box" id="prev_box_2" style="<%= (produto && produto.imagem2) ? 'display:block' : '' %>">
+                                <img id="preview_2" src="<%= (produto && produto.imagem2) ? '/uploads/produtos/'+produto.imagem2 : '' %>">
+                                <div class="btn-remove-img" onclick="removeImage(2, event)"><i class="fas fa-times"></i></div>
+                            </div>
+                            <input type="file" class="d-none" id="imagem2" name="imagem2" accept="image/*" onchange="handleFileSelect(this, 2)">
+                        </div>
+
+                        <!-- Upload 3 -->
+                        <div class="upload-box" onclick="triggerUpload('imagem3')">
+                            <div class="upload-content text-center">
+                                <i class="fas fa-plus upload-icon"></i>
+                                <div class="upload-label">Foto 3</div>
+                            </div>
+                            <div class="img-preview-box" id="prev_box_3" style="<%= (produto && produto.imagem3) ? 'display:block' : '' %>">
+                                <img id="preview_3" src="<%= (produto && produto.imagem3) ? '/uploads/produtos/'+produto.imagem3 : '' %>">
+                                <div class="btn-remove-img" onclick="removeImage(3, event)"><i class="fas fa-times"></i></div>
+                            </div>
+                            <input type="file" class="d-none" id="imagem3" name="imagem3" accept="image/*" onchange="handleFileSelect(this, 3)">
+                        </div>
+
+                    </div>
+                    <p class="small text-muted mt-3 mb-0">Formatos: JPG, PNG. Máx 5MB. A primeira foto será a capa.</p>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- COLUNA DIREITA: PREVIEW AO VIVO -->
+    <div class="col-lg-4">
+        <div class="live-preview-wrapper">
+            <h6 class="text-uppercase text-muted fw-bold mb-3 small ps-2">Pré-visualização do Cliente</h6>
+            
+            <div class="preview-card">
+                <!-- Imagem -->
+                <div class="preview-img" id="live_img_container">
+                    <% if (produto && produto.imagem1) { %>
+                        <img src="/uploads/produtos/<%= produto.imagem1 %>" id="live_img">
+                    <% } else { %>
+                        <i class="fas fa-image"></i>
+                        <img src="" id="live_img" style="display:none; width:100%; height:100%; object-fit:cover;">
+                    <% } %>
+                </div>
+                
+                <!-- Corpo -->
+                <div class="preview-body">
+                    <span class="preview-cat" id="live_cat"><%= produto ? produto.categoria_nome : 'CATEGORIA' %></span>
+                    <h5 class="preview-title" id="live_name"><%= produto ? produto.nome : 'Nome do Produto' %></h5>
+                    
+                    <div class="mt-2">
+                        <span class="preview-price" id="live_price"><%= produto ? parseFloat(produto.preco).toLocaleString('pt-AO') : '0.00' %> Kz</span>
+                        <span class="preview-old" id="live_old_price" style="<%= (produto && produto.preco_promocional) ? '' : 'display:none' %>">
+                            <%= produto ? parseFloat(produto.preco).toLocaleString('pt-AO') : '' %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4 small border-0 shadow-sm">
+                <i class="fas fa-lightbulb me-2"></i> <strong>Dica:</strong> Use fotos quadradas (1:1) para melhor visualização no Instagram e no App.
+            </div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    // 1. Upload Logic
+    function triggerUpload(id) {
+        document.getElementById(id).click();
+    }
+
+    function handleFileSelect(input, index) {
+        const file = input.files[0];
+        if (file) {
+            // Validation
+            if(file.size > 5 * 1024 * 1024) {
+                alert('Imagem muito grande (Max 5MB)');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Show in upload box
+                const previewBox = document.getElementById(`prev_box_${index}`);
+                const previewImg = document.getElementById(`preview_${index}`);
+                previewImg.src = e.target.result;
+                previewBox.style.display = 'block';
+
+                // Update Live Preview if it's image 1
+                if(index === 1) {
+                    const liveImg = document.getElementById('live_img');
+                    const liveContainer = document.getElementById('live_img_container');
+                    liveImg.src = e.target.result;
+                    liveImg.style.display = 'block';
+                    // Hide placeholder icon
+                    const icon = liveContainer.querySelector('i');
+                    if(icon) icon.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeImage(index, e) {
+        e.stopPropagation(); // Prevent opening upload dialog
+        
+        const input = document.getElementById(`imagem${index}`);
+        input.value = '';
+        
+        const previewBox = document.getElementById(`prev_box_${index}`);
+        previewBox.style.display = 'none';
+        
+        // If removing main image, clear live preview
+        if(index === 1) {
+            const liveImg = document.getElementById('live_img');
+            const liveContainer = document.getElementById('live_img_container');
+            liveImg.style.display = 'none';
+            liveImg.src = '';
+            const icon = liveContainer.querySelector('i');
+            if(icon) icon.style.display = 'block';
+        }
+    }
+
+    // 2. Live Preview Logic
+    function updatePreview() {
+        // Nome
+        const nome = document.getElementById('nome').value;
+        document.getElementById('live_name').textContent = nome || 'Nome do Produto';
+
+        // Categoria
+        const catSelect = document.getElementById('categoria_id');
+        const catName = catSelect.options[catSelect.selectedIndex].getAttribute('data-name');
+        document.getElementById('live_cat').textContent = catName || 'CATEGORIA';
+
+        // Preço
+        const preco = parseFloat(document.getElementById('preco').value) || 0;
+        const promo = parseFloat(document.getElementById('preco_promocional').value) || 0;
+        
+        const livePrice = document.getElementById('live_price');
+        const liveOld = document.getElementById('live_old_price');
+
+        if(promo > 0) {
+            livePrice.textContent = promo.toLocaleString('pt-AO') + ' Kz';
+            livePrice.style.color = '#E31C25'; // Red for offer
+            liveOld.textContent = preco.toLocaleString('pt-AO') + ' Kz';
+            liveOld.style.display = 'inline';
+        } else {
+            livePrice.textContent = preco.toLocaleString('pt-AO') + ' Kz';
+            livePrice.style.color = '#0F0F0F'; // Black normal
+            liveOld.style.display = 'none';
+        }
+    }
+
+    // 3. Validation on Submit
+    document.getElementById('productForm').addEventListener('submit', function(e) {
+        const nome = document.getElementById('nome').value.trim();
+        const preco = document.getElementById('preco').value;
+        const estoque = document.getElementById('estoque').value;
+        
+        // Validação Imagem Principal (Se for novo produto)
+        <% if (!produto) { %>
+            const img1 = document.getElementById('imagem1').files.length;
+            if(!img1) {
+                e.preventDefault();
+                alert('A imagem principal é obrigatória.');
+                return;
+            }
+        <% } %>
+
+        if(!nome || !preco || !estoque) {
+            e.preventDefault();
+            alert('Preencha os campos obrigatórios.');
+        }
+    });
+</script>

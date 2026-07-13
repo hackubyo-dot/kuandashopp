@@ -1,0 +1,302 @@
+
+    <style>
+        :root {
+            --primary: #0F0F0F;
+            --accent: #E31C25;
+        }
+        
+        .pedido-card {
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .pedido-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .pedido-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .pedido-body {
+            padding: 20px;
+        }
+        
+        .pedido-footer {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .status-pendente { background: #fff3cd; color: #856404; }
+        .status-confirmado { background: #d4edda; color: #155724; }
+        .status-pago { background: #cce5ff; color: #004085; }
+        .status-concluido { background: #d1ecf1; color: #0c5460; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+        
+        .loja-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .loja-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .loja-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .filter-badge {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .filter-badge.active {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shopping-bag me-2"></i>KuandaShop
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home me-1"></i>Início
+                </a>
+                <a href="/perfil" class="nav-link">
+                    <i class="fas fa-user me-1"></i>Perfil
+                </a>
+                <a href="/carrinho" class="nav-link">
+                    <i class="fas fa-shopping-cart me-1"></i>Carrinho
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 fw-bold mb-2">Meus Pedidos</h1>
+                        <p class="text-muted mb-0">Acompanhe todos os seus pedidos em um só lugar</p>
+                    </div>
+                    <div class="text-end">
+                        <a href="/produtos" class="btn btn-outline-dark">
+                            <i class="fas fa-shopping-bag me-2"></i>Continuar Comprando
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Rápidos -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="filter-badge badge <%= filtroStatus === 'todos' ? 'bg-dark active' : 'bg-light text-dark' %>" 
+                          onclick="window.location.href='/meus-pedidos?status=todos'">
+                        Todos
+                    </span>
+                    <span class="filter-badge badge <%= filtroStatus === 'pendente' ? 'bg-warning active' : 'bg-light text-dark' %>" 
+                          onclick="window.location.href='/meus-pedidos?status=pendente'">
+                        Pendentes
+                    </span>
+                    <span class="filter-badge badge <%= filtroStatus === 'confirmado' ? 'bg-primary active' : 'bg-light text-dark' %>" 
+                          onclick="window.location.href='/meus-pedidos?status=confirmado'">
+                        Confirmados
+                    </span>
+                    <span class="filter-badge badge <%= filtroStatus === 'pago' ? 'bg-success active' : 'bg-light text-dark' %>" 
+                          onclick="window.location.href='/meus-pedidos?status=pago'">
+                        Pagos
+                    </span>
+                    <span class="filter-badge badge <%= filtroStatus === 'concluido' ? 'bg-info active' : 'bg-light text-dark' %>" 
+                          onclick="window.location.href='/meus-pedidos?status=concluido'">
+                        Concluídos
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <% if (pedidosPorGrupo.length === 0) { %>
+        <div class="empty-state">
+            <i class="fas fa-shopping-bag empty-icon"></i>
+            <h3>Nenhum pedido encontrado</h3>
+            <p class="text-muted mb-4">Você ainda não fez nenhuma compra.</p>
+            <a href="/produtos" class="btn btn-dark btn-lg">
+                <i class="fas fa-shopping-bag me-2"></i>Ver Produtos
+            </a>
+        </div>
+        <% } else { %>
+            <% pedidosPorGrupo.forEach(grupo => { %>
+            <div class="pedido-card">
+                <div class="pedido-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="far fa-calendar-alt me-2"></i>
+                            Pedido - <%= new Date(grupo.data).toLocaleDateString('pt-AO', { 
+                                day: '2-digit', 
+                                month: 'long', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) %>
+                        </h5>
+                        <small class="text-muted">ID do grupo: <%= grupo.grupoId %></small>
+                    </div>
+                    <div class="text-end">
+                        <h4 class="fw-bold mb-0"><%= formatPrice(grupo.total) %> Kz</h4>
+                        <small class="text-muted"><%= grupo.pedidos.length %> <%= grupo.pedidos.length === 1 ? 'loja' : 'lojas' %></small>
+                    </div>
+                </div>
+                
+                <div class="pedido-body">
+                    <% grupo.pedidos.forEach(pedido => { 
+                        const produtos = JSON.parse(pedido.produto_info);
+                    %>
+                    <div class="loja-item">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="fw-bold mb-1">
+                                        <i class="fas fa-store me-2"></i>
+                                        <%= pedido.nome_loja || pedido.vendedor_nome %>
+                                    </h6>
+                                    <small class="text-muted">
+                                        Código: <%= pedido.codigo %>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge-status status-<%= pedido.status %>">
+                                        <%= pedido.status.charAt(0).toUpperCase() + pedido.status.slice(1) %>
+                                    </span>
+                                    <div class="fw-bold mt-1"><%= formatPrice(pedido.total) %> Kz</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2">
+                                <% produtos.slice(0, 2).forEach(produto => { %>
+                                <small class="d-block">
+                                    <%= produto.qtd %>x <%= produto.nome %>
+                                </small>
+                                <% }); %>
+                                <% if (produtos.length > 2) { %>
+                                <small class="text-muted">
+                                    +<%= produtos.length - 2 %> <%= produtos.length - 2 === 1 ? 'outro produto' : 'outros produtos' %>
+                                </small>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                
+                <div class="pedido-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <% const statusCounts = {};
+                            grupo.pedidos.forEach(p => {
+                                statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
+                            }); %>
+                            <% Object.keys(statusCounts).forEach(status => { %>
+                            <span class="badge-status status-<%= status %> me-2">
+                                <%= statusCounts[status] %> <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                            </span>
+                            <% }); %>
+                        </div>
+                        <div>
+                            <a href="/pedido/resumo/<%= grupo.grupoId %>" class="btn btn-sm btn-outline-dark me-2">
+                                <i class="fas fa-external-link-alt me-1"></i>Ver Resumo
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="reenviarWhatsApp('<%= grupo.grupoId %>')">
+                                <i class="fab fa-whatsapp me-1"></i>Reenviar WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        <% } %>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function reenviarWhatsApp(grupoId) {
+            try {
+                const response = await fetch(`/pedido/grupo/${grupoId}/whatsapp-todos`);
+                const data = await response.json();
+                
+                if (data.success && data.pedidos.length > 0) {
+                    if (confirm(`Deseja reenviar mensagens para ${data.pedidos.length} lojas?`)) {
+                        data.pedidos.forEach(p => {
+                            if (p.whatsappUrl) {
+                                window.open(p.whatsappUrl, '_blank');
+                            }
+                        });
+                        alert('Mensagens abertas no WhatsApp!');
+                    }
+                } else {
+                    alert('Erro ao reenviar mensagens.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar.');
+            }
+        }
+        
+        // Atualizar status via AJAX (opcional)
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/meus-pedidos/atualizar');
+                if (response.ok) {
+                    // Pode atualizar badges sem recarregar a página
+                    const data = await response.json();
+                    console.log('Status atualizados', data);
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+            }
+        }, 30000); // A cada 30 segundos
+    </script>

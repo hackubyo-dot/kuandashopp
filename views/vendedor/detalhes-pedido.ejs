@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUANDA OS | Gestão de Pedido #<%= pedido.codigo %></title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- ENGINE DE TEMAS --- */
+        :root {
+            --bg: #F0F2F5;
+            --surface: #FFFFFF;
+            --text-main: #1A1D23;
+            --text-muted: #677489;
+            --primary: #FF002E;
+            --primary-soft: rgba(255, 0, 46, 0.1);
+            --border: rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+            --card-radius: 24px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0B0C10;
+            --surface: #161B22;
+            --text-main: #F0F6FC;
+            --text-muted: #8B949E;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .raleway { font-family: 'Raleway', sans-serif; font-weight: 800; }
+
+        /* --- BOTÃO ALTERNÂNCIA --- */
+        .theme-toggle {
+            position: fixed; top: 20px; right: 30px; z-index: 2000;
+            background: var(--surface); border: 1px solid var(--border);
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: var(--shadow); transition: var(--transition);
+        }
+        .theme-toggle:hover { transform: scale(1.1); border-color: var(--primary); }
+
+        /* --- HERO CAROUSEL --- */
+        .hero-wrap {
+            position: relative; width: 100%; height: 420px;
+            overflow: hidden;
+            background: #000;
+        }
+        .hero-img { 
+            width: 100%; height: 420px; object-fit: cover; 
+            transition: transform 0.8s ease;
+            filter: brightness(0.9);
+        }
+        .carousel-item a:hover .hero-img { transform: scale(1.05); filter: brightness(1); }
+
+        /* --- CONTENT MAPPING --- */
+        .master-grid {
+            max-width: 1300px; margin: 0 auto;
+            padding: 40px 20px 100px; position: relative;
+        }
+
+        /* --- CABEÇALHO DO PEDIDO (ABAIXO DO BANNER) --- */
+        .order-meta-header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* --- ITEM ESTAMPADO NO BACKGROUND --- */
+        .item-stamp {
+            display: flex; align-items: center; gap: 20px;
+            padding: 22px; background: var(--surface);
+            border-radius: 22px; border: 1px solid var(--border);
+            box-shadow: var(--shadow); margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .item-stamp:hover { transform: translateY(-5px); border-color: var(--primary); }
+        
+        .item-img {
+            width: 85px; height: 85px; border-radius: 16px;
+            object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        /* --- GLASS CARDS --- */
+        .glass-card {
+            background: var(--surface);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--border);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            margin-bottom: 25px;
+        }
+
+        /* --- STATUS SELECTOR --- */
+        .status-pill {
+            padding: 16px 20px; border-radius: 16px;
+            background: var(--bg); border: 1px solid var(--border);
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: space-between; font-weight: 600;
+            transition: var(--transition); color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .status-pill.active {
+            background: var(--primary); color: white;
+            border-color: var(--primary); box-shadow: 0 10px 20px var(--primary-soft);
+        }
+
+        .btn-confirm {
+            width: 100%; padding: 18px; border-radius: 16px;
+            background: var(--text-main); color: var(--surface);
+            border: none; font-weight: 700; text-transform: uppercase;
+            margin-top: 15px; transition: var(--transition);
+        }
+        .btn-confirm:hover { background: var(--primary); transform: scale(1.02); }
+
+        .btn-wa {
+            background: #25D366; color: white; border-radius: 16px;
+            padding: 15px; display: flex; align-items: center; justify-content: center;
+            gap: 10px; text-decoration: none; font-weight: 700; transition: var(--transition);
+        }
+
+        /* --- NAVBAR --- */
+        .top-nav {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 15px 30px; display: flex; align-items: center;
+        }
+        .back-btn {
+            color: var(--text-main); text-decoration: none; font-weight: 700;
+            display: flex; align-items: center; gap: 10px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </div>
+
+    <nav class="top-nav">
+        <a href="/vendedor/vendas" class="back-btn">
+            <i class="fas fa-chevron-left"></i> PAINEL DE VENDAS
+        </a>
+    </nav>
+
+    <div class="hero-wrap">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active" data-bs-interval="4000">
+                    <a href="https://kuanda.onrender.com/filme/14" target="_blank">
+                        <img src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767361160596-862867324.webp" class="hero-img w-100" alt="Banner 1">
+                    </a>
+                </div>
+                <div class="carousel-item" data-bs-interval="4000">
+                    <a href="https://kuanda.onrender.com/game/12" target="_blank">
+                        <img src="https://i.ytimg.com/vi/J-EHvQ7HgUM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBw-3r8GaFvFTtsTsq3n85_K2d8rQ" class="hero-img w-100" alt="Banner 2">
+                    </a>
+                </div>
+                <div class="carousel-item" data-bs-interval="4000">
+                    <a href="https://kuanda.onrender.com/produto/7" target="_blank">
+                        <img src="/images/site.jpg" class="hero-img w-100" alt="Banner 3">
+                    </a>
+                </div>
+                <div class="carousel-item" data-bs-interval="4000">
+                    <a href="https://kuanda.onrender.com/filme/2" target="_blank">
+                        <img src="https://kuanda.onrender.com/uploads/filmes/imagem-7-1767379440078-175525311.jpeg" class="hero-img w-100" alt="Banner 4">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="master-grid">
+        
+        <header class="order-meta-header">
+            <div>
+                <span class="raleway fw-800 text-danger text-uppercase" style="letter-spacing: 2px; font-size: 0.75rem;">Detalhes do Pedido</span>
+                <h1 class="display-5 raleway m-0">Pedido #<%= pedido.codigo || pedido.id %></h1>
+                <p class="text-muted fw-500 m-0"><i class="far fa-calendar-alt me-2"></i>Registado em <%= new Date(pedido.created_at).toLocaleString('pt-AO') %></p>
+            </div>
+            <div class="text-lg-end">
+                <div class="text-muted small fw-bold raleway text-uppercase">Total da Fatura</div>
+                <div class="h2 fw-900 text-primary m-0"><%= parseFloat(pedido.total).toLocaleString('pt-AO') %> Kz</div>
+            </div>
+        </header>
+
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <h4 class="raleway mb-4">Itens do Pedido</h4>
+                
+                <div class="items-list">
+                    <% itens.forEach(item => { %>
+                        <div class="item-stamp">
+                            <img src="/uploads/produtos/<%= item.imagem1 %>" class="item-img" onerror="this.src='https://placehold.co/100x100/f0f0f0/999?text=IMG'">
+                            <div class="flex-grow-1">
+                                <h6 class="fw-700 m-0"><%= item.produto_nome %></h6>
+                                <div class="text-muted small">Preço: <%= parseFloat(item.preco_unitario).toLocaleString() %> Kz</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-bold mb-1">QTD: <%= item.quantidade %></div>
+                                <div class="fw-800"><%= (item.preco_unitario * item.quantidade).toLocaleString() %> Kz</div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <div class="row g-4 mt-2">
+                    <div class="col-md-6">
+                        <div class="glass-card h-100">
+                            <h6 class="raleway fw-800 text-danger mb-3">DESTINO</h6>
+                            <p class="text-muted fw-600 m-0"><%= pedido.endereco_entrega %></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card h-100">
+                            <h6 class="raleway fw-800 text-danger mb-3">PAGAMENTO</h6>
+                            <p class="text-muted fw-600 m-0"><%= pedido.metodo_pagamento %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 20px;">
+                    
+                    <div class="glass-card">
+                        <h5 class="raleway mb-4">Status do Fluxo</h5>
+                        <form action="/vendedor/pedido/<%= pedido.id %>/status" method="POST">
+                            <input type="hidden" name="status" id="stField" value="<%= pedido.status %>">
+                            <div class="status-list">
+                                <% const sts = [
+                                    {id: 'pendente', label: 'Pendente', icon: 'fa-clock'},
+                                    {id: 'confirmado', label: 'Confirmado', icon: 'fa-check-circle'},
+                                    {id: 'enviado', label: 'Em Trânsito', icon: 'fa-truck'},
+                                    {id: 'entregue', label: 'Entregue', icon: 'fa-box-open'},
+                                    {id: 'cancelado', label: 'Cancelado', icon: 'fa-ban'}
+                                ] %>
+                                <% sts.forEach(s => { %>
+                                    <div class="status-pill <%= pedido.status === s.id ? 'active' : '' %>" onclick="updateSt('<%= s.id %>', this)">
+                                        <span><i class="fas <%= s.icon %> me-2"></i> <%= s.label %></span>
+                                        <% if(pedido.status === s.id) { %> <i class="fas fa-check"></i> <% } %>
+                                    </div>
+                                <% }) %>
+                            </div>
+                            <button type="submit" class="btn-confirm">Salvar Alterações</button>
+                        </form>
+                    </div>
+
+                    <div class="glass-card">
+                        <h5 class="raleway mb-4">Cliente</h5>
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                <%= pedido.cliente_nome.charAt(0) %>
+                            </div>
+                            <div>
+                                <h6 class="fw-800 m-0"><%= pedido.cliente_nome %></h6>
+                                <div class="small text-muted"><%= pedido.cliente_email %></div>
+                            </div>
+                        </div>
+                        <% if (pedido.cliente_telefone) { %>
+                            <a href="https://wa.me/<%= pedido.cliente_telefone.replace(/\D/g, '') %>" target="_blank" class="btn-wa">
+                                <i class="fab fa-whatsapp"></i> WHATSAPP
+                            </a>
+                        <% } %>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateSt(v, el) {
+            document.getElementById('stField').value = v;
+            document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            const i = document.getElementById('theme-icon');
+            const isL = b.getAttribute('data-theme') === 'light';
+            b.setAttribute('data-theme', isL ? 'dark' : 'light');
+            i.classList.replace(isL ? 'fa-moon' : 'fa-sun', isL ? 'fa-sun' : 'fa-moon');
+            localStorage.setItem('k-theme', isL ? 'dark' : 'light');
+        }
+
+        window.onload = () => {
+            const t = localStorage.getItem('k-theme');
+            if(t === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+    </script>
+    <script src="/js/chat-monitor.js"></script>
+</body>
+</html>

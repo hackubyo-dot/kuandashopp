@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Cinema Kuanda' %></title>
+    
+    <!-- Dependências visuais -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           KUANDA CINEMA - DARK THEME
+           ========================================= */
+        :root {
+            --kc-bg: #0a0a0a;
+            --kc-card: #141414;
+            --kc-red: #E31C25;
+            --kc-gray: #b3b3b3;
+            --kc-white: #ffffff;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background-color: var(--kc-bg);
+            color: var(--kc-white);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* HERO SECTION (DESTAQUE) */
+        .cinema-hero {
+            position: relative;
+            height: 70vh;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .hero-backdrop {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(10,10,10,0)); /* Fade top */
+            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent); /* Compatibilidade */
+        }
+        
+        /* Gradiente Overlay para leitura */
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, var(--kc-bg) 10%, transparent 80%),
+                        linear-gradient(to right, rgba(0,0,0,0.8) 0%, transparent 60%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 5% 60px;
+            max-width: 800px;
+            animation: fadeUp 1s ease-out;
+        }
+
+        .hero-badge {
+            background: var(--kc-red);
+            color: white;
+            padding: 5px 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .hero-desc {
+            color: var(--kc-gray);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-cinema {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .btn-primary-cine {
+            background: var(--kc-white);
+            color: black;
+        }
+        .btn-primary-cine:hover {
+            background: var(--kc-gray);
+            transform: scale(1.05);
+        }
+
+        .btn-outline-cine {
+            background: rgba(100,100,100,0.3);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-outline-cine:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+
+        /* CATALOGO GRID */
+        .catalog-container {
+            padding: 20px 5%;
+            margin-top: -40px; /* Sobrepor levemente o hero */
+            position: relative;
+            z-index: 3;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            border-left: 4px solid var(--kc-red);
+            padding-left: 15px;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px 20px;
+        }
+
+        /* MOVIE CARD */
+        .cinema-card {
+            position: relative;
+            aspect-ratio: 2/3;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--kc-card);
+            transition: var(--transition);
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .cinema-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(227, 28, 37, 0.15); /* Glow vermelho suave */
+            z-index: 10;
+        }
+
+        .card-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .cinema-card:hover .card-poster {
+            opacity: 0.3; /* Escurece imagem para mostrar info */
+        }
+
+        /* Info oculta que aparece no hover */
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .cinema-card:hover .card-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .card-meta {
+            font-size: 0.75rem;
+            color: var(--kc-red);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-card-play {
+            background: var(--kc-red);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: auto; /* Empurra para o topo */
+            align-self: center;
+            transform: scale(0);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cinema-card:hover .btn-card-play {
+            transform: scale(1);
+        }
+
+        /* Labels e Badges no Card */
+        .premium-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 193, 7, 0.9);
+            color: black;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            z-index: 5;
+        }
+
+        .type-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            font-size: 0.65rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            color: white;
+            z-index: 5;
+        }
+
+        /* Mensagem Vazia */
+        .empty-state {
+            text-align: center;
+            padding: 100px 0;
+            color: #555;
+            grid-column: 1 / -1;
+        }
+
+        /* Animações */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-desc { display: none; } /* Ocultar descrição no mobile p/ limpar */
+            .cinema-hero { height: 55vh; }
+            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+            .card-overlay { opacity: 1; background: linear-gradient(to top, black 40%, transparent); transform: translateY(0); padding: 10px; justify-content: flex-end; }
+            .card-poster { opacity: 1 !important; }
+            .btn-card-play { display: none; } /* Remove botão play do hover no mobile */
+            .card-title { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION (Se houver destaque) -->
+    <% if (typeof destaque !== 'undefined' && destaque) { %>
+    <section class="cinema-hero">
+        <!-- Background Imagem -->
+        <img src="<%= destaque.banner ? '/uploads/filmes/' + destaque.banner : '/uploads/filmes/' + destaque.poster %>" class="hero-backdrop" onerror="this.style.display='none'">
+        
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <span class="hero-badge">Destaque da Semana</span>
+            <h1 class="hero-title"><%= destaque.titulo %></h1>
+            <p class="hero-desc"><%= destaque.sinopse || 'Uma produção incrível disponível agora no Kuanda Cinema.' %></p>
+            
+            <div class="hero-actions">
+                <a href="/filme/<%= destaque.id %>" class="btn-cinema btn-primary-cine">
+                    <i class="fas fa-play"></i> Assistir Agora
+                </a>
+                <a href="#catalogo" class="btn-cinema btn-outline-cine">
+                    <i class="fas fa-plus"></i> Ver Lista
+                </a>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- CATALOGO -->
+    <div class="catalog-container" id="catalogo">
+        
+        <div class="section-header">
+            <div class="section-title">Em Cartaz</div>
+            <!-- Filtros simples (Visual por enquanto) -->
+            <div style="color: #666; font-size: 0.9rem;">
+                <i class="fas fa-sort-amount-down me-2"></i>Recentes
+            </div>
+        </div>
+
+        <div class="movie-grid">
+            
+            <% if (filmes && filmes.length > 0) { %>
+                <% filmes.forEach(filme => { %>
+                    <a href="/filme/<%= filme.id %>" style="text-decoration: none; color: inherit;">
+                        <div class="cinema-card">
+                            <!-- Badges -->
+                            <% if(parseFloat(filme.preco) > 0) { %>
+                                <span class="premium-badge"><i class="fas fa-crown me-1"></i>Pago</span>
+                            <% } %>
+                            <span class="type-badge"><%= filme.tipo === 'serie' ? 'Série' : 'Filme' %></span>
+
+                            <!-- Poster -->
+                            <img src="/uploads/filmes/<%= filme.poster %>" class="card-poster" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=Sem+Capa'">
+
+                            <!-- Overlay Hover -->
+                            <div class="card-overlay">
+                                <div class="btn-card-play">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                
+                                <div class="card-meta">
+                                    <span><%= new Date(filme.data_lancamento).getFullYear() %></span>
+                                    <span>•</span>
+                                    <span style="border: 1px solid white; padding: 0 4px; font-size: 0.6rem;"><%= filme.classificacao %></span>
+                                </div>
+                                <div class="card-title"><%= filme.titulo %></div>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fas fa-film fa-3x mb-3"></i>
+                    <h3>Nenhum título encontrado</h3>
+                    <p>Nosso catálogo está sendo atualizado. Volte em breve!</p>
+                </div>
+            <% } %>
+
+        </div>
+        
+    </div>
+
+</body>
+</html>

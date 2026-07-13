@@ -1,0 +1,503 @@
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* =========================================
+    KUANDA GAME STUDIO - PREMIUM THEME (ULTRA RESPONSIVE)
+    ========================================= */
+    :root { 
+        --kg-bg: #09090b; 
+        --kg-panel: #131316; 
+        --kg-accent: #E31C25; 
+        --kg-neon: #00f2ea; 
+        --kg-text: #e4e4e7;
+        --kg-text-muted: #a1a1aa;
+        --kg-card-glow: rgba(227, 28, 37, 0.15);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        --header-height-mobile: 60px; /* Ajuste conforme seu menu principal */
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    
+    body { 
+        background: var(--kg-bg); 
+        color: var(--kg-text); 
+        font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+        margin: 0; 
+        overflow-x: hidden;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding-bottom: 0; /* Controlado via padding do container */
+    }
+
+    /* BACKDROP CINEMÁTICO */
+    .backdrop {
+        position: absolute; width: 100%; height: 75vh; z-index: -1; top: 0; left: 0;
+        mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+        pointer-events: none;
+    }
+    .backdrop img { width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: blur(25px) saturate(120%); }
+
+    /* LAYOUT PRINCIPAL */
+    .container-main { 
+        max-width: 1280px; 
+        margin: 0 auto; 
+        padding: 120px 25px 100px; 
+        display: grid; 
+        grid-template-columns: 1.8fr 1fr; 
+        gap: 50px;
+        flex: 1;
+        position: relative;
+        width: 100%;
+    }
+
+    /* MEDIA BOX (Video/Capa) */
+    .media-box { 
+        background: #000; aspect-ratio: 16/9; border-radius: 16px; 
+        overflow: hidden; border: 1px solid rgba(255,255,255,0.08); 
+        margin-bottom: 20px; position: relative;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        animation: fadeIn 0.8s ease-out;
+    }
+    .media-box iframe, .media-box img { width: 100%; height: 100%; object-fit: cover; border: none; display: block; }
+    
+    /* GALERIA THUMBS */
+    .thumbs { 
+        display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px; 
+        scrollbar-width: none; 
+        mask-image: linear-gradient(to right, black 90%, transparent 100%); 
+        -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%); 
+    }
+    .thumbs::-webkit-scrollbar { display: none; }
+    .thumb { 
+        flex: 0 0 90px; height: 55px; border-radius: 8px; cursor: pointer; 
+        opacity: 0.6; transition: var(--transition); object-fit: cover; 
+        border: 2px solid transparent; filter: grayscale(30%); background: #111;
+    }
+    .thumb:hover, .thumb:active { opacity: 1; border-color: var(--kg-neon); filter: grayscale(0); transform: translateY(-2px); }
+
+    /* TIPOGRAFIA & ELEMENTOS */
+    h1, h2, h3, h4 { font-weight: 800; letter-spacing: -0.5px; margin: 0; color: #fff; }
+    
+    .section-title { 
+        font-size: 1.1rem; color: #fff; margin-bottom: 15px; margin-top: 30px;
+        display: flex; align-items: center; gap: 10px; opacity: 0.95; 
+        font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .section-title::after { content: ''; flex-grow: 1; height: 1px; background: linear-gradient(to right, rgba(227,28,37,0.4), transparent); }
+    
+    .game-desc { font-size: 1rem; color: var(--kg-text-muted); white-space: pre-line; margin-bottom: 20px; line-height: 1.7; }
+
+    /* DOWNLOAD CARDS */
+    .dl-section { animation: fadeInUp 0.8s ease-out; }
+    .dl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    
+    .dl-card {
+        background: linear-gradient(145deg, #1c1c21 0%, #131316 100%);
+        padding: 14px 18px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: space-between;
+        transition: var(--transition); border: 1px solid rgba(255,255,255,0.06);
+        text-decoration: none; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .dl-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--kg-accent); opacity: 0.7; }
+    .dl-card:hover { transform: translateY(-2px); background: #222; border-color: rgba(227, 28, 37, 0.4); }
+    
+    .dl-info .dl-label { font-weight: 700; font-size: 0.9rem; color: #fff; display: block; margin-bottom: 2px; }
+    .dl-info .dl-sub { font-size: 0.65rem; font-weight: 700; color: var(--kg-accent); text-transform: uppercase; letter-spacing: 0.5px; }
+    .dl-icon { width: 32px; height: 32px; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.9rem; }
+
+    /* STATUS BOXES */
+    .status-box {
+        padding: 35px; border-radius: 16px; text-align: center;
+        background: rgba(19, 19, 22, 0.6); border: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(10px); margin-top: 20px;
+    }
+    .status-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        margin-top: 15px; padding: 12px 25px; border-radius: 50px;
+        font-weight: 800; text-transform: uppercase; font-size: 0.9rem;
+        border: none; cursor: pointer; transition: 0.3s; width: auto;
+    }
+
+    /* REQUISITOS */
+    .req-card {
+        background: #101012; padding: 20px; border-radius: 14px; margin-top: 30px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .req-item { 
+        background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;
+        display: flex; gap: 12px; align-items: flex-start; border-left: 2px solid var(--kg-panel);
+    }
+    .req-item i { color: var(--kg-neon); font-size: 1rem; margin-top: 3px; }
+    .req-item strong { color: #ccc; font-size: 0.85rem; line-height: 1.5; }
+
+    /* SIDEBAR (Desktop) */
+    .sidebar { position: sticky; top: 100px; animation: fadeInRight 0.8s ease-out; height: fit-content; }
+    .cover-box { position: relative; margin-bottom: 20px; perspective: 1000px; }
+    .cover { 
+        width: 100%; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); 
+        border: 1px solid rgba(255,255,255,0.1); aspect-ratio: 2/3; object-fit: cover;
+        transition: transform 0.3s;
+    }
+    .cover:hover { transform: rotateY(2deg) scale(1.02); }
+    
+    .floating-badges { position: absolute; bottom: 10px; left: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
+    .badge-game { 
+        background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); color: #fff; 
+        padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; 
+        border: 1px solid rgba(255,255,255,0.15); text-transform: uppercase;
+    }
+
+    .price-container { margin: 15px 0 25px; }
+    .price-label { font-size: 0.7rem; color: #777; text-transform: uppercase; font-weight: 700; display: block; }
+    .price-value { font-size: 2.2rem; font-weight: 900; color: #fff; letter-spacing: -1px; }
+    .price-free { color: var(--kg-neon); }
+
+    /* BOTÕES GERAIS */
+    .btn-action {
+        width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; 
+        text-transform: uppercase; border: none; cursor: pointer; font-size: 0.95rem;
+        transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-buy { background: var(--kg-accent); color: white; box-shadow: 0 8px 25px rgba(227, 28, 37, 0.25); }
+    .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(227, 28, 37, 0.4); background: #f01e28; }
+    .btn-free { background: var(--kg-neon); color: #000; box-shadow: 0 8px 25px rgba(0, 242, 234, 0.2); }
+    .btn-free:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0, 242, 234, 0.4); background: #33fffa; }
+    .btn-pending { background: #27272a; color: #71717a; cursor: not-allowed; }
+
+    /* MOBILE STICKY BAR */
+    .mobile-sticky-bar {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: rgba(13, 13, 15, 0.95);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+        z-index: 1000;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        display: none;
+        align-items: center; justify-content: space-between;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+        animation: slideUp 0.4s ease-out;
+    }
+    .mobile-price-group { display: flex; flex-direction: column; justify-content: center; }
+    .mpg-label { font-size: 0.65rem; color: #888; text-transform: uppercase; font-weight: 700; line-height: 1; margin-bottom: 2px; }
+    .mpg-value { font-size: 1.2rem; font-weight: 900; color: white; line-height: 1; }
+    
+    .btn-mobile-buy {
+        border: none; padding: 10px 24px; border-radius: 50px; font-weight: 800;
+        font-size: 0.85rem; letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer;
+        display: flex; align-items: center; gap: 6px;
+    }
+
+    /* HEADER MOBILE INFO (Miniaturizado) */
+    .mobile-header-info { display: none; margin-bottom: 20px; animation: fadeIn 0.8s; }
+    .mhi-flex { display: flex; gap: 12px; align-items: flex-end; }
+    .mhi-cover { 
+        width: 85px; aspect-ratio: 2/3; border-radius: 8px; object-fit: cover; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); 
+        flex-shrink: 0;
+    }
+    .mhi-details { flex: 1; padding-bottom: 2px; }
+    .mhi-title { font-size: 1.3rem; line-height: 1.1; margin-bottom: 6px; text-transform: uppercase; }
+    .mhi-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.7rem; color: #bbb; }
+    .mhi-tag { 
+        background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px; 
+        display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .mhi-tag i { color: var(--kg-neon); font-size: 0.65rem; }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    /* =========================================
+    RESPONSIVIDADE OTIMIZADA (Mobile First Logic)
+    ========================================= */
+    @media(max-width: 950px) { 
+        .container-main { 
+            grid-template-columns: 1fr; 
+            padding: 80px 20px 140px; /* Topo menor, Fundo maior para sticky bar */
+            gap: 25px;
+            max-width: 100%;
+        } 
+        
+        .sidebar { display: none; }
+        .d-none-mobile { display: none !important; }
+        
+        /* Ajustes Miniaturizados */
+        .mobile-header-info { display: block; }
+        .mobile-sticky-bar { display: flex; }
+        
+        .media-box { border-radius: 12px; margin-bottom: 15px; }
+        .thumb { flex: 0 0 70px; height: 45px; border-radius: 6px; }
+        
+        .section-title { font-size: 0.95rem; margin-top: 25px; margin-bottom: 12px; }
+        .game-desc { font-size: 0.9rem; line-height: 1.5; color: #999; }
+        
+        /* Grid de download compacto no mobile */
+        .dl-grid { grid-template-columns: 1fr; gap: 10px; }
+        .dl-card { padding: 12px 15px; }
+        .dl-icon { width: 28px; height: 28px; font-size: 0.8rem; }
+        
+        .status-box { padding: 25px 20px; }
+        .status-box i.fa-3x { font-size: 2.5rem; }
+        .status-box h3 { font-size: 1.2rem; margin: 10px 0; }
+        
+        .req-card { padding: 15px; }
+        .req-item { padding: 10px; font-size: 0.8rem; }
+    }
+
+    /* Pequenos ajustes para telas muito pequenas */
+    @media(max-width: 380px) {
+        .mhi-cover { width: 70px; }
+        .mhi-title { font-size: 1.1rem; }
+        .container-main { padding-left: 15px; padding-right: 15px; }
+    }
+
+    @media(min-width: 951px) {
+        .mobile-header-info { display: none !important; }
+        .mobile-sticky-bar { display: none !important; }
+    }
+</style>
+
+<!-- BACKDROP DINÂMICO -->
+<div class="backdrop">
+    <img src="<%= jogo.banner ? '/uploads/games/' + jogo.banner : '/uploads/games/' + jogo.capa %>" alt="Backdrop">
+</div>
+
+<div class="container-main">
+    
+    <!-- HEADER EXCLUSIVO MOBILE (Miniaturizado e Proporcional) -->
+    <div class="mobile-header-info">
+        <div class="mhi-flex">
+            <img src="/uploads/games/<%= jogo.capa %>" class="mhi-cover" alt="Cover">
+            <div class="mhi-details">
+                <h1 class="mhi-title"><%= jogo.titulo %></h1>
+                <div class="mhi-meta">
+                    <span class="mhi-tag"><i class="fas fa-gamepad"></i> <%= jogo.plataforma %></span>
+                    <span class="mhi-tag"><i class="fas fa-calendar-alt"></i> <%= new Date(jogo.created_at).getFullYear() %></span>
+                    <span class="mhi-tag" style="border-color: rgba(0, 242, 234, 0.2); color: var(--kg-neon);"><i class="fas fa-check-circle"></i> Verificado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+        <!-- Título Desktop (Escondido no Mobile para não duplicar) -->
+        <h1 class="d-none-mobile" style="margin-bottom: 25px; font-size: 2.8rem; text-shadow: 0 10px 30px rgba(0,0,0,0.5);"><%= jogo.titulo %></h1>
+        
+        <!-- PLAYER DE VÍDEO -->
+        <div class="media-box" id="mainDisplay">
+            <% 
+                let videoId = null;
+                if (jogo.trailer_url) {
+                    if (jogo.trailer_url.includes('v=')) {
+                        videoId = jogo.trailer_url.split('v=')[1].split('&')[0];
+                    } else if (jogo.trailer_url.includes('youtu.be/')) {
+                        videoId = jogo.trailer_url.split('youtu.be/')[1].split('?')[0];
+                    }
+                }
+            %>
+            <% if (videoId) { %>
+                <iframe src="https://www.youtube.com/embed/<%= videoId %>?rel=0&showinfo=0&autoplay=0" allowfullscreen loading="lazy"></iframe>
+            <% } else { %>
+                <img src="/uploads/games/<%= jogo.capa %>" alt="Capa Principal">
+            <% } %>
+        </div>
+
+        <!-- GALERIA DE SCREENSHOTS (Scroll Horizontal Limpo) -->
+        <% if (jogo.screenshots && jogo.screenshots.length > 0) { %>
+            <div class="thumbs">
+                <% if (videoId) { %>
+                    <div class="thumb" onclick="location.reload()" style="display:flex; align-items:center; justify-content:center; color: #fff;">
+                        <i class="fas fa-play"></i>
+                    </div>
+                <% } %>
+                <% jogo.screenshots.forEach(src => { %>
+                    <img src="/uploads/games/<%= src %>" class="thumb" onclick="verImagem('/uploads/games/<%= src %>')" alt="Screenshot">
+                <% }) %>
+            </div>
+        <% } %>
+
+        <!-- DESCRIÇÃO -->
+        <div style="animation: fadeInUp 0.6s ease-out;">
+            <div class="section-title">
+                <i class="fa-solid fa-circle-info text-danger"></i> Sobre o Jogo
+            </div>
+            <p class="game-desc">
+                <%= jogo.descricao || 'Nenhuma descrição detalhada disponível para este título.' %>
+            </p>
+        </div>
+
+        <!-- ÁREA DE DOWNLOADS COM LÓGICA DE ACESSO -->
+        <div class="dl-section" id="downloads">
+            <div class="section-title">
+                <i class="fa-solid fa-cloud-arrow-down text-danger"></i> 
+                <%= temAcesso ? 'Arquivos de Instalação' : 'Área de Download' %>
+            </div>
+
+            <% if (temAcesso) { %>
+                <!-- ================= CASO 1: TEM ACESSO (LINKS LIBERADOS) ================= -->
+                <div class="dl-grid">
+                    <% if (links && links.length > 0) { %>
+                        <% links.forEach(link => { %>
+                            <a href="<%= link.url %>" target="_blank" class="dl-card">
+                                <div class="dl-info">
+                                    <span class="dl-sub">Link Seguro</span>
+                                    <span class="dl-label"><%= link.label %></span>
+                                </div>
+                                <div class="dl-icon"><i class="fas fa-download"></i></div>
+                            </a>
+                        <% }) %>
+                    <% } else if (jogo.link_download) { %>
+                         <!-- Suporte a link legado único -->
+                        <a href="<%= jogo.link_download %>" target="_blank" class="dl-card">
+                            <div class="dl-info">
+                                <span class="dl-sub">Servidor Principal</span>
+                                <span class="dl-label">Download Direto</span>
+                            </div>
+                            <div class="dl-icon"><i class="fas fa-download"></i></div>
+                        </a>
+                    <% } else { %>
+                        <div class="text-muted p-3" style="font-size: 0.9rem;">Nenhum link disponível no momento.</div>
+                    <% } %>
+                </div>
+
+            <% } else if (pedidoPendente) { %>
+                <!-- ================= CASO 2: PEDIDO EM ANÁLISE ================= -->
+                <div class="status-box" style="border-color: #ffc107;">
+                    <i class="fas fa-clock fa-3x text-warning"></i>
+                    <h3 class="text-white">Pagamento em Análise</h3>
+                    <p class="text-muted small" style="margin-bottom: 20px;">Seu pedido está sendo verificado. Assim que aprovado, os links aparecerão aqui automaticamente.</p>
+                    <a href="https://wa.me/244923456789" target="_blank" class="status-btn" style="background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid #ffc107; text-decoration: none;">
+                        <i class="fab fa-whatsapp"></i> Enviar Comprovante
+                    </a>
+                </div>
+
+            <% } else { %>
+                <!-- ================= CASO 3: BLOQUEADO (PRECISA COMPRAR) ================= -->
+                <div class="status-box" style="border-color: var(--kg-accent);">
+                    <i class="fas fa-lock fa-3x" style="color: var(--kg-accent);"></i>
+                    <h3 class="text-white">Conteúdo Premium</h3>
+                    <p class="text-muted small mb-4">Este jogo é exclusivo. Adquira agora para liberar acesso vitalício e downloads em alta velocidade.</p>
+                    
+                    <h2 class="fw-bold text-white mb-4">
+                        <%= parseFloat(jogo.preco).toLocaleString('pt-AO', {style: 'currency', currency: 'AOA'}) %>
+                    </h2>
+
+                    <form action="/game/<%= jogo.id %>/comprar" method="POST">
+                        <button type="submit" class="btn-buy status-btn" style="width: auto; padding: 14px 40px; box-shadow: 0 10px 30px rgba(227,28,37,0.4);">
+                            <i class="fas fa-shopping-cart"></i> COMPRAR AGORA
+                        </button>
+                    </form>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- REQUISITOS (Compacto) -->
+        <div class="req-card">
+            <div class="section-title" style="margin-top: 0;">
+                <i class="fa-solid fa-microchip text-danger"></i> Requisitos
+            </div>
+            <div class="req-item">
+                <i class="fa-solid fa-gears"></i>
+                <div>
+                    <strong><%= jogo.requisitos || 'Informações técnicas não disponibilizadas.' %></strong>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SIDEBAR DESKTOP (Fixa e Completa) -->
+    <aside class="sidebar">
+        <div class="cover-box">
+            <img src="/uploads/games/<%= jogo.capa %>" class="cover" alt="Box Art">
+            <div class="floating-badges">
+                <span class="badge-game"><%= jogo.plataforma %></span>
+                <span class="badge-game"><%= jogo.genero %></span>
+            </div>
+        </div>
+        
+        <div class="price-container">
+            <span class="price-label">Valor Final</span>
+            <% if (parseFloat(jogo.preco) > 0) { %>
+                <div class="price-value"><%= parseFloat(jogo.preco).toLocaleString('pt-AO') %> <small style="font-size: 1rem; color: #888;">Kz</small></div>
+            <% } else { %>
+                <div class="price-value price-free">GRÁTIS</div>
+            <% } %>
+        </div>
+
+        <% if (!temAcesso && !pedidoPendente && parseFloat(jogo.preco) > 0) { %>
+            <!-- Botão Comprar Desktop -->
+            <form action="/game/<%= jogo.id %>/comprar" method="POST">
+                <button type="submit" class="btn-action btn-buy w-100">
+                    <i class="fa-solid fa-cart-shopping"></i> COMPRAR AGORA
+                </button>
+            </form>
+        <% } else if (pedidoPendente) { %>
+            <!-- Botão Pendente Desktop -->
+            <button disabled class="btn-action btn-pending w-100">
+                <i class="fa-solid fa-clock"></i> AGUARDANDO
+            </button>
+        <% } else { %>
+            <!-- Botão Baixar Desktop -->
+            <button onclick="document.getElementById('downloads').scrollIntoView({behavior: 'smooth'})" class="btn-action btn-free w-100">
+                <i class="fa-solid fa-download"></i> BAIXAR AGORA
+            </button>
+        <% } %>
+    </aside>
+</div>
+
+<!-- BARRA FIXA MOBILE (Sticky Action Bar - Miniaturizada e Funcional) -->
+<div class="mobile-sticky-bar">
+    <div class="mobile-price-group">
+        <span class="mpg-label">Total</span>
+        <% if (parseFloat(jogo.preco) > 0) { %>
+            <span class="mpg-value"><%= parseFloat(jogo.preco).toLocaleString('pt-AO') %> <small style="font-size: 0.8rem">Kz</small></span>
+        <% } else { %>
+            <span class="mpg-value" style="color: var(--kg-neon);">GRÁTIS</span>
+        <% } %>
+    </div>
+    
+    <% if (!temAcesso && !pedidoPendente && parseFloat(jogo.preco) > 0) { %>
+        <!-- Mobile Comprar -->
+        <form action="/game/<%= jogo.id %>/comprar" method="POST" style="margin: 0;">
+            <button type="submit" class="btn-mobile-buy" style="background: var(--kg-accent); color: white;">
+                COMPRAR <i class="fas fa-chevron-right" style="font-size: 0.7em;"></i>
+            </button>
+        </form>
+    <% } else if (pedidoPendente) { %>
+        <!-- Mobile Pendente -->
+        <button class="btn-mobile-buy" style="background: #333; color: #aaa; cursor: default;" disabled>
+            PENDENTE <i class="fas fa-clock" style="font-size: 0.7em;"></i>
+        </button>
+    <% } else { %>
+        <!-- Mobile Baixar -->
+        <button onclick="document.getElementById('downloads').scrollIntoView({behavior: 'smooth'})" class="btn-mobile-buy" style="background: var(--kg-neon); color: black;">
+            BAIXAR <i class="fas fa-arrow-down" style="font-size: 0.7em;"></i>
+        </button>
+    <% } %>
+</div>
+
+<script>
+    // Função simples para troca de imagem na galeria sem recarregar
+    function verImagem(src) {
+        const main = document.getElementById('mainDisplay');
+        // Efeito visual de troca
+        main.style.transition = 'opacity 0.2s';
+        main.style.opacity = '0.4';
+        
+        setTimeout(() => {
+            main.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover; animation: fadeIn 0.4s;">`;
+            main.style.opacity = '1';
+        }, 200);
+    }
+</script>
+<script src="/js/chat-monitor.js"></script>
