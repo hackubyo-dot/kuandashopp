@@ -671,15 +671,13 @@ app.get('/auth/status', (req, res) => {
         sessionUser: req.session.user || null,
         googleConfigured: !!googleClientID && !!googleClientSecret,
         environment: process.env.NODE_ENV || 'development',
-        callbackURL: process.env.NODE_ENV === 'production' 
-            ? 'https://kuandashopp.onrender.com/auth/google/callback'
-            : 'http://localhost:3000/auth/google/callback'
+        // URL FIXA - SEMPRE A MESMA!
+        callbackURL: 'https://kuandashopp.onrender.com/auth/google/callback'
     });
 });
 
 console.log('✅ Google Passport configurado com sucesso!');
-console.log('📌 Callback URL PRODUÇÃO: https://kuandashopp.onrender.com/auth/google/callback');
-console.log('📌 Callback URL DESENVOLVIMENTO: http://localhost:3000/auth/google/callback');
+console.log('📌 Callback URL FIXA: https://kuandashopp.onrender.com/auth/google/callback');
 
 
 // ==================== CONFIGURAÇÃO DE DIRETÓRIOS ====================
