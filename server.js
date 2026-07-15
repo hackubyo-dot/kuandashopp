@@ -351,6 +351,13 @@ if (passport._strategies && passport._strategies.google) {
     passport.unuse('google');
 }
 
+// ============================================================
+// URLS DE CALLBACK CORRETAS PARA CADA AMBIENTE
+// ============================================================
+// PRODUÇÃO: https://kuandashopp.onrender.com/auth/google/callback
+// DESENVOLVIMENTO: http://localhost:3000/auth/google/callback
+// ============================================================
+
 // Configuração do Google Strategy
 passport.use(new GoogleStrategy(
 {
@@ -358,9 +365,9 @@ passport.use(new GoogleStrategy(
     clientID: googleClientID,
     clientSecret: googleClientSecret,
     
-    // URLs de callback - dinâmicas baseadas no ambiente
+    // URLs de callback CORRETAS
     callbackURL: process.env.NODE_ENV === 'production' 
-        ? 'https://kuanda.onrender.com/auth/google/callback'
+        ? 'https://kuandashopp.onrender.com/auth/google/callback'
         : 'http://localhost:3000/auth/google/callback',
     
     // Proxy para funcionar em produção (Render/Heroku)
@@ -593,6 +600,7 @@ const requireAdmin = (req, res, next) => {
 app.get('/auth/google',
     (req, res, next) => {
         console.log('🚀 Iniciando autenticação Google...');
+        console.log('🌐 URL base:', process.env.NODE_ENV === 'production' ? 'https://kuandashopp.onrender.com' : 'http://localhost:3000');
         // Salva a URL de destino para redirecionar depois
         if (req.query.returnTo) {
             req.session.returnTo = req.query.returnTo;
@@ -609,6 +617,7 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
     (req, res, next) => {
         console.log('🔄 Google callback recebido');
+        console.log('🔗 URL completa:', req.protocol + '://' + req.get('host') + req.originalUrl);
         next();
     },
     passport.authenticate('google', { 
@@ -618,6 +627,7 @@ app.get('/auth/google/callback',
     (req, res) => {
         // Sucesso na autenticação
         console.log('✅ Autenticação Google bem-sucedida!');
+        console.log('👤 Usuário:', req.user.email);
         
         // Salvar usuário na sessão personalizada
         req.session.user = req.user;
@@ -659,11 +669,17 @@ app.get('/auth/status', (req, res) => {
         authenticated: isAuthenticated,
         user: req.user || null,
         sessionUser: req.session.user || null,
-        googleConfigured: !!googleClientID && !!googleClientSecret
+        googleConfigured: !!googleClientID && !!googleClientSecret,
+        environment: process.env.NODE_ENV || 'development',
+        callbackURL: process.env.NODE_ENV === 'production' 
+            ? 'https://kuandashopp.onrender.com/auth/google/callback'
+            : 'http://localhost:3000/auth/google/callback'
     });
 });
 
 console.log('✅ Google Passport configurado com sucesso!');
+console.log('📌 Callback URL PRODUÇÃO: https://kuandashopp.onrender.com/auth/google/callback');
+console.log('📌 Callback URL DESENVOLVIMENTO: http://localhost:3000/auth/google/callback');
 
 
 // ==================== CONFIGURAÇÃO DE DIRETÓRIOS ====================
