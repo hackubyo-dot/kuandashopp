@@ -61,7 +61,7 @@ const salvarBackupImagem = async (filePath, fileName, tabelaOrigem = null, regis
         // Ler arquivo
         const imagemBuffer = fs.readFileSync(filePath);
         const stats = fs.statSync(filePath);
-        
+        a
         // Detectar tipo MIME
         const mimeType = getMimeType(filePath);
         
@@ -224,244 +224,200 @@ const limparBackupsAntigos = async (daysOld = 30) => {
     }
 };
 
-// ==================== CONFIGURAÇÃO DA BASE_URL (CORRIGIDA) ====================
-const BASE_URL = process.env.BASE_URL || 
-                (process.env.NODE_ENV === 'production' ? 
-                'https://kuandashopp.onrender.com' : 
-                `http://localhost:${PORT}`);
-
-// Sobrescreve o BASE_URL no ambiente
-process.env.BASE_URL = BASE_URL;
-
-console.log(`🌐 BASE_URL configurada: ${BASE_URL}`);
-
-// ==================== CONFIGURAÇÃO DE EMAIL (SENDGRID - OTIMIZADO) ====================
+// ==================== CONFIGURAÇÃO DE EMAIL (BLINDADA + CORREÇÃO FINAL) ====================
 
 // Carrega as credenciais do ambiente
-const emailUser = (process.env.EMAIL_USER || '').trim();
-const emailPass = (process.env.EMAIL_PASS || '').replace(/\s+/g, '').trim();
-const emailHost = process.env.EMAIL_HOST || 'smtp.sendgrid.net';
-const emailPort = parseInt(process.env.EMAIL_PORT) || 587;
-const emailSecure = process.env.EMAIL_SECURE === 'true';
+const emailUser = process.env.EMAIL_USER || '';
+const emailPassRaw = process.env.EMAIL_PASS || '';
+const emailPass = emailPassRaw.replace(/\s+/g, ''); // Remove espaços automaticamente
 
-console.log('📧 Configurando sistema de e-mail:');
-console.log(`   Host: ${emailHost}:${emailPort}`);
-console.log(`   Usuário: ${emailUser}`);
-console.log(`   Secure: ${emailSecure}`);
-
-// ============================================================
-// CRIAÇÃO DO TRANSPORTER
-// ============================================================
-let transporter = null;
-let emailEnviados = 0;
-let emailFalhas = 0;
-
-if (emailUser && emailPass) {
-    try {
-        transporter = nodemailer.createTransport({
-            host: emailHost,
-            port: emailPort,
-            secure: emailSecure,
-            auth: {
-                user: emailUser,
-                pass: emailPass
-            },
-            tls: {
-                rejectUnauthorized: false,
-                minVersion: 'TLSv1.2'
-            },
-            connectionTimeout: 15000,
-            greetingTimeout: 15000,
-            socketTimeout: 30000,
-            // Pool de conexões para melhor performance
-            pool: true,
-            maxConnections: 5,
-            maxMessages: 100
-        });
-
-        // Verificação da conexão (assíncrona)
-        setTimeout(async () => {
-            try {
-                await transporter.verify();
-                console.log('✅ Servidor de Email (SendGrid) conectado com sucesso!');
-                console.log(`📧 Remetente: KuandaShop <kuandashopp@gmail.com>`);
-                console.log('✅ Sistema de envio de e-mails OPERACIONAL');
-                console.log(`📊 Limite: 100 e-mails/dia (plano gratuito)`);
-            } catch (verifyError) {
-                console.error('❌ Falha na verificação SMTP:');
-                console.error(`   Mensagem: ${verifyError.message}`);
-                console.error(`   Código: ${verifyError.code || 'N/A'}`);
-                console.warn('⚠️ Verifique a chave API do SendGrid.');
-            }
-        }, 2000);
-
-    } catch (error) {
-        console.error('❌ Erro ao criar transporter:', error.message);
-        transporter = null;
-    }
-} else {
-    console.warn('⚠️ SMTP desativado: credenciais não configuradas.');
+// Verificação das variáveis de ambiente
+if (!emailUser) {
+    console.warn('⚠️ EMAIL_USER não foi configurado nas variáveis de ambiente.');
 }
 
-// ============================================================
-// FUNÇÃO DE ENVIO DE E-MAIL (COM RETRY AUTOMÁTICO)
-// ============================================================
-const enviarEmail = async (destinatario, assunto, html, tentativas = 3) => {
-    // Se não há transporter, ativa fallback
-    if (!transporter) {
-        console.warn(`⚠️ [FALLBACK] E-mail não enviado para ${destinatario}: SMTP não disponível.`);
-        console.log(`📧 Assunto: ${assunto}`);
-        return false;
-    }
+if (!emailPassRaw) {
+    console.warn('⚠️ EMAIL_PASS não foi configurado nas variáveis de ambiente.');
+}
 
-    let ultimoErro = null;
-    
-    for (let i = 0; i < tentativas; i++) {
-        try {
-            const info = await transporter.sendMail({
-                from: '"KuandaShop" <kuandashopp@gmail.com>',
-                to: destinatario,
-                subject: assunto,
-                html: html,
-                // Headers extras para melhor entrega
-                headers: {
-                    'X-Priority': '1',
-                    'X-MSMail-Priority': 'High',
-                    'Importance': 'high'
-                }
-            });
+const transporter = nodemailer.createTransport({
 
-            emailEnviados++;
-            console.log(`✅ E-mail enviado para ${destinatario} (tentativa ${i + 1})`);
-            console.log(`   Message-ID: ${info.messageId}`);
-            return true;
-        } catch (error) {
-            ultimoErro = error;
-            console.warn(`⚠️ Tentativa ${i + 1} falhou para ${destinatario}: ${error.message}`);
-            
-            // Se não for a última tentativa, espera antes de tentar novamente
-            if (i < tentativas - 1) {
-                const tempoEspera = 2000 * (i + 1); // 2s, 4s, 6s
-                console.log(`⏳ Aguardando ${tempoEspera/1000}s antes da próxima tentativa...`);
-                await new Promise(resolve => setTimeout(resolve, tempoEspera));
-            }
-        }
-    }
+    // Servidor SMTP do Gmail
+    host: 'smtp.gmail.com',
 
-    emailFalhas++;
-    console.error(`❌ Todas as ${tentativas} tentativas falharam para ${destinatario}`);
-    console.error(`   Último erro: ${ultimoErro ? ultimoErro.message : 'Desconhecido'}`);
-    console.warn(`⚠️ [FALLBACK ATIVADO] Conta será ativada mesmo sem e-mail.`);
-    return false;
-};
+    // Porta STARTTLS
+    port: 587,
 
-// ============================================================
-// FUNÇÃO PARA ESTATÍSTICAS DE E-MAIL
-// ============================================================
-const getEmailStats = () => ({
-    enviados: emailEnviados,
-    falhas: emailFalhas,
-    total: emailEnviados + emailFalhas,
-    taxaSucesso: emailEnviados + emailFalhas > 0 
-        ? `${((emailEnviados / (emailEnviados + emailFalhas)) * 100).toFixed(1)}%` 
-        : '0%'
+    // OBRIGATÓRIO para porta 587
+    secure: false,
+
+    auth: {
+        user: emailUser,
+        pass: emailPass
+    },
+
+    tls: {
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
+    },
+
+    // Timeouts
+    connectionTimeout: 15000, // Tempo para conectar ao servidor
+    greetingTimeout: 15000,   // Tempo para receber saudação do servidor
+    socketTimeout: 30000,     // Tempo máximo da conexão
+
+    // Logs
+    logger: false,
+    debug: false
+
 });
 
-// ============================================================
-// EXPORTA AS FUNÇÕES
-// ============================================================
-app.enviarEmail = enviarEmail;
-app.getEmailStats = getEmailStats;
+// ==================== TESTE DA CONEXÃO SMTP ====================
 
-// ==================== SISTEMA DE NOTIFICAÇÕES (SYS_NOTIFICATION) ====================
-/**
- * Sistema de notificações interno
- * @param {number} fromUserId - ID do remetente
- * @param {number} toUserId - ID do destinatário
- * @param {string} message - Mensagem da notificação
- * @param {string} type - Tipo: 'compra', 'status', 'sistema', 'venda'
- * @param {number} referenceId - ID do pedido ou assinatura (opcional)
- */
-const sysNotification = async (fromUserId, toUserId, message, type = 'sistema', referenceId = null) => {
-    try {
-        // Verifica se a tabela de notificações existe, se não, cria
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS notificacoes (
-                id SERIAL PRIMARY KEY,
-                de_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
-                para_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
-                mensagem TEXT NOT NULL,
-                tipo VARCHAR(50) DEFAULT 'sistema',
-                referencia_id INTEGER,
-                lida BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
+if (emailUser && emailPass) {
 
-        await db.query(`
-            INSERT INTO notificacoes (de_usuario_id, para_usuario_id, mensagem, tipo, referencia_id)
-            VALUES ($1, $2, $3, $4, $5)
-        `, [fromUserId, toUserId, message, type, referenceId]);
+    transporter.verify((error, success) => {
 
-        console.log(`📬 Notificação enviada: ${message.substring(0, 50)}...`);
-        return true;
-    } catch (error) {
-        console.error('❌ Erro ao enviar notificação:', error.message);
-        // Não falha a aplicação se a notificação falhar
-        return false;
-    }
-};
+        if (error) {
 
-// Adiciona a função ao app para ser usada em outras rotas
-app.sysNotification = sysNotification;
+            console.error('❌ Erro na conexão SMTP');
+            console.error('Mensagem:', error.message);
+            console.error('Código:', error.code || 'N/A');
+            console.error('Comando:', error.command || 'N/A');
 
-// ==================== CONFIGURAÇÃO DO PASSPORT (GOOGLE) - BLINDADA ====================
+        } else {
+
+            console.log('✅ Servidor de Email pronto para envios!');
+            console.log(`📧 Conta utilizada: ${emailUser}`);
+
+        }
+
+    });
+
+} else {
+
+    console.warn('⚠️ SMTP desativado: EMAIL_USER ou EMAIL_PASS não configurados.');
+
+}
+
+// ==================== TESTE DA CONEXÃO SMTP ====================
+
+if (emailUser && emailPass) {
+
+    transporter.verify((error, success) => {
+
+        if (error) {
+
+            console.error("❌ Erro na conexão SMTP");
+            console.error("Mensagem:", error.message);
+            console.error("Código:", error.code || "N/A");
+            console.error("Comando:", error.command || "N/A");
+
+        } else {
+
+            console.log("✅ Servidor SMTP conectado com sucesso!");
+            console.log("📧 Email:", emailUser);
+
+        }
+
+    });
+
+} else {
+
+    console.warn("⚠️ SMTP desativado porque EMAIL_USER ou EMAIL_PASS não estão configurados.");
+
+}
+
+// ==================== CONFIGURAÇÃO DO PASSPORT (GOOGLE) - FULL CORRIGIDA ====================
 
 const googleClientID = process.env.GOOGLE_CLIENT_ID || '';
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
 
+// Validação das credenciais
 if (!googleClientID) {
-    console.warn('⚠️ GOOGLE_CLIENT_ID não configurado.');
+    console.warn('⚠️ GOOGLE_CLIENT_ID não configurado no .env');
+} else {
+    console.log('✅ GOOGLE_CLIENT_ID carregado:', googleClientID.substring(0, 20) + '...');
 }
 
 if (!googleClientSecret) {
-    console.warn('⚠️ GOOGLE_CLIENT_SECRET não configurado.');
+    console.warn('⚠️ GOOGLE_CLIENT_SECRET não configurado no .env');
+} else {
+    console.log('✅ GOOGLE_CLIENT_SECRET carregado');
 }
 
+// Verificação se o Passport já tem a estratégia registrada
+// (evita erro de "Strategy already registered")
+if (passport._strategies && passport._strategies.google) {
+    console.log('🔄 Google Strategy já registrada. Substituindo...');
+    passport.unuse('google');
+}
+
+// Configuração do Google Strategy
 passport.use(new GoogleStrategy(
 {
+    // Credenciais do Google
     clientID: googleClientID,
     clientSecret: googleClientSecret,
-
-    // IMPORTANTE PARA O RENDER (HTTPS)
-    callbackURL: "/auth/google/callback",
+    
+    // URLs de callback - dinâmicas baseadas no ambiente
+    callbackURL: process.env.NODE_ENV === 'production' 
+        ? 'https://kuanda.onrender.com/auth/google/callback'
+        : 'http://localhost:3000/auth/google/callback',
+    
+    // Proxy para funcionar em produção (Render/Heroku)
     proxy: true,
-
-    // Sempre solicitar perfil e e-mail
-    scope: ['profile', 'email']
+    
+    // Permissões solicitadas
+    scope: ['profile', 'email'],
+    
+    // Parâmetros adicionais para melhor compatibilidade
+    accessType: 'offline',
+    prompt: 'consent',
+    
+    // Timeout para evitar travamentos
+    timeout: 10000
 },
 async (accessToken, refreshToken, profile, done) => {
-
     try {
-
-        // ==================== VALIDAÇÕES ====================
-
+        // ==================== 1. VALIDAÇÕES INICIAIS ====================
+        
         if (!profile) {
+            console.error('❌ Profile do Google é nulo');
             return done(new Error("Perfil do Google não recebido."), null);
         }
 
         if (!profile.id) {
+            console.error('❌ Profile ID não encontrado');
             return done(new Error("Google ID não encontrado."), null);
         }
 
         if (!profile.emails || profile.emails.length === 0) {
+            console.error('❌ Nenhum email encontrado no profile');
             return done(new Error("O Google não retornou um endereço de e-mail."), null);
         }
 
         const email = profile.emails[0].value;
         const nome = profile.displayName || "Usuário Google";
+        const avatar = profile.photos && profile.photos.length > 0 ? profile.photos[0].value : null;
 
-        // ==================== 1. PROCURA PELO GOOGLE ID ====================
+        console.log(`🔍 Processando login Google: ${email}`);
+
+        // ==================== 2. VERIFICAÇÃO DE SEGURANÇA ====================
+        
+        // Verifica se o email é válido (não vazio)
+        if (!email || email.trim() === '') {
+            return done(new Error("Email inválido."), null);
+        }
+
+        // Verifica se o email é do domínio permitido (opcional)
+        // const allowedDomains = ['gmail.com', 'kuandashop.com'];
+        // const emailDomain = email.split('@')[1];
+        // if (!allowedDomains.includes(emailDomain)) {
+        //     return done(new Error("Domínio de email não permitido."), null);
+        // }
+
+        // ==================== 3. PROCURA POR GOOGLE_ID EXISTENTE ====================
 
         let userResult = await db.query(
             'SELECT * FROM usuarios WHERE google_id = $1',
@@ -469,12 +425,22 @@ async (accessToken, refreshToken, profile, done) => {
         );
 
         if (userResult.rows.length > 0) {
-
-            return done(null, userResult.rows[0]);
-
+            const user = userResult.rows[0];
+            
+            // Atualiza o avatar se mudou
+            if (avatar && user.foto_perfil !== avatar) {
+                await db.query(
+                    'UPDATE usuarios SET foto_perfil = $1 WHERE id = $2',
+                    [avatar, user.id]
+                );
+                console.log(`📸 Avatar atualizado para ${email}`);
+            }
+            
+            console.log(`✅ Usuário encontrado por Google ID: ${email}`);
+            return done(null, user);
         }
 
-        // ==================== 2. PROCURA PELO E-MAIL ====================
+        // ==================== 4. PROCURA POR EMAIL EXISTENTE ====================
 
         userResult = await db.query(
             'SELECT * FROM usuarios WHERE email = $1',
@@ -482,88 +448,231 @@ async (accessToken, refreshToken, profile, done) => {
         );
 
         if (userResult.rows.length > 0) {
-
-            const updatedUser = await db.query(
-
-                `UPDATE usuarios
-                 SET
-                    google_id = $1,
-                    email_verificado = TRUE
-                 WHERE email = $2
-                 RETURNING *`,
-
-                [profile.id, email]
-
-            );
-
-            console.log(`✅ Conta vinculada ao Google: ${email}`);
-
-            return done(null, updatedUser.rows[0]);
-
+            const existingUser = userResult.rows[0];
+            
+            // Se o usuário já existe mas não tem google_id, vincula a conta
+            if (!existingUser.google_id) {
+                const updatedUser = await db.query(
+                    `UPDATE usuarios 
+                     SET google_id = $1, 
+                         email_verificado = TRUE,
+                         foto_perfil = COALESCE($2, foto_perfil)
+                     WHERE email = $3
+                     RETURNING *`,
+                    [profile.id, avatar, email]
+                );
+                
+                console.log(`✅ Conta vinculada ao Google: ${email}`);
+                return done(null, updatedUser.rows[0]);
+            } else {
+                // Se já tem google_id, mas é diferente do atual (caso raro)
+                console.warn(`⚠️ Email ${email} já está vinculado a outro Google ID`);
+                return done(new Error("Esta conta já está vinculada a outra conta Google."), null);
+            }
         }
 
-        // ==================== 3. CRIA NOVO USUÁRIO ====================
+        // ==================== 5. CRIAÇÃO DE NOVO USUÁRIO ====================
+
+        console.log(`🆕 Criando novo usuário Google: ${email}`);
 
         const newUser = await db.query(
-
-            `INSERT INTO usuarios
-            (
-                nome,
-                email,
-                google_id,
-                tipo,
-                email_verificado,
+            `INSERT INTO usuarios (
+                nome, 
+                email, 
+                google_id, 
+                foto_perfil,
+                tipo, 
+                email_verificado, 
                 loja_ativa,
-                created_at
-            )
-
-            VALUES
-            (
-                $1,
-                $2,
-                $3,
-                'cliente',
-                TRUE,
-                TRUE,
-                NOW()
-            )
-
+                created_at,
+                updated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
             RETURNING *`,
-
             [
                 nome,
                 email,
-                profile.id
+                profile.id,
+                avatar,
+                'cliente',
+                true,
+                true
             ]
-
         );
 
-        console.log(`✅ Novo usuário Google criado: ${email}`);
-
+        console.log(`✅ Novo usuário Google criado: ${email} (ID: ${newUser.rows[0].id})`);
+        
         return done(null, newUser.rows[0]);
 
     } catch (err) {
-
-        console.error("❌ Erro na autenticação Google:", err);
-
+        console.error('❌ Erro na autenticação Google:', err);
+        console.error('Stack:', err.stack);
         return done(err, null);
-
     }
-
 }));
 
+// ==================== SERIALIZAÇÃO ====================
+
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+    try {
+        if (!user || !user.id) {
+            return done(new Error("Usuário inválido para serialização"), null);
+        }
+        console.log(`🔐 Serializando usuário ID: ${user.id}`);
+        done(null, user.id);
+    } catch (err) {
+        console.error('❌ Erro na serialização:', err);
+        done(err, null);
+    }
 });
 
+// ==================== DESSERIALIZAÇÃO ====================
+
 passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await db.query('SELECT * FROM usuarios WHERE id = $1', [id]);
-    done(null, user.rows[0]);
-  } catch (err) {
-    done(err, null);
-  }
+    try {
+        if (!id) {
+            return done(new Error("ID inválido para desserialização"), null);
+        }
+        
+        console.log(`🔓 Desserializando usuário ID: ${id}`);
+        
+        const userResult = await db.query(
+            'SELECT * FROM usuarios WHERE id = $1',
+            [id]
+        );
+        
+        if (userResult.rows.length === 0) {
+            console.warn(`⚠️ Usuário não encontrado para ID: ${id}`);
+            return done(null, null);
+        }
+        
+        const user = userResult.rows[0];
+        
+        // Remove dados sensíveis antes de enviar (opcional)
+        // delete user.senha;
+        // delete user.reset_token;
+        
+        return done(null, user);
+        
+    } catch (err) {
+        console.error('❌ Erro na desserialização:', err);
+        return done(err, null);
+    }
 });
+
+// ==================== MIDDLEWARE DE AUTENTICAÇÃO ====================
+
+// Middleware para verificar autenticação via Passport e Session
+const requireAuth = (req, res, next) => {
+    // Verifica se o usuário está na sessão (seu sistema)
+    if (req.session.user) {
+        return next();
+    }
+    
+    // Verifica se o usuário está autenticado via Passport
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        // Sincroniza com sua sessão personalizada
+        req.session.user = req.user;
+        return next();
+    }
+    
+    // Se não estiver autenticado, redireciona
+    req.flash('error', 'Você precisa fazer login para acessar esta página');
+    return res.redirect('/login');
+};
+
+const requireVendor = (req, res, next) => {
+    if (!req.session.user || req.session.user.tipo !== 'vendedor') {
+        req.flash('error', 'Acesso restrito a vendedores');
+        return res.redirect('/');
+    }
+    next();
+};
+
+const requireAdmin = (req, res, next) => {
+    if (!req.session.user || req.session.user.tipo !== 'admin') {
+        req.flash('error', 'Acesso restrito a administradores');
+        return res.redirect('/');
+    }
+    next();
+};
+
+// ==================== ROTAS GOOGLE AUTH ====================
+
+// Iniciar login com Google
+app.get('/auth/google',
+    (req, res, next) => {
+        console.log('🚀 Iniciando autenticação Google...');
+        // Salva a URL de destino para redirecionar depois
+        if (req.query.returnTo) {
+            req.session.returnTo = req.query.returnTo;
+        }
+        next();
+    },
+    passport.authenticate('google', { 
+        scope: ['profile', 'email'],
+        prompt: 'select_account' // Força a seleção de conta
+    })
+);
+
+// Callback do Google
+app.get('/auth/google/callback',
+    (req, res, next) => {
+        console.log('🔄 Google callback recebido');
+        next();
+    },
+    passport.authenticate('google', { 
+        failureRedirect: '/login?error=google_failed',
+        failureFlash: true
+    }),
+    (req, res) => {
+        // Sucesso na autenticação
+        console.log('✅ Autenticação Google bem-sucedida!');
+        
+        // Salvar usuário na sessão personalizada
+        req.session.user = req.user;
+        
+        // Redirecionar para página de destino ou perfil
+        const returnTo = req.session.returnTo || '/perfil';
+        delete req.session.returnTo;
+        
+        req.flash('success', `Bem-vindo, ${req.user.nome}!`);
+        res.redirect(returnTo);
+    }
+);
+
+// Logout via Google (apenas desconecta da aplicação)
+app.get('/auth/logout', (req, res) => {
+    console.log('🚪 Logout via Google');
+    
+    // Destroi a sessão do Passport
+    req.logout((err) => {
+        if (err) {
+            console.error('❌ Erro no logout:', err);
+        }
+        
+        // Destroi a sessão personalizada
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('❌ Erro ao destruir sessão:', err);
+            }
+            res.redirect('/login?success=logout');
+        });
+    });
+});
+
+// ==================== ROTA DE STATUS DO GOOGLE ====================
+
+app.get('/auth/status', (req, res) => {
+    const isAuthenticated = req.isAuthenticated && req.isAuthenticated();
+    res.json({
+        authenticated: isAuthenticated,
+        user: req.user || null,
+        sessionUser: req.session.user || null,
+        googleConfigured: !!googleClientID && !!googleClientSecret
+    });
+});
+
+console.log('✅ Google Passport configurado com sucesso!');
 
 // ==================== MIDDLEWARES DE AUTENTICAÇÃO ====================
 const requireAuth = (req, res, next) => {
@@ -907,7 +1016,8 @@ app.post('/perfil/upload-hibrido', requireAuth, uploadPerfilMiddleware, async (r
     console.log(`🔄 Upload híbrido iniciado para usuário: ${userId}`);
     console.log('📁 Arquivos recebidos:', Object.keys(req.files || {}));
 
-    // 1. Buscar usuário atual    const usuarioResult = await db.query('SELECT * FROM usuarios WHERE id = $1', [userId]);
+    // 1. Buscar usuário atual
+    const usuarioResult = await db.query('SELECT * FROM usuarios WHERE id = $1', [userId]);
     if (usuarioResult.rows.length === 0) {
       req.flash('error', 'Usuário não encontrado.');
       return res.redirect('/perfil');
@@ -2802,125 +2912,88 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
         // ========================================================================
         const linkConfirmacao = `${process.env.BASE_URL}/verificar-email/${tokenVerificacao}`;
 
-        const htmlEmail = `
-            <!DOCTYPE html>
-            <html lang="pt">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Confirme sua conta no KuandaShop</title>
-            </head>
-            <body style="margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
-                    <tr>
-                        <td align="center">
-                            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                                <!-- HEADER -->
-                                <tr>
-                                    <td style="background-color: #E31C25; padding: 30px; text-align: center;">
-                                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">KuandaShop</h1>
-                                        <p style="margin: 5px 0 0 0; color: #ffcccc; font-size: 14px;">Marketplace Multi-Vendor</p>
-                                    </td>
-                                </tr>
-                                <!-- BODY -->
-                                <tr>
-                                    <td style="padding: 40px 30px;">
-                                        <h2 style="color: #333333; font-size: 22px; margin-top: 0;">Olá, ${nome.split(' ')[0]}! 👋</h2>
-                                        <p style="color: #555555; font-size: 16px; line-height: 1.6;">
-                                            Sua conta foi criada com sucesso no <strong>KuandaShop</strong>!
-                                        </p>
-                                        <p style="color: #555555; font-size: 16px; line-height: 1.6;">
-                                            Para ativar sua conta e começar a comprar, clique no botão abaixo:
-                                        </p>
-                                        <div style="text-align: center; margin: 35px 0;">
-                                            <a href="${linkConfirmacao}" 
-                                               style="background-color: #E31C25; 
-                                                      color: #ffffff; 
-                                                      text-decoration: none; 
-                                                      padding: 14px 40px; 
-                                                      border-radius: 8px; 
-                                                      display: inline-block; 
-                                                      font-size: 16px; 
-                                                      font-weight: bold;
-                                                      box-shadow: 0 2px 10px rgba(227, 28, 37, 0.3);">
-                                                ✅ Confirmar Conta
-                                            </a>
-                                        </div>
-                                        <p style="color: #888888; font-size: 14px; line-height: 1.6;">
-                                            Caso o botão não funcione, copie e cole este link no seu navegador:
-                                        </p>
-                                        <p style="background-color: #f5f5f5; 
-                                                  padding: 12px; 
-                                                  border-radius: 5px; 
-                                                  word-break: break-all; 
-                                                  color: #0066cc; 
-                                                  font-size: 13px;
-                                                  border: 1px solid #e0e0e0;">
-                                            ${linkConfirmacao}
-                                        </p>
-                                        <hr style="border: none; border-top: 1px solid #eeeeee; margin: 30px 0;">
-                                        <p style="color: #999999; font-size: 13px; line-height: 1.6;">
-                                            ⚠️ Se você não criou esta conta, ignore este e-mail.
-                                        </p>
-                                        <p style="color: #999999; font-size: 13px; line-height: 1.6;">
-                                            📧 Este link expira em 24 horas.
-                                        </p>
-                                    </td>
-                                </tr>
-                                <!-- FOOTER -->
-                                <tr>
-                                    <td style="background-color: #f8f8f8; padding: 20px 30px; text-align: center;">
-                                        <p style="margin: 0; color: #999999; font-size: 12px;">
-                                            © ${new Date().getFullYear()} KuandaShop - Todos os direitos reservados
-                                        </p>
-                                        <p style="margin: 5px 0 0 0; color: #999999; font-size: 12px;">
-                                            Rua 2, Bairro Rotunda da Fubu, Luanda, Angola
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </body>
-            </html>
-        `;
+        try {
+            // Verifica se o SMTP está minimamente configurado
+            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+                throw new Error("SMTP não configurado no ambiente.");
+            }
 
-        // ==================== TENTATIVA DE ENVIO COM FALLBACK ====================
-        console.log(`📧 Tentando enviar e-mail de confirmação para ${email}...`);
-        const emailEnviado = await app.enviarEmail(email, 'Confirme sua conta no KuandaShop', htmlEmail);
+            await transporter.sendMail({
+                from: `"KuandaShop" <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: "Confirme sua conta no KuandaShop",
+                html: `
+                <!DOCTYPE html>
+                <html lang="pt">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Confirmação de Conta</title>
+                </head>
+                <body style="margin:0; padding:30px; background:#f5f5f5; font-family:Arial,sans-serif;">
+                    <div style="max-width:650px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,.08);">
+                        <div style="background:#E31C25; padding:30px; text-align:center; color:white;">
+                            <h1 style="margin:0;">KuandaShop</h1>
+                        </div>
+                        <div style="padding:40px;">
+                            <h2>Olá, ${nome.split(' ')[0]} 👋</h2>
+                            <p>Sua conta foi criada com sucesso. Clique no botão abaixo para confirmar seu endereço de e-mail e ativar seu acesso.</p>
+                            <div style="text-align:center; margin:40px 0;">
+                                <a href="${linkConfirmacao}" style="background:#E31C25; color:white; text-decoration:none; padding:15px 35px; border-radius:8px; display:inline-block; font-size:16px; font-weight:bold;">Confirmar Conta</a>
+                            </div>
+                            <p>Caso o botão não funcione, copie este link:</p>
+                            <p style="word-break:break-all; color:#0066cc;">${linkConfirmacao}</p>
+                            <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
+                            <p style="font-size:13px; color:#888;">Se você não criou esta conta, ignore este e-mail.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>`
+            });
 
-        // ==================== FALLBACK AUTOMÁTICO ====================
-        if (!emailEnviado) {
-            // Ativa a conta automaticamente se o e-mail falhar
+            console.log("==========================================");
+            console.log("✅ E-mail enviado com sucesso para:", email);
+            console.log("==========================================");
+
+            req.flash("success", "Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.");
+
+        } catch (mailError) {
+            console.error("==========================================");
+            console.error("❌ ERRO SMTP (Fallback Ativado)");
+            console.error("Mensagem:", mailError.message);
+            console.error("==========================================");
+
+            // FALLBACK AUTOMÁTICO: Ativa a conta se o e-mail falhar para o usuário não ficar preso
             try {
                 await db.query(
                     `UPDATE usuarios SET email_verificado = TRUE, token_verificacao = NULL WHERE id = $1`,
                     [newUser.id]
                 );
-                console.log(`✅ [FALLBACK] Conta ${email} ativada automaticamente.`);
-                req.flash('warning', '⚠️ Não foi possível enviar o e-mail de confirmação, mas sua conta foi ATIVADA automaticamente. Você já pode fazer login.');
+                console.log("✅ Conta ativada via FALLBACK devido à falha do servidor de e-mail.");
             } catch (dbError) {
-                console.error('❌ Erro no fallback do banco:', dbError.message);
-                req.flash('error', 'Erro ao processar sua conta. Tente novamente.');
-                return req.session.save(() => res.redirect('/registro'));
+                console.error("Erro no fallback de banco de dados:", dbError);
             }
-        } else {
-            req.flash('success', '✅ Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.');
+
+            req.flash("warning", "Sua conta foi criada e ATIVADA! Notamos uma instabilidade no nosso servidor de e-mail, então liberamos seu acesso automaticamente.");
         }
 
+        // Finaliza o registro redirecionando para o login
         return req.session.save(() => {
-            res.redirect('/login');
+            res.redirect("/login?success=conta_criada");
         });
 
     } catch (error) {
-        console.error('❌ CRASH REGISTRO:', error);
+        // Limpeza de arquivo em caso de erro crítico no processo
         if (req.file) {
             const tempPath = path.join(__dirname, 'public/uploads/perfil/', req.file.filename);
             if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
         }
-        req.flash('error', 'Erro interno ao criar conta. Tente novamente.');
-        return req.session.save(() => res.redirect('/registro'));
+
+        console.error("CRASH REGISTRO:", error);
+        req.flash("error", "Ocorreu um erro interno ao criar sua conta. Tente novamente em instantes.");
+
+        return req.session.save(() => {
+            res.redirect("/registro?error=erro_interno");
+        });
     }
 });
 
@@ -2989,77 +3062,25 @@ app.post('/recuperar-senha', async (req, res) => {
 
         const resetUrl = `${req.protocol}://${req.get('host')}/resetar-senha/${token}`;
 
-        const htmlEmail = `
-            <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <div style="background-color: #E31C25; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="color: #ffffff; margin: 0;">KuandaShop</h1>
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'Redefinição de Senha - KuandaShop',
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                    <h2>Redefinição de Senha</h2>
+                    <p>Clique abaixo para criar uma nova senha:</p>
+                    <a href="${resetUrl}" style="background-color: #E31C25; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
                 </div>
-                <div style="padding: 30px;">
-                    <h2 style="color: #333333;">Redefinição de Senha</h2>
-                    <p style="color: #555555; font-size: 16px; line-height: 1.6;">
-                        Olá, ${user.nome.split(' ')[0]}! Recebemos uma solicitação para redefinir sua senha no KuandaShop.
-                    </p>
-                    <p style="color: #555555; font-size: 16px; line-height: 1.6;">
-                        Clique no botão abaixo para criar uma nova senha:
-                    </p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${resetUrl}" 
-                           style="background-color: #E31C25; 
-                                  color: #ffffff; 
-                                  text-decoration: none; 
-                                  padding: 12px 35px; 
-                                  border-radius: 8px; 
-                                  display: inline-block; 
-                                  font-size: 16px; 
-                                  font-weight: bold;">
-                            🔑 Redefinir Senha
-                        </a>
-                    </div>
-                    <p style="color: #888888; font-size: 14px; line-height: 1.6;">
-                        Caso o botão não funcione, copie e cole este link no seu navegador:
-                    </p>
-                    <p style="background-color: #f5f5f5; 
-                              padding: 12px; 
-                              border-radius: 5px; 
-                              word-break: break-all; 
-                              color: #0066cc; 
-                              font-size: 13px;
-                              border: 1px solid #e0e0e0;">
-                        ${resetUrl}
-                    </p>
-                    <hr style="border: none; border-top: 1px solid #eeeeee; margin: 25px 0;">
-                    <p style="color: #999999; font-size: 13px; line-height: 1.6;">
-                        ⏰ Este link expira em <strong>1 hora</strong>.
-                    </p>
-                    <p style="color: #999999; font-size: 13px; line-height: 1.6;">
-                        🔒 Se você não solicitou esta redefinição, ignore este e-mail.
-                    </p>
-                </div>
-                <div style="background-color: #f8f8f8; padding: 15px; text-align: center; border-radius: 0 0 10px 10px;">
-                    <p style="margin: 0; color: #999999; font-size: 12px;">
-                        © ${new Date().getFullYear()} KuandaShop - Todos os direitos reservados
-                    </p>
-                    <p style="margin: 5px 0 0 0; color: #999999; font-size: 12px;">
-                        Rua 2, Bairro Rotunda da Fubu, Luanda, Angola
-                    </p>
-                </div>
-            </div>
-        `;
+            `
+        });
 
-        console.log(`📧 Tentando enviar e-mail de recuperação para ${email}...`);
-        const emailEnviado = await app.enviarEmail(email, 'Redefinição de Senha - KuandaShop', htmlEmail);
-
-        if (!emailEnviado) {
-            req.flash('warning', '⚠️ Não foi possível enviar o e-mail de recuperação. Entre em contato com o suporte.');
-        } else {
-            req.flash('success', '✅ Link de recuperação enviado para seu e-mail!');
-        }
-
-        return req.session.save(() => res.redirect('/login'));
+        req.flash('success', 'Link enviado! Verifique seu e-mail.');
+        return req.session.save(() => res.redirect('/login?success=email_enviado'));
 
     } catch (error) {
-        console.error('❌ Erro na recuperação de senha:', error);
-        req.flash('error', 'Erro ao processar solicitação.');
+        console.error('Erro Recuperação:', error);
+        req.flash('error', 'Erro ao enviar e-mail.');
         return req.session.save(() => res.redirect('/recuperar-senha'));
     }
 });
@@ -3166,44 +3187,6 @@ async function initDatabaseSchema() {
                 filme_id INTEGER REFERENCES filmes(id),
                 status VARCHAR(20) DEFAULT 'pendente',
                 updated_at TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        // 4. Garante tabela notificacoes
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS notificacoes (
-                id SERIAL PRIMARY KEY,
-                de_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
-                para_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
-                mensagem TEXT NOT NULL,
-                tipo VARCHAR(50) DEFAULT 'sistema',
-                referencia_id INTEGER,
-                lida BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        // 5. Garante tabela jogo_links
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS jogo_links (
-                id SERIAL PRIMARY KEY,
-                jogo_id INTEGER REFERENCES jogos(id) ON DELETE CASCADE,
-                label VARCHAR(100) NOT NULL,
-                url TEXT NOT NULL,
-                ordem INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        // 6. Garante tabela filme_links
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS filme_links (
-                id SERIAL PRIMARY KEY,
-                filme_id INTEGER REFERENCES filmes(id) ON DELETE CASCADE,
-                label VARCHAR(100) NOT NULL,
-                url TEXT NOT NULL,
-                ordem INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
@@ -7018,67 +7001,6 @@ app.get('/admin/restaurar-imagens', requireAdmin, async (req, res) => {
   }
 });
 
-// ==================== ROTA DE ESTATÍSTICAS DE E-MAIL (PARA ADMIN) ====================
-app.get('/admin/email-stats', requireAdmin, (req, res) => {
-    res.json({
-        success: true,
-        stats: getEmailStats(),
-        remetente: 'KuandaShop <kuandashopp@gmail.com>',
-        status: transporter ? 'CONECTADO' : 'DESCONECTADO'
-    });
-});
-
-// ==================== ROTA DE TESTE DE E-MAIL ====================
-app.get('/admin/test-email', requireAdmin, async (req, res) => {
-    try {
-        const destinatario = req.query.email || req.session.user.email;
-        
-        const htmlTeste = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-                    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    h1 { color: #E31C25; }
-                    .success { color: #10b981; font-size: 48px; text-align: center; }
-                    .info { background: #f0f0f0; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="success">✅</div>
-                    <h1>🧪 Teste de E-mail</h1>
-                    <p>Este é um e-mail de teste do sistema KuandaShop.</p>
-                    <div class="info">
-                        <p><strong>📧 Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
-                        <p><strong>👤 Usuário:</strong> ${req.session.user.nome}</p>
-                        <p><strong>📊 Status:</strong> <span style="color: #10b981;">✅ Sistema operacional</span></p>
-                        <p><strong>📧 Remetente:</strong> KuandaShop <kuandashopp@gmail.com></p>
-                    </div>
-                    <hr>
-                    <p style="color: #666; font-size: 12px;">E-mail enviado via SendGrid</p>
-                </div>
-            </body>
-            </html>
-        `;
-
-        const enviado = await app.enviarEmail(destinatario, '🧪 Teste do Sistema de E-mail', htmlTeste);
-        
-        res.json({
-            success: enviado,
-            message: enviado ? 'E-mail enviado com sucesso!' : 'Falha no envio do e-mail',
-            destinatario: destinatario,
-            stats: app.getEmailStats ? app.getEmailStats() : null
-        });
-    } catch (error) {
-        res.json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
 // ==================== TRATAMENTO DE ERROS ====================
 
 // 1. Erro 404 - Página não encontrada
@@ -7234,6 +7156,7 @@ app.post('/checkout/processar', requireAuth, async (req, res) => {
     }
 });
 
+
 // ==================== INICIALIZAR SERVIDOR ====================
 const server = app.listen(PORT, () => {
   console.log(`
@@ -7248,8 +7171,6 @@ const server = app.listen(PORT, () => {
   ✅ Sistema de planos implementado
   ✅ IMAGENS HÍBRIDAS PERSISTENTES IMPLEMENTADAS!
   ✅ UPLOAD DE PERFIL E BANNER CORRIGIDO E FUNCIONAL!
-  ✅ SISTEMA DE NOTIFICAÇÕES IMPLEMENTADO!
-  ✅ SISTEMA DE E-MAIL COM SENDGRID E FALLBACK!
   
   📍 Porta: ${PORT}
   🌐 Ambiente: ${process.env.NODE_ENV || 'development'}
@@ -7274,12 +7195,6 @@ const server = app.listen(PORT, () => {
     Email: admin@kuandashop.ao
     Senha: password
   
-  📧 SISTEMA DE E-MAIL:
-    • Provedor: SendGrid
-    • Remetente: KuandaShop <kuandashopp@gmail.com>
-    • Status: ${transporter ? '✅ CONECTADO' : '⚠️ DESCONECTADO'}
-    • Fallback: ✅ ATIVO (conta ativada mesmo sem e-mail)
-  
   📊 Funcionalidades disponíveis:
     • Página inicial com banners
     • Catálogo de produtos
@@ -7295,8 +7210,6 @@ const server = app.listen(PORT, () => {
     • Loja de jogos completa
     • ✅ IMAGENS PERSISTENTES HÍBRIDAS (arquivo + bytea)
     • ✅ UPLOAD DE PERFIL E BANNER FUNCIONAL
-    • ✅ NOTIFICAÇÕES EM TEMPO REAL
-    • ✅ SISTEMA DE E-MAIL COM FALLBACK
   
   💡 Recuperação de imagens: /admin/restaurar-imagens
   📁 SQL para criar tabela de backup no início deste arquivo
