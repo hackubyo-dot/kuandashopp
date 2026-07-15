@@ -235,7 +235,7 @@ process.env.BASE_URL = BASE_URL;
 
 console.log(`🌐 BASE_URL configurada: ${BASE_URL}`);
 
-// ==================== CONFIGURAÇÃO DE EMAIL (CORRIGIDA) ====================
+// ==================== CONFIGURAÇÃO DE EMAIL (CORRIGIDA COM MÚLTIPLAS TENTATIVAS) ====================
 
 // Carrega as credenciais do ambiente e limpa espaços em branco
 const emailUser = (process.env.EMAIL_USER || '').trim();
@@ -253,62 +253,110 @@ if (!emailPass) {
 }
 
 // ============================================================
-// CRIAÇÃO DO TRANSPORTER COM FALLBACKS
+// CRIAÇÃO DO TRANSPORTER COM CONFIGURAÇÕES ALTERNATIVAS
 // ============================================================
 let transporter = null;
+let transporterConfigs = [];
 
 if (emailUser && emailPass) {
-    try {
-        transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // Porta 465 usa SSL/TLS direto
-            auth: {
-                user: emailUser,
-                pass: emailPass
-            },
-            tls: {
-                rejectUnauthorized: false,
-                minVersion: 'TLSv1.2'
-            },
-            connectionTimeout: 10000,
-            greetingTimeout: 10000,
-            socketTimeout: 30000,
-            logger: false,
-            debug: false
-        });
+    // Configuração 1: Porta 465 com SSL (padrão)
+    transporterConfigs.push({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: emailUser,
+            pass: emailPass
+        },
+        tls: {
+            rejectUnauthorized: false,
+            minVersion: 'TLSv1.2'
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
+        logger: false,
+        debug: false
+    });
 
-        // ============================================================
-        // VERIFICAÇÃO DA CONEXÃO (Assíncrona e Silenciosa)
-        // ============================================================
-        setTimeout(async () => {
+    // Configuração 2: Porta 587 com STARTTLS (alternativa)
+    transporterConfigs.push({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: emailUser,
+            pass: emailPass
+        },
+        tls: {
+            rejectUnauthorized: false,
+            minVersion: 'TLSv1.2'
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
+        logger: false,
+        debug: false
+    });
+
+    // Configuração 3: Porta 25 com STARTTLS (último recurso)
+    transporterConfigs.push({
+        host: 'smtp.gmail.com',
+        port: 25,
+        secure: false,
+        auth: {
+            user: emailUser,
+            pass: emailPass
+        },
+        tls: {
+            rejectUnauthorized: false,
+            minVersion: 'TLSv1.2'
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
+        logger: false,
+        debug: false
+    });
+
+    // Tenta criar o transporter com a primeira configuração que funciona
+    async function criarTransporter() {
+        for (const config of transporterConfigs) {
             try {
-                await transporter.verify();
-                console.log('✅ Servidor de Email conectado com sucesso!');
-                console.log(`📧 Conta: ${emailUser}`);
-                console.log('✅ Sistema de envio de e-mails OPERACIONAL');
-            } catch (verifyError) {
-                console.error('❌ Falha na verificação SMTP');
-                console.error(`   Mensagem: ${verifyError.message}`);
-                console.error(`   Código: ${verifyError.code || 'N/A'}`);
-                console.warn('⚠️ E-mails podem não ser enviados. Verifique a senha de app.');
-                // Mantém o transporter mesmo com erro de verificação (tenta enviar mesmo assim)
+                console.log(`🔄 Tentando conexão SMTP na porta ${config.port}...`);
+                const testTransporter = nodemailer.createTransport(config);
+                await testTransporter.verify();
+                console.log(`✅ Conexão SMTP estabelecida na porta ${config.port}!`);
+                return testTransporter;
+            } catch (error) {
+                console.log(`❌ Falha na porta ${config.port}: ${error.message}`);
+                // Continua tentando a próxima configuração
             }
-        }, 2000);
-
-    } catch (error) {
-        console.error('❌ Erro ao criar transporter SMTP:', error.message);
-        transporter = null;
+        }
+        console.warn('⚠️ Todas as tentativas de conexão SMTP falharam.');
+        return null;
     }
+
+    // Executa a tentativa de conexão
+    (async () => {
+        transporter = await criarTransporter();
+        if (transporter) {
+            console.log(`📧 Conta: ${emailUser}`);
+            console.log('✅ Sistema de envio de e-mails OPERACIONAL');
+        } else {
+            console.warn('⚠️ E-mails podem não ser enviados. Verifique suas configurações de rede.');
+        }
+    })();
+
 } else {
     console.warn('⚠️ SMTP desativado: EMAIL_USER ou EMAIL_PASS não configurados.');
 }
 
 // ============================================================
-// FUNÇÃO DE ENVIO DE E-MAIL (SEGURA COM FALLBACK)
+// FUNÇÃO DE ENVIO DE E-MAIL (COM RETRY AUTOMÁTICO)
 // ============================================================
-const enviarEmail = async (destinatario, assunto, html) => {
-    // Se não há transporter, ativa fallback automático (ativo)
+const enviarEmail = async (destinatario, assunto, html, tentativas = 3) => {
+    // Se não há transporter, tenta criar um novo
     if (!transporter) {
         console.warn(`⚠️ [FALLBACK] E-mail não enviado para ${destinatario}: SMTP não configurado.`);
         console.log(`📧 Assunto: ${assunto}`);
@@ -316,22 +364,36 @@ const enviarEmail = async (destinatario, assunto, html) => {
         return false;
     }
 
-    try {
-        const info = await transporter.sendMail({
-            from: `"KuandaShop" <${emailUser}>`,
-            to: destinatario,
-            subject: assunto,
-            html: html
-        });
+    let ultimoErro = null;
+    
+    for (let i = 0; i < tentativas; i++) {
+        try {
+            const info = await transporter.sendMail({
+                from: `"KuandaShop" <${emailUser}>`,
+                to: destinatario,
+                subject: assunto,
+                html: html
+            });
 
-        console.log(`✅ E-mail enviado para ${destinatario}`);
-        console.log(`   Message-ID: ${info.messageId}`);
-        return true;
-    } catch (error) {
-        console.error(`❌ Erro ao enviar e-mail para ${destinatario}:`, error.message);
-        console.warn(`⚠️ [FALLBACK ATIVADO] A conta será ativada mesmo sem e-mail.`);
-        return false;
+            console.log(`✅ E-mail enviado para ${destinatario} (tentativa ${i + 1})`);
+            console.log(`   Message-ID: ${info.messageId}`);
+            return true;
+        } catch (error) {
+            ultimoErro = error;
+            console.warn(`⚠️ Tentativa ${i + 1} falhou para ${destinatario}: ${error.message}`);
+            
+            // Se não for a última tentativa, espera um pouco antes de tentar novamente
+            if (i < tentativas - 1) {
+                console.log(`⏳ Aguardando 2 segundos antes da próxima tentativa...`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
     }
+
+    console.error(`❌ Todas as ${tentativas} tentativas falharam para ${destinatario}`);
+    console.error(`   Último erro: ${ultimoErro ? ultimoErro.message : 'Desconhecido'}`);
+    console.warn(`⚠️ [FALLBACK ATIVADO] A conta será ativada mesmo sem e-mail.`);
+    return false;
 };
 
 // Exporta a função para ser usada em outras partes
