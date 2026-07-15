@@ -674,29 +674,48 @@ app.get('/auth/status', (req, res) => {
 
 console.log('✅ Google Passport configurado com sucesso!');
 
-// ==================== MIDDLEWARES DE AUTENTICAÇÃO ====================
+// ==================== MIDDLEWARE DE AUTENTICAÇÃO (VERSÃO ÚNICA E CORRIGIDA) ====================
+
+// Middleware para verificar autenticação via Passport e Session
 const requireAuth = (req, res, next) => {
-  if (!req.session.user) {
+    // Verifica se o usuário está na sessão (seu sistema)
+    if (req.session.user) {
+        return next();
+    }
+    
+    // Verifica se o usuário está autenticado via Passport
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        // Sincroniza com sua sessão personalizada
+        req.session.user = req.user;
+        return next();
+    }
+    
+    // Se não estiver autenticado, redireciona
     req.flash('error', 'Você precisa fazer login para acessar esta página');
     return res.redirect('/login');
-  }
-  next();
 };
 
 const requireVendor = (req, res, next) => {
-  if (!req.session.user || req.session.user.tipo !== 'vendedor') {
-    req.flash('error', 'Acesso restrito a vendedores');
-    return res.redirect('/');
-  }
-  next();
+    if (!req.session.user || req.session.user.tipo !== 'vendedor') {
+        req.flash('error', 'Acesso restrito a vendedores');
+        return res.redirect('/');
+    }
+    next();
 };
 
 const requireAdmin = (req, res, next) => {
-  if (!req.session.user || req.session.user.tipo !== 'admin') {
-    req.flash('error', 'Acesso restrito a administradores');
-    return res.redirect('/');
-  }
-  next();
+    if (!req.session.user || req.session.user.tipo !== 'admin') {
+        req.flash('error', 'Acesso restrito a administradores');
+        return res.redirect('/');
+    }
+    next();
+};
+
+// Exportar para uso em outras rotas (se necessário)
+module.exports = {
+    requireAuth,
+    requireVendor,
+    requireAdmin
 };
 
 
