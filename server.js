@@ -235,132 +235,82 @@ process.env.BASE_URL = BASE_URL;
 
 console.log(`🌐 BASE_URL configurada: ${BASE_URL}`);
 
-// ==================== CONFIGURAÇÃO DE EMAIL (CORRIGIDA COM MÚLTIPLAS TENTATIVAS) ====================
+// ==================== CONFIGURAÇÃO DE EMAIL (SENDGRID - OTIMIZADO) ====================
 
-// Carrega as credenciais do ambiente e limpa espaços em branco
+// Carrega as credenciais do ambiente
 const emailUser = (process.env.EMAIL_USER || '').trim();
 const emailPass = (process.env.EMAIL_PASS || '').replace(/\s+/g, '').trim();
+const emailHost = process.env.EMAIL_HOST || 'smtp.sendgrid.net';
+const emailPort = parseInt(process.env.EMAIL_PORT) || 587;
+const emailSecure = process.env.EMAIL_SECURE === 'true';
+
+console.log('📧 Configurando sistema de e-mail:');
+console.log(`   Host: ${emailHost}:${emailPort}`);
+console.log(`   Usuário: ${emailUser}`);
+console.log(`   Secure: ${emailSecure}`);
 
 // ============================================================
-// VALIDAÇÃO DAS CREDENCIAIS
-// ============================================================
-if (!emailUser) {
-    console.warn('⚠️ EMAIL_USER não configurado. E-mails não serão enviados.');
-}
-
-if (!emailPass) {
-    console.warn('⚠️ EMAIL_PASS não configurado. E-mails não serão enviados.');
-}
-
-// ============================================================
-// CRIAÇÃO DO TRANSPORTER COM CONFIGURAÇÕES ALTERNATIVAS
+// CRIAÇÃO DO TRANSPORTER
 // ============================================================
 let transporter = null;
-let transporterConfigs = [];
+let emailEnviados = 0;
+let emailFalhas = 0;
 
 if (emailUser && emailPass) {
-    // Configuração 1: Porta 465 com SSL (padrão)
-    transporterConfigs.push({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: emailUser,
-            pass: emailPass
-        },
-        tls: {
-            rejectUnauthorized: false,
-            minVersion: 'TLSv1.2'
-        },
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 30000,
-        logger: false,
-        debug: false
-    });
+    try {
+        transporter = nodemailer.createTransport({
+            host: emailHost,
+            port: emailPort,
+            secure: emailSecure,
+            auth: {
+                user: emailUser,
+                pass: emailPass
+            },
+            tls: {
+                rejectUnauthorized: false,
+                minVersion: 'TLSv1.2'
+            },
+            connectionTimeout: 15000,
+            greetingTimeout: 15000,
+            socketTimeout: 30000,
+            // Pool de conexões para melhor performance
+            pool: true,
+            maxConnections: 5,
+            maxMessages: 100
+        });
 
-    // Configuração 2: Porta 587 com STARTTLS (alternativa)
-    transporterConfigs.push({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: emailUser,
-            pass: emailPass
-        },
-        tls: {
-            rejectUnauthorized: false,
-            minVersion: 'TLSv1.2'
-        },
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 30000,
-        logger: false,
-        debug: false
-    });
-
-    // Configuração 3: Porta 25 com STARTTLS (último recurso)
-    transporterConfigs.push({
-        host: 'smtp.gmail.com',
-        port: 25,
-        secure: false,
-        auth: {
-            user: emailUser,
-            pass: emailPass
-        },
-        tls: {
-            rejectUnauthorized: false,
-            minVersion: 'TLSv1.2'
-        },
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 30000,
-        logger: false,
-        debug: false
-    });
-
-    // Tenta criar o transporter com a primeira configuração que funciona
-    async function criarTransporter() {
-        for (const config of transporterConfigs) {
+        // Verificação da conexão (assíncrona)
+        setTimeout(async () => {
             try {
-                console.log(`🔄 Tentando conexão SMTP na porta ${config.port}...`);
-                const testTransporter = nodemailer.createTransport(config);
-                await testTransporter.verify();
-                console.log(`✅ Conexão SMTP estabelecida na porta ${config.port}!`);
-                return testTransporter;
-            } catch (error) {
-                console.log(`❌ Falha na porta ${config.port}: ${error.message}`);
-                // Continua tentando a próxima configuração
+                await transporter.verify();
+                console.log('✅ Servidor de Email (SendGrid) conectado com sucesso!');
+                console.log(`📧 Remetente: KuandaShop <kuandashopp@gmail.com>`);
+                console.log('✅ Sistema de envio de e-mails OPERACIONAL');
+                console.log(`📊 Limite: 100 e-mails/dia (plano gratuito)`);
+            } catch (verifyError) {
+                console.error('❌ Falha na verificação SMTP:');
+                console.error(`   Mensagem: ${verifyError.message}`);
+                console.error(`   Código: ${verifyError.code || 'N/A'}`);
+                console.warn('⚠️ Verifique a chave API do SendGrid.');
             }
-        }
-        console.warn('⚠️ Todas as tentativas de conexão SMTP falharam.');
-        return null;
+        }, 2000);
+
+    } catch (error) {
+        console.error('❌ Erro ao criar transporter:', error.message);
+        transporter = null;
     }
-
-    // Executa a tentativa de conexão
-    (async () => {
-        transporter = await criarTransporter();
-        if (transporter) {
-            console.log(`📧 Conta: ${emailUser}`);
-            console.log('✅ Sistema de envio de e-mails OPERACIONAL');
-        } else {
-            console.warn('⚠️ E-mails podem não ser enviados. Verifique suas configurações de rede.');
-        }
-    })();
-
 } else {
-    console.warn('⚠️ SMTP desativado: EMAIL_USER ou EMAIL_PASS não configurados.');
+    console.warn('⚠️ SMTP desativado: credenciais não configuradas.');
 }
 
 // ============================================================
 // FUNÇÃO DE ENVIO DE E-MAIL (COM RETRY AUTOMÁTICO)
 // ============================================================
 const enviarEmail = async (destinatario, assunto, html, tentativas = 3) => {
-    // Se não há transporter, tenta criar um novo
+    // Se não há transporter, ativa fallback
     if (!transporter) {
-        console.warn(`⚠️ [FALLBACK] E-mail não enviado para ${destinatario}: SMTP não configurado.`);
+        console.warn(`⚠️ [FALLBACK] E-mail não enviado para ${destinatario}: SMTP não disponível.`);
         console.log(`📧 Assunto: ${assunto}`);
-        console.log(`📧 Conteúdo: ${html ? 'HTML disponível' : 'Sem conteúdo'}`);
         return false;
     }
 
@@ -369,12 +319,19 @@ const enviarEmail = async (destinatario, assunto, html, tentativas = 3) => {
     for (let i = 0; i < tentativas; i++) {
         try {
             const info = await transporter.sendMail({
-                from: `"KuandaShop" <${emailUser}>`,
+                from: '"KuandaShop" <kuandashopp@gmail.com>',
                 to: destinatario,
                 subject: assunto,
-                html: html
+                html: html,
+                // Headers extras para melhor entrega
+                headers: {
+                    'X-Priority': '1',
+                    'X-MSMail-Priority': 'High',
+                    'Importance': 'high'
+                }
             });
 
+            emailEnviados++;
             console.log(`✅ E-mail enviado para ${destinatario} (tentativa ${i + 1})`);
             console.log(`   Message-ID: ${info.messageId}`);
             return true;
@@ -382,22 +339,39 @@ const enviarEmail = async (destinatario, assunto, html, tentativas = 3) => {
             ultimoErro = error;
             console.warn(`⚠️ Tentativa ${i + 1} falhou para ${destinatario}: ${error.message}`);
             
-            // Se não for a última tentativa, espera um pouco antes de tentar novamente
+            // Se não for a última tentativa, espera antes de tentar novamente
             if (i < tentativas - 1) {
-                console.log(`⏳ Aguardando 2 segundos antes da próxima tentativa...`);
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                const tempoEspera = 2000 * (i + 1); // 2s, 4s, 6s
+                console.log(`⏳ Aguardando ${tempoEspera/1000}s antes da próxima tentativa...`);
+                await new Promise(resolve => setTimeout(resolve, tempoEspera));
             }
         }
     }
 
+    emailFalhas++;
     console.error(`❌ Todas as ${tentativas} tentativas falharam para ${destinatario}`);
     console.error(`   Último erro: ${ultimoErro ? ultimoErro.message : 'Desconhecido'}`);
-    console.warn(`⚠️ [FALLBACK ATIVADO] A conta será ativada mesmo sem e-mail.`);
+    console.warn(`⚠️ [FALLBACK ATIVADO] Conta será ativada mesmo sem e-mail.`);
     return false;
 };
 
-// Exporta a função para ser usada em outras partes
+// ============================================================
+// FUNÇÃO PARA ESTATÍSTICAS DE E-MAIL
+// ============================================================
+const getEmailStats = () => ({
+    enviados: emailEnviados,
+    falhas: emailFalhas,
+    total: emailEnviados + emailFalhas,
+    taxaSucesso: emailEnviados + emailFalhas > 0 
+        ? `${((emailEnviados / (emailEnviados + emailFalhas)) * 100).toFixed(1)}%` 
+        : '0%'
+});
+
+// ============================================================
+// EXPORTA AS FUNÇÕES
+// ============================================================
 app.enviarEmail = enviarEmail;
+app.getEmailStats = getEmailStats;
 
 // ==================== SISTEMA DE NOTIFICAÇÕES (SYS_NOTIFICATION) ====================
 /**
@@ -933,8 +907,7 @@ app.post('/perfil/upload-hibrido', requireAuth, uploadPerfilMiddleware, async (r
     console.log(`🔄 Upload híbrido iniciado para usuário: ${userId}`);
     console.log('📁 Arquivos recebidos:', Object.keys(req.files || {}));
 
-    // 1. Buscar usuário atual
-    const usuarioResult = await db.query('SELECT * FROM usuarios WHERE id = $1', [userId]);
+    // 1. Buscar usuário atual    const usuarioResult = await db.query('SELECT * FROM usuarios WHERE id = $1', [userId]);
     if (usuarioResult.rows.length === 0) {
       req.flash('error', 'Usuário não encontrado.');
       return res.redirect('/perfil');
@@ -2733,7 +2706,8 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
         }
 
         /* =======================
-           2. VERIFICAR DUPLICIDADE        ======================= */
+           2. VERIFICAR DUPLICIDADE
+        ======================= */
         const emailExiste = await db.query('SELECT id FROM usuarios WHERE email = $1', [email]);
 
         if (emailExiste.rows.length > 0) {
@@ -2828,126 +2802,125 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
         // ========================================================================
         const linkConfirmacao = `${process.env.BASE_URL}/verificar-email/${tokenVerificacao}`;
 
-        let emailEnviado = false;
+        const htmlEmail = `
+            <!DOCTYPE html>
+            <html lang="pt">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Confirme sua conta no KuandaShop</title>
+            </head>
+            <body style="margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+                    <tr>
+                        <td align="center">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <!-- HEADER -->
+                                <tr>
+                                    <td style="background-color: #E31C25; padding: 30px; text-align: center;">
+                                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">KuandaShop</h1>
+                                        <p style="margin: 5px 0 0 0; color: #ffcccc; font-size: 14px;">Marketplace Multi-Vendor</p>
+                                    </td>
+                                </tr>
+                                <!-- BODY -->
+                                <tr>
+                                    <td style="padding: 40px 30px;">
+                                        <h2 style="color: #333333; font-size: 22px; margin-top: 0;">Olá, ${nome.split(' ')[0]}! 👋</h2>
+                                        <p style="color: #555555; font-size: 16px; line-height: 1.6;">
+                                            Sua conta foi criada com sucesso no <strong>KuandaShop</strong>!
+                                        </p>
+                                        <p style="color: #555555; font-size: 16px; line-height: 1.6;">
+                                            Para ativar sua conta e começar a comprar, clique no botão abaixo:
+                                        </p>
+                                        <div style="text-align: center; margin: 35px 0;">
+                                            <a href="${linkConfirmacao}" 
+                                               style="background-color: #E31C25; 
+                                                      color: #ffffff; 
+                                                      text-decoration: none; 
+                                                      padding: 14px 40px; 
+                                                      border-radius: 8px; 
+                                                      display: inline-block; 
+                                                      font-size: 16px; 
+                                                      font-weight: bold;
+                                                      box-shadow: 0 2px 10px rgba(227, 28, 37, 0.3);">
+                                                ✅ Confirmar Conta
+                                            </a>
+                                        </div>
+                                        <p style="color: #888888; font-size: 14px; line-height: 1.6;">
+                                            Caso o botão não funcione, copie e cole este link no seu navegador:
+                                        </p>
+                                        <p style="background-color: #f5f5f5; 
+                                                  padding: 12px; 
+                                                  border-radius: 5px; 
+                                                  word-break: break-all; 
+                                                  color: #0066cc; 
+                                                  font-size: 13px;
+                                                  border: 1px solid #e0e0e0;">
+                                            ${linkConfirmacao}
+                                        </p>
+                                        <hr style="border: none; border-top: 1px solid #eeeeee; margin: 30px 0;">
+                                        <p style="color: #999999; font-size: 13px; line-height: 1.6;">
+                                            ⚠️ Se você não criou esta conta, ignore este e-mail.
+                                        </p>
+                                        <p style="color: #999999; font-size: 13px; line-height: 1.6;">
+                                            📧 Este link expira em 24 horas.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <!-- FOOTER -->
+                                <tr>
+                                    <td style="background-color: #f8f8f8; padding: 20px 30px; text-align: center;">
+                                        <p style="margin: 0; color: #999999; font-size: 12px;">
+                                            © ${new Date().getFullYear()} KuandaShop - Todos os direitos reservados
+                                        </p>
+                                        <p style="margin: 5px 0 0 0; color: #999999; font-size: 12px;">
+                                            Rua 2, Bairro Rotunda da Fubu, Luanda, Angola
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+        `;
 
-        try {
-            // Verifica se o SMTP está minimamente configurado
-            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-                throw new Error("SMTP não configurado no ambiente.");
-            }
+        // ==================== TENTATIVA DE ENVIO COM FALLBACK ====================
+        console.log(`📧 Tentando enviar e-mail de confirmação para ${email}...`);
+        const emailEnviado = await app.enviarEmail(email, 'Confirme sua conta no KuandaShop', htmlEmail);
 
-            // Usa a função de envio que já tem fallback interno
-            if (typeof app.enviarEmail === 'function') {
-                emailEnviado = await app.enviarEmail(email, 'Confirme sua conta no KuandaShop', `
-                <!DOCTYPE html>
-                <html lang="pt">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Confirmação de Conta</title>
-                </head>
-                <body style="margin:0; padding:30px; background:#f5f5f5; font-family:Arial,sans-serif;">
-                    <div style="max-width:650px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,.08);">
-                        <div style="background:#E31C25; padding:30px; text-align:center; color:white;">
-                            <h1 style="margin:0;">KuandaShop</h1>
-                        </div>
-                        <div style="padding:40px;">
-                            <h2>Olá, ${nome.split(' ')[0]} 👋</h2>
-                            <p>Sua conta foi criada com sucesso. Clique no botão abaixo para confirmar seu endereço de e-mail e ativar seu acesso.</p>
-                            <div style="text-align:center; margin:40px 0;">
-                                <a href="${linkConfirmacao}" style="background:#E31C25; color:white; text-decoration:none; padding:15px 35px; border-radius:8px; display:inline-block; font-size:16px; font-weight:bold;">Confirmar Conta</a>
-                            </div>
-                            <p>Caso o botão não funcione, copie este link:</p>
-                            <p style="word-break:break-all; color:#0066cc;">${linkConfirmacao}</p>
-                            <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
-                            <p style="font-size:13px; color:#888;">Se você não criou esta conta, ignore este e-mail.</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
-            } else if (transporter) {
-                // Fallback: usa o transporter diretamente
-                await transporter.sendMail({
-                    from: `"KuandaShop" <${emailUser}>`,
-                    to: email,
-                    subject: 'Confirme sua conta no KuandaShop',
-                    html: `
-                    <!DOCTYPE html>
-                    <html lang="pt">
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>Confirmação de Conta</title>
-                    </head>
-                    <body style="margin:0; padding:30px; background:#f5f5f5; font-family:Arial,sans-serif;">
-                        <div style="max-width:650px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,.08);">
-                            <div style="background:#E31C25; padding:30px; text-align:center; color:white;">
-                                <h1 style="margin:0;">KuandaShop</h1>
-                            </div>
-                            <div style="padding:40px;">
-                                <h2>Olá, ${nome.split(' ')[0]} 👋</h2>
-                                <p>Sua conta foi criada com sucesso. Clique no botão abaixo para confirmar seu endereço de e-mail e ativar seu acesso.</p>
-                                <div style="text-align:center; margin:40px 0;">
-                                    <a href="${linkConfirmacao}" style="background:#E31C25; color:white; text-decoration:none; padding:15px 35px; border-radius:8px; display:inline-block; font-size:16px; font-weight:bold;">Confirmar Conta</a>
-                                </div>
-                                <p>Caso o botão não funcione, copie este link:</p>
-                                <p style="word-break:break-all; color:#0066cc;">${linkConfirmacao}</p>
-                                <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
-                                <p style="font-size:13px; color:#888;">Se você não criou esta conta, ignore este e-mail.</p>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `
-                });
-                emailEnviado = true;
-                console.log(`✅ E-mail enviado para ${email}`);
-            }
-
-            console.log("==========================================");
-            console.log("✅ E-mail enviado com sucesso para:", email);
-            console.log("==========================================");
-
-            req.flash("success", "Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.");
-
-        } catch (mailError) {
-            console.error("==========================================");
-            console.error("❌ ERRO SMTP (Fallback Ativado)");
-            console.error("Mensagem:", mailError.message);
-            console.error("==========================================");
-
-            // FALLBACK AUTOMÁTICO: Ativa a conta se o e-mail falhar para o usuário não ficar preso
+        // ==================== FALLBACK AUTOMÁTICO ====================
+        if (!emailEnviado) {
+            // Ativa a conta automaticamente se o e-mail falhar
             try {
                 await db.query(
                     `UPDATE usuarios SET email_verificado = TRUE, token_verificacao = NULL WHERE id = $1`,
                     [newUser.id]
                 );
-                console.log("✅ Conta ativada via FALLBACK devido à falha do servidor de e-mail.");
-                req.flash("warning", "Sua conta foi criada e ATIVADA! Notamos uma instabilidade no nosso servidor de e-mail, então liberamos seu acesso automaticamente.");
+                console.log(`✅ [FALLBACK] Conta ${email} ativada automaticamente.`);
+                req.flash('warning', '⚠️ Não foi possível enviar o e-mail de confirmação, mas sua conta foi ATIVADA automaticamente. Você já pode fazer login.');
             } catch (dbError) {
-                console.error("Erro no fallback de banco de dados:", dbError);
-                req.flash("error", "Erro ao processar sua conta. Tente novamente.");
+                console.error('❌ Erro no fallback do banco:', dbError.message);
+                req.flash('error', 'Erro ao processar sua conta. Tente novamente.');
                 return req.session.save(() => res.redirect('/registro'));
             }
+        } else {
+            req.flash('success', '✅ Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.');
         }
 
-        // Finaliza o registro redirecionando para o login
         return req.session.save(() => {
-            res.redirect("/login?success=conta_criada");
+            res.redirect('/login');
         });
 
     } catch (error) {
-        // Limpeza de arquivo em caso de erro crítico no processo
+        console.error('❌ CRASH REGISTRO:', error);
         if (req.file) {
             const tempPath = path.join(__dirname, 'public/uploads/perfil/', req.file.filename);
             if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
         }
-
-        console.error("CRASH REGISTRO:", error);
-        req.flash("error", "Ocorreu um erro interno ao criar sua conta. Tente novamente em instantes.");
-
-        return req.session.save(() => {
-            res.redirect("/registro?error=erro_interno");
-        });
+        req.flash('error', 'Erro interno ao criar conta. Tente novamente.');
+        return req.session.save(() => res.redirect('/registro'));
     }
 });
 
@@ -3016,39 +2989,68 @@ app.post('/recuperar-senha', async (req, res) => {
 
         const resetUrl = `${req.protocol}://${req.get('host')}/resetar-senha/${token}`;
 
-        let emailEnviado = false;
-
-        try {
-            if (typeof app.enviarEmail === 'function') {
-                emailEnviado = await app.enviarEmail(email, 'Redefinição de Senha - KuandaShop', `
-                    <div style="font-family: sans-serif; padding: 20px; color: #333;">
-                        <h2>Redefinição de Senha</h2>
-                        <p>Clique abaixo para criar uma nova senha:</p>
-                        <a href="${resetUrl}" style="background-color: #E31C25; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
+        const htmlEmail = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div style="background-color: #E31C25; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+                    <h1 style="color: #ffffff; margin: 0;">KuandaShop</h1>
+                </div>
+                <div style="padding: 30px;">
+                    <h2 style="color: #333333;">Redefinição de Senha</h2>
+                    <p style="color: #555555; font-size: 16px; line-height: 1.6;">
+                        Olá, ${user.nome.split(' ')[0]}! Recebemos uma solicitação para redefinir sua senha no KuandaShop.
+                    </p>
+                    <p style="color: #555555; font-size: 16px; line-height: 1.6;">
+                        Clique no botão abaixo para criar uma nova senha:
+                    </p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${resetUrl}" 
+                           style="background-color: #E31C25; 
+                                  color: #ffffff; 
+                                  text-decoration: none; 
+                                  padding: 12px 35px; 
+                                  border-radius: 8px; 
+                                  display: inline-block; 
+                                  font-size: 16px; 
+                                  font-weight: bold;">
+                            🔑 Redefinir Senha
+                        </a>
                     </div>
-                `);
-            } else if (transporter) {
-                await transporter.sendMail({
-                    from: `"KuandaShop" <${emailUser}>`,
-                    to: email,
-                    subject: 'Redefinição de Senha - KuandaShop',
-                    html: `
-                        <div style="font-family: sans-serif; padding: 20px; color: #333;">
-                            <h2>Redefinição de Senha</h2>
-                            <p>Clique abaixo para criar uma nova senha:</p>
-                            <a href="${resetUrl}" style="background-color: #E31C25; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
-                            <p style="margin-top: 20px; font-size: 12px; color: #666;">Link válido por 1 hora.</p>
-                        </div>
-                    `
-                });
-                emailEnviado = true;
-            }
-        } catch (mailError) {
-            console.error('❌ Erro ao enviar e-mail de recuperação:', mailError.message);
-        }
+                    <p style="color: #888888; font-size: 14px; line-height: 1.6;">
+                        Caso o botão não funcione, copie e cole este link no seu navegador:
+                    </p>
+                    <p style="background-color: #f5f5f5; 
+                              padding: 12px; 
+                              border-radius: 5px; 
+                              word-break: break-all; 
+                              color: #0066cc; 
+                              font-size: 13px;
+                              border: 1px solid #e0e0e0;">
+                        ${resetUrl}
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #eeeeee; margin: 25px 0;">
+                    <p style="color: #999999; font-size: 13px; line-height: 1.6;">
+                        ⏰ Este link expira em <strong>1 hora</strong>.
+                    </p>
+                    <p style="color: #999999; font-size: 13px; line-height: 1.6;">
+                        🔒 Se você não solicitou esta redefinição, ignore este e-mail.
+                    </p>
+                </div>
+                <div style="background-color: #f8f8f8; padding: 15px; text-align: center; border-radius: 0 0 10px 10px;">
+                    <p style="margin: 0; color: #999999; font-size: 12px;">
+                        © ${new Date().getFullYear()} KuandaShop - Todos os direitos reservados
+                    </p>
+                    <p style="margin: 5px 0 0 0; color: #999999; font-size: 12px;">
+                        Rua 2, Bairro Rotunda da Fubu, Luanda, Angola
+                    </p>
+                </div>
+            </div>
+        `;
+
+        console.log(`📧 Tentando enviar e-mail de recuperação para ${email}...`);
+        const emailEnviado = await app.enviarEmail(email, 'Redefinição de Senha - KuandaShop', htmlEmail);
 
         if (!emailEnviado) {
-            req.flash('warning', '⚠️ Não foi possível enviar o e-mail, mas o link foi gerado. Entre em contato com o suporte.');
+            req.flash('warning', '⚠️ Não foi possível enviar o e-mail de recuperação. Entre em contato com o suporte.');
         } else {
             req.flash('success', '✅ Link de recuperação enviado para seu e-mail!');
         }
@@ -3178,6 +3180,30 @@ async function initDatabaseSchema() {
                 tipo VARCHAR(50) DEFAULT 'sistema',
                 referencia_id INTEGER,
                 lida BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // 5. Garante tabela jogo_links
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS jogo_links (
+                id SERIAL PRIMARY KEY,
+                jogo_id INTEGER REFERENCES jogos(id) ON DELETE CASCADE,
+                label VARCHAR(100) NOT NULL,
+                url TEXT NOT NULL,
+                ordem INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // 6. Garante tabela filme_links
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS filme_links (
+                id SERIAL PRIMARY KEY,
+                filme_id INTEGER REFERENCES filmes(id) ON DELETE CASCADE,
+                label VARCHAR(100) NOT NULL,
+                url TEXT NOT NULL,
+                ordem INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
@@ -6992,6 +7018,67 @@ app.get('/admin/restaurar-imagens', requireAdmin, async (req, res) => {
   }
 });
 
+// ==================== ROTA DE ESTATÍSTICAS DE E-MAIL (PARA ADMIN) ====================
+app.get('/admin/email-stats', requireAdmin, (req, res) => {
+    res.json({
+        success: true,
+        stats: getEmailStats(),
+        remetente: 'KuandaShop <kuandashopp@gmail.com>',
+        status: transporter ? 'CONECTADO' : 'DESCONECTADO'
+    });
+});
+
+// ==================== ROTA DE TESTE DE E-MAIL ====================
+app.get('/admin/test-email', requireAdmin, async (req, res) => {
+    try {
+        const destinatario = req.query.email || req.session.user.email;
+        
+        const htmlTeste = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+                    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                    h1 { color: #E31C25; }
+                    .success { color: #10b981; font-size: 48px; text-align: center; }
+                    .info { background: #f0f0f0; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="success">✅</div>
+                    <h1>🧪 Teste de E-mail</h1>
+                    <p>Este é um e-mail de teste do sistema KuandaShop.</p>
+                    <div class="info">
+                        <p><strong>📧 Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+                        <p><strong>👤 Usuário:</strong> ${req.session.user.nome}</p>
+                        <p><strong>📊 Status:</strong> <span style="color: #10b981;">✅ Sistema operacional</span></p>
+                        <p><strong>📧 Remetente:</strong> KuandaShop <kuandashopp@gmail.com></p>
+                    </div>
+                    <hr>
+                    <p style="color: #666; font-size: 12px;">E-mail enviado via SendGrid</p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const enviado = await app.enviarEmail(destinatario, '🧪 Teste do Sistema de E-mail', htmlTeste);
+        
+        res.json({
+            success: enviado,
+            message: enviado ? 'E-mail enviado com sucesso!' : 'Falha no envio do e-mail',
+            destinatario: destinatario,
+            stats: app.getEmailStats ? app.getEmailStats() : null
+        });
+    } catch (error) {
+        res.json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // ==================== TRATAMENTO DE ERROS ====================
 
 // 1. Erro 404 - Página não encontrada
@@ -7147,7 +7234,6 @@ app.post('/checkout/processar', requireAuth, async (req, res) => {
     }
 });
 
-
 // ==================== INICIALIZAR SERVIDOR ====================
 const server = app.listen(PORT, () => {
   console.log(`
@@ -7163,7 +7249,7 @@ const server = app.listen(PORT, () => {
   ✅ IMAGENS HÍBRIDAS PERSISTENTES IMPLEMENTADAS!
   ✅ UPLOAD DE PERFIL E BANNER CORRIGIDO E FUNCIONAL!
   ✅ SISTEMA DE NOTIFICAÇÕES IMPLEMENTADO!
-  ✅ SISTEMA DE E-MAIL CORRIGIDO COM FALLBACK!
+  ✅ SISTEMA DE E-MAIL COM SENDGRID E FALLBACK!
   
   📍 Porta: ${PORT}
   🌐 Ambiente: ${process.env.NODE_ENV || 'development'}
@@ -7187,6 +7273,12 @@ const server = app.listen(PORT, () => {
   👤 Credenciais Admin:
     Email: admin@kuandashop.ao
     Senha: password
+  
+  📧 SISTEMA DE E-MAIL:
+    • Provedor: SendGrid
+    • Remetente: KuandaShop <kuandashopp@gmail.com>
+    • Status: ${transporter ? '✅ CONECTADO' : '⚠️ DESCONECTADO'}
+    • Fallback: ✅ ATIVO (conta ativada mesmo sem e-mail)
   
   📊 Funcionalidades disponíveis:
     • Página inicial com banners
