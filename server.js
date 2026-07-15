@@ -352,11 +352,10 @@ if (passport._strategies && passport._strategies.google) {
 }
 
 // ============================================================
-// URLS DE CALLBACK CORRETAS PARA CADA AMBIENTE
+// URL DE CALLBACK FIXA - NUNCA MUDA!
 // ============================================================
-// PRODUÇÃO: https://kuandashopp.onrender.com/auth/google/callback
-// DESENVOLVIMENTO: http://localhost:3000/auth/google/callback
-// ============================================================
+const GOOGLE_CALLBACK_URL = 'https://kuandashopp.onrender.com/auth/google/callback';
+console.log('📌 Google Callback URL FIXA:', GOOGLE_CALLBACK_URL);
 
 // Configuração do Google Strategy
 passport.use(new GoogleStrategy(
@@ -365,10 +364,8 @@ passport.use(new GoogleStrategy(
     clientID: googleClientID,
     clientSecret: googleClientSecret,
     
-    // URLs de callback CORRETAS
-    callbackURL: process.env.NODE_ENV === 'production' 
-        ? 'https://kuandashopp.onrender.com/auth/google/callback'
-        : 'http://localhost:3000/auth/google/callback',
+    // URL DE CALLBACK FIXA
+    callbackURL: GOOGLE_CALLBACK_URL,
     
     // Proxy para funcionar em produção (Render/Heroku)
     proxy: true,
@@ -600,7 +597,7 @@ const requireAdmin = (req, res, next) => {
 app.get('/auth/google',
     (req, res, next) => {
         console.log('🚀 Iniciando autenticação Google...');
-        console.log('🌐 URL base:', process.env.NODE_ENV === 'production' ? 'https://kuandashopp.onrender.com' : 'http://localhost:3000');
+        console.log('📌 Callback URL:', GOOGLE_CALLBACK_URL);
         // Salva a URL de destino para redirecionar depois
         if (req.query.returnTo) {
             req.session.returnTo = req.query.returnTo;
@@ -671,13 +668,14 @@ app.get('/auth/status', (req, res) => {
         sessionUser: req.session.user || null,
         googleConfigured: !!googleClientID && !!googleClientSecret,
         environment: process.env.NODE_ENV || 'development',
-        // URL FIXA - SEMPRE A MESMA!
-        callbackURL: 'https://kuandashopp.onrender.com/auth/google/callback'
+        callbackURL: GOOGLE_CALLBACK_URL
     });
 });
 
 console.log('✅ Google Passport configurado com sucesso!');
-console.log('📌 Callback URL FIXA: https://kuandashopp.onrender.com/auth/google/callback');
+console.log('📌 Callback URL FIXA:', GOOGLE_CALLBACK_URL);
+console.log('🔒 Certifique-se que esta URL está cadastrada no Google Cloud Console:');
+console.log('   ➜', GOOGLE_CALLBACK_URL);
 
 
 // ==================== CONFIGURAÇÃO DE DIRETÓRIOS ====================
