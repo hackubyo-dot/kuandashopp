@@ -677,6 +677,115 @@ console.log('📌 Callback URL FIXA:', GOOGLE_CALLBACK_URL);
 console.log('🔒 Certifique-se que esta URL está cadastrada no Google Cloud Console:');
 console.log('   ➜', GOOGLE_CALLBACK_URL);
 
+// ============================================================
+// BLOCO DE MIDDLEWARES COM ORDEM CORRIGIDA
+// ============================================================
+
+// ==================== MIDDLEWARES (ORDEM CORRIGIDA - SUPER IMPORTANTE) ====================
+
+// 1. CONFIGURAÇÕES BÁSICAS DO EXPRESS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// 2. ARQUIVOS ESTÁTICOS E PARSERS
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(methodOverride('_method'));
+
+// ============================================================
+// 3. PRIMEIRO: SESSÃO (express-session) - DEVE SER O PRIMEIRO!
+// ============================================================
+app.use(session({
+    store: new pgSession({
+        conString: process.env.DATABASE_URL,
+        tableName: 'user_sessions',
+        createTableIfMissing: true,
+        ttl: 24 * 60 * 60 // 24 horas
+    }),
+    secret: process.env.SESSION_SECRET || 'kuandashop-secret-key-2025',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax'
+    }
+}));
+
+// ============================================================
+// 4. SEGUNDO: PASSPORT (DEVE VIR DEPOIS DA SESSÃO!)
+// ============================================================
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ============================================================
+// 5. TERCEIRO: FLASH (DEPOIS DA SESSÃO)
+// ============================================================
+app.use(flash());
+
+// ============================================================
+// 6. QUARTO: EXPRESS LAYOUTS
+// ============================================================
+app.use(expressLayouts);
+app.set('layout', 'layout');
+
+// ============================================================
+// 7. QUINTO: MIDDLEWARE GLOBAL DE VARIÁVEIS
+// ============================================================
+app.use((req, res, next) => {
+    // A. Disponibilizar Usuário
+    res.locals.user = req.session.user || null;
+    
+    // B. Capturar Mensagens Flash
+    const messages = req.flash();
+    res.locals.messages = messages;
+    res.locals.currentUrl = req.originalUrl;
+
+    // C. Gerar Script do SweetAlert2 Automaticamente
+    let scriptNotificacao = '';
+    
+    const toastConfig = `toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); }`;
+
+    if (messages.success && messages.success.length > 0) {
+        scriptNotificacao = `Swal.fire({ icon: 'success', title: '${messages.success[0].replace(/'/g, "\\'")}', ${toastConfig} });`;
+    } else if (messages.error && messages.error.length > 0) {
+        scriptNotificacao = `Swal.fire({ icon: 'error', title: '${messages.error[0].replace(/'/g, "\\'")}', ${toastConfig} });`;
+    } else if (messages.info && messages.info.length > 0) {
+        scriptNotificacao = `Swal.fire({ icon: 'info', title: '${messages.info[0].replace(/'/g, "\\'")}', ${toastConfig} });`;
+    } else if (messages.warning && messages.warning.length > 0) {
+        scriptNotificacao = `Swal.fire({ icon: 'warning', title: '${messages.warning[0].replace(/'/g, "\\'")}', ${toastConfig} });`;
+    }
+
+    res.locals.notificacaoScript = scriptNotificacao;
+    next();
+});
+
+// ============================================================
+// 8. SEXTO: MIDDLEWARE DO CARRINHO
+// ============================================================
+app.use((req, res, next) => {
+    if (!req.session.carrinho) {
+        req.session.carrinho = [];
+    }
+    res.locals.carrinho = req.session.carrinho || [];
+    next();
+});
+
+// ============================================================
+// 9. SÉTIMO: SISTEMA DE CHAT (Antes das rotas)
+// ============================================================
+require('./routes/sistema_chat')(app, db);
+
+// ============================================================
+// 10. OITAVO: IMPORTAÇÃO DAS ROTAS (POR ÚLTIMO!)
+// ============================================================
+app.use('/', vendasRoutes);
+
+console.log('✅ Todos os middlewares configurados na ordem correta!');
+console.log('📋 Ordem: Sessão → Passport → Flash → Layouts → Variáveis → Carrinho → Chat → Rotas');
+
 
 // ==================== CONFIGURAÇÃO DE DIRETÓRIOS ====================
 const uploadDirs = [
