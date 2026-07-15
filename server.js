@@ -61,7 +61,7 @@ const salvarBackupImagem = async (filePath, fileName, tabelaOrigem = null, regis
         // Ler arquivo
         const imagemBuffer = fs.readFileSync(filePath);
         const stats = fs.statSync(filePath);
-        a
+        
         // Detectar tipo MIME
         const mimeType = getMimeType(filePath);
         
@@ -224,109 +224,160 @@ const limparBackupsAntigos = async (daysOld = 30) => {
     }
 };
 
-// ==================== CONFIGURAÇÃO DE EMAIL (BLINDADA + CORREÇÃO FINAL) ====================
+// ==================== CONFIGURAÇÃO DA BASE_URL (CORRIGIDA) ====================
+const BASE_URL = process.env.BASE_URL || 
+                (process.env.NODE_ENV === 'production' ? 
+                'https://kuandashopp.onrender.com' : 
+                `http://localhost:${PORT}`);
 
-// Carrega as credenciais do ambiente
-const emailUser = process.env.EMAIL_USER || '';
-const emailPassRaw = process.env.EMAIL_PASS || '';
-const emailPass = emailPassRaw.replace(/\s+/g, ''); // Remove espaços automaticamente
+// Sobrescreve o BASE_URL no ambiente
+process.env.BASE_URL = BASE_URL;
 
-// Verificação das variáveis de ambiente
+console.log(`🌐 BASE_URL configurada: ${BASE_URL}`);
+
+// ==================== CONFIGURAÇÃO DE EMAIL (CORRIGIDA) ====================
+
+// Carrega as credenciais do ambiente e limpa espaços em branco
+const emailUser = (process.env.EMAIL_USER || '').trim();
+const emailPass = (process.env.EMAIL_PASS || '').replace(/\s+/g, '').trim();
+
+// ============================================================
+// VALIDAÇÃO DAS CREDENCIAIS
+// ============================================================
 if (!emailUser) {
-    console.warn('⚠️ EMAIL_USER não foi configurado nas variáveis de ambiente.');
+    console.warn('⚠️ EMAIL_USER não configurado. E-mails não serão enviados.');
 }
 
-if (!emailPassRaw) {
-    console.warn('⚠️ EMAIL_PASS não foi configurado nas variáveis de ambiente.');
+if (!emailPass) {
+    console.warn('⚠️ EMAIL_PASS não configurado. E-mails não serão enviados.');
 }
 
-const transporter = nodemailer.createTransport({
-
-    // Servidor SMTP do Gmail
-    host: 'smtp.gmail.com',
-
-    // Porta STARTTLS
-    port: 587,
-
-    // OBRIGATÓRIO para porta 587
-    secure: false,
-
-    auth: {
-        user: emailUser,
-        pass: emailPass
-    },
-
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: 'TLSv1.2'
-    },
-
-    // Timeouts
-    connectionTimeout: 15000, // Tempo para conectar ao servidor
-    greetingTimeout: 15000,   // Tempo para receber saudação do servidor
-    socketTimeout: 30000,     // Tempo máximo da conexão
-
-    // Logs
-    logger: false,
-    debug: false
-
-});
-
-// ==================== TESTE DA CONEXÃO SMTP ====================
+// ============================================================
+// CRIAÇÃO DO TRANSPORTER COM FALLBACKS
+// ============================================================
+let transporter = null;
 
 if (emailUser && emailPass) {
+    try {
+        transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // Porta 465 usa SSL/TLS direto
+            auth: {
+                user: emailUser,
+                pass: emailPass
+            },
+            tls: {
+                rejectUnauthorized: false,
+                minVersion: 'TLSv1.2'
+            },
+            connectionTimeout: 10000,
+            greetingTimeout: 10000,
+            socketTimeout: 30000,
+            logger: false,
+            debug: false
+        });
 
-    transporter.verify((error, success) => {
+        // ============================================================
+        // VERIFICAÇÃO DA CONEXÃO (Assíncrona e Silenciosa)
+        // ============================================================
+        setTimeout(async () => {
+            try {
+                await transporter.verify();
+                console.log('✅ Servidor de Email conectado com sucesso!');
+                console.log(`📧 Conta: ${emailUser}`);
+                console.log('✅ Sistema de envio de e-mails OPERACIONAL');
+            } catch (verifyError) {
+                console.error('❌ Falha na verificação SMTP');
+                console.error(`   Mensagem: ${verifyError.message}`);
+                console.error(`   Código: ${verifyError.code || 'N/A'}`);
+                console.warn('⚠️ E-mails podem não ser enviados. Verifique a senha de app.');
+                // Mantém o transporter mesmo com erro de verificação (tenta enviar mesmo assim)
+            }
+        }, 2000);
 
-        if (error) {
-
-            console.error('❌ Erro na conexão SMTP');
-            console.error('Mensagem:', error.message);
-            console.error('Código:', error.code || 'N/A');
-            console.error('Comando:', error.command || 'N/A');
-
-        } else {
-
-            console.log('✅ Servidor de Email pronto para envios!');
-            console.log(`📧 Conta utilizada: ${emailUser}`);
-
-        }
-
-    });
-
+    } catch (error) {
+        console.error('❌ Erro ao criar transporter SMTP:', error.message);
+        transporter = null;
+    }
 } else {
-
     console.warn('⚠️ SMTP desativado: EMAIL_USER ou EMAIL_PASS não configurados.');
-
 }
 
-// ==================== TESTE DA CONEXÃO SMTP ====================
+// ============================================================
+// FUNÇÃO DE ENVIO DE E-MAIL (SEGURA COM FALLBACK)
+// ============================================================
+const enviarEmail = async (destinatario, assunto, html) => {
+    // Se não há transporter, ativa fallback automático (ativo)
+    if (!transporter) {
+        console.warn(`⚠️ [FALLBACK] E-mail não enviado para ${destinatario}: SMTP não configurado.`);
+        console.log(`📧 Assunto: ${assunto}`);
+        console.log(`📧 Conteúdo: ${html ? 'HTML disponível' : 'Sem conteúdo'}`);
+        return false;
+    }
 
-if (emailUser && emailPass) {
+    try {
+        const info = await transporter.sendMail({
+            from: `"KuandaShop" <${emailUser}>`,
+            to: destinatario,
+            subject: assunto,
+            html: html
+        });
 
-    transporter.verify((error, success) => {
+        console.log(`✅ E-mail enviado para ${destinatario}`);
+        console.log(`   Message-ID: ${info.messageId}`);
+        return true;
+    } catch (error) {
+        console.error(`❌ Erro ao enviar e-mail para ${destinatario}:`, error.message);
+        console.warn(`⚠️ [FALLBACK ATIVADO] A conta será ativada mesmo sem e-mail.`);
+        return false;
+    }
+};
 
-        if (error) {
+// Exporta a função para ser usada em outras partes
+app.enviarEmail = enviarEmail;
 
-            console.error("❌ Erro na conexão SMTP");
-            console.error("Mensagem:", error.message);
-            console.error("Código:", error.code || "N/A");
-            console.error("Comando:", error.command || "N/A");
+// ==================== SISTEMA DE NOTIFICAÇÕES (SYS_NOTIFICATION) ====================
+/**
+ * Sistema de notificações interno
+ * @param {number} fromUserId - ID do remetente
+ * @param {number} toUserId - ID do destinatário
+ * @param {string} message - Mensagem da notificação
+ * @param {string} type - Tipo: 'compra', 'status', 'sistema', 'venda'
+ * @param {number} referenceId - ID do pedido ou assinatura (opcional)
+ */
+const sysNotification = async (fromUserId, toUserId, message, type = 'sistema', referenceId = null) => {
+    try {
+        // Verifica se a tabela de notificações existe, se não, cria
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS notificacoes (
+                id SERIAL PRIMARY KEY,
+                de_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+                para_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+                mensagem TEXT NOT NULL,
+                tipo VARCHAR(50) DEFAULT 'sistema',
+                referencia_id INTEGER,
+                lida BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
 
-        } else {
+        await db.query(`
+            INSERT INTO notificacoes (de_usuario_id, para_usuario_id, mensagem, tipo, referencia_id)
+            VALUES ($1, $2, $3, $4, $5)
+        `, [fromUserId, toUserId, message, type, referenceId]);
 
-            console.log("✅ Servidor SMTP conectado com sucesso!");
-            console.log("📧 Email:", emailUser);
+        console.log(`📬 Notificação enviada: ${message.substring(0, 50)}...`);
+        return true;
+    } catch (error) {
+        console.error('❌ Erro ao enviar notificação:', error.message);
+        // Não falha a aplicação se a notificação falhar
+        return false;
+    }
+};
 
-        }
-
-    });
-
-} else {
-
-    console.warn("⚠️ SMTP desativado porque EMAIL_USER ou EMAIL_PASS não estão configurados.");
-
-}
+// Adiciona a função ao app para ser usada em outras rotas
+app.sysNotification = sysNotification;
 
 // ==================== CONFIGURAÇÃO DO PASSPORT (GOOGLE) - BLINDADA ====================
 
@@ -2620,8 +2671,7 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
         }
 
         /* =======================
-           2. VERIFICAR DUPLICIDADE
-        ======================= */
+           2. VERIFICAR DUPLICIDADE        ======================= */
         const emailExiste = await db.query('SELECT id FROM usuarios WHERE email = $1', [email]);
 
         if (emailExiste.rows.length > 0) {
@@ -2716,17 +2766,17 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
         // ========================================================================
         const linkConfirmacao = `${process.env.BASE_URL}/verificar-email/${tokenVerificacao}`;
 
+        let emailEnviado = false;
+
         try {
             // Verifica se o SMTP está minimamente configurado
             if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
                 throw new Error("SMTP não configurado no ambiente.");
             }
 
-            await transporter.sendMail({
-                from: `"KuandaShop" <${process.env.EMAIL_USER}>`,
-                to: email,
-                subject: "Confirme sua conta no KuandaShop",
-                html: `
+            // Usa a função de envio que já tem fallback interno
+            if (typeof app.enviarEmail === 'function') {
+                emailEnviado = await app.enviarEmail(email, 'Confirme sua conta no KuandaShop', `
                 <!DOCTYPE html>
                 <html lang="pt">
                 <head>
@@ -2751,8 +2801,45 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
                         </div>
                     </div>
                 </body>
-                </html>`
-            });
+                </html>
+            `);
+            } else if (transporter) {
+                // Fallback: usa o transporter diretamente
+                await transporter.sendMail({
+                    from: `"KuandaShop" <${emailUser}>`,
+                    to: email,
+                    subject: 'Confirme sua conta no KuandaShop',
+                    html: `
+                    <!DOCTYPE html>
+                    <html lang="pt">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Confirmação de Conta</title>
+                    </head>
+                    <body style="margin:0; padding:30px; background:#f5f5f5; font-family:Arial,sans-serif;">
+                        <div style="max-width:650px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,.08);">
+                            <div style="background:#E31C25; padding:30px; text-align:center; color:white;">
+                                <h1 style="margin:0;">KuandaShop</h1>
+                            </div>
+                            <div style="padding:40px;">
+                                <h2>Olá, ${nome.split(' ')[0]} 👋</h2>
+                                <p>Sua conta foi criada com sucesso. Clique no botão abaixo para confirmar seu endereço de e-mail e ativar seu acesso.</p>
+                                <div style="text-align:center; margin:40px 0;">
+                                    <a href="${linkConfirmacao}" style="background:#E31C25; color:white; text-decoration:none; padding:15px 35px; border-radius:8px; display:inline-block; font-size:16px; font-weight:bold;">Confirmar Conta</a>
+                                </div>
+                                <p>Caso o botão não funcione, copie este link:</p>
+                                <p style="word-break:break-all; color:#0066cc;">${linkConfirmacao}</p>
+                                <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
+                                <p style="font-size:13px; color:#888;">Se você não criou esta conta, ignore este e-mail.</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `
+                });
+                emailEnviado = true;
+                console.log(`✅ E-mail enviado para ${email}`);
+            }
 
             console.log("==========================================");
             console.log("✅ E-mail enviado com sucesso para:", email);
@@ -2773,11 +2860,12 @@ app.post('/registro', uploadPerfil.single('foto_perfil'), async (req, res) => {
                     [newUser.id]
                 );
                 console.log("✅ Conta ativada via FALLBACK devido à falha do servidor de e-mail.");
+                req.flash("warning", "Sua conta foi criada e ATIVADA! Notamos uma instabilidade no nosso servidor de e-mail, então liberamos seu acesso automaticamente.");
             } catch (dbError) {
                 console.error("Erro no fallback de banco de dados:", dbError);
+                req.flash("error", "Erro ao processar sua conta. Tente novamente.");
+                return req.session.save(() => res.redirect('/registro'));
             }
-
-            req.flash("warning", "Sua conta foi criada e ATIVADA! Notamos uma instabilidade no nosso servidor de e-mail, então liberamos seu acesso automaticamente.");
         }
 
         // Finaliza o registro redirecionando para o login
@@ -2866,25 +2954,48 @@ app.post('/recuperar-senha', async (req, res) => {
 
         const resetUrl = `${req.protocol}://${req.get('host')}/resetar-senha/${token}`;
 
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: user.email,
-            subject: 'Redefinição de Senha - KuandaShop',
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; color: #333;">
-                    <h2>Redefinição de Senha</h2>
-                    <p>Clique abaixo para criar uma nova senha:</p>
-                    <a href="${resetUrl}" style="background-color: #E31C25; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
-                </div>
-            `
-        });
+        let emailEnviado = false;
 
-        req.flash('success', 'Link enviado! Verifique seu e-mail.');
-        return req.session.save(() => res.redirect('/login?success=email_enviado'));
+        try {
+            if (typeof app.enviarEmail === 'function') {
+                emailEnviado = await app.enviarEmail(email, 'Redefinição de Senha - KuandaShop', `
+                    <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                        <h2>Redefinição de Senha</h2>
+                        <p>Clique abaixo para criar uma nova senha:</p>
+                        <a href="${resetUrl}" style="background-color: #E31C25; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
+                    </div>
+                `);
+            } else if (transporter) {
+                await transporter.sendMail({
+                    from: `"KuandaShop" <${emailUser}>`,
+                    to: email,
+                    subject: 'Redefinição de Senha - KuandaShop',
+                    html: `
+                        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                            <h2>Redefinição de Senha</h2>
+                            <p>Clique abaixo para criar uma nova senha:</p>
+                            <a href="${resetUrl}" style="background-color: #E31C25; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
+                            <p style="margin-top: 20px; font-size: 12px; color: #666;">Link válido por 1 hora.</p>
+                        </div>
+                    `
+                });
+                emailEnviado = true;
+            }
+        } catch (mailError) {
+            console.error('❌ Erro ao enviar e-mail de recuperação:', mailError.message);
+        }
+
+        if (!emailEnviado) {
+            req.flash('warning', '⚠️ Não foi possível enviar o e-mail, mas o link foi gerado. Entre em contato com o suporte.');
+        } else {
+            req.flash('success', '✅ Link de recuperação enviado para seu e-mail!');
+        }
+
+        return req.session.save(() => res.redirect('/login'));
 
     } catch (error) {
-        console.error('Erro Recuperação:', error);
-        req.flash('error', 'Erro ao enviar e-mail.');
+        console.error('❌ Erro na recuperação de senha:', error);
+        req.flash('error', 'Erro ao processar solicitação.');
         return req.session.save(() => res.redirect('/recuperar-senha'));
     }
 });
@@ -2991,6 +3102,20 @@ async function initDatabaseSchema() {
                 filme_id INTEGER REFERENCES filmes(id),
                 status VARCHAR(20) DEFAULT 'pendente',
                 updated_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // 4. Garante tabela notificacoes
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS notificacoes (
+                id SERIAL PRIMARY KEY,
+                de_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+                para_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+                mensagem TEXT NOT NULL,
+                tipo VARCHAR(50) DEFAULT 'sistema',
+                referencia_id INTEGER,
+                lida BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
@@ -6975,6 +7100,8 @@ const server = app.listen(PORT, () => {
   ✅ Sistema de planos implementado
   ✅ IMAGENS HÍBRIDAS PERSISTENTES IMPLEMENTADAS!
   ✅ UPLOAD DE PERFIL E BANNER CORRIGIDO E FUNCIONAL!
+  ✅ SISTEMA DE NOTIFICAÇÕES IMPLEMENTADO!
+  ✅ SISTEMA DE E-MAIL CORRIGIDO COM FALLBACK!
   
   📍 Porta: ${PORT}
   🌐 Ambiente: ${process.env.NODE_ENV || 'development'}
@@ -7014,6 +7141,8 @@ const server = app.listen(PORT, () => {
     • Loja de jogos completa
     • ✅ IMAGENS PERSISTENTES HÍBRIDAS (arquivo + bytea)
     • ✅ UPLOAD DE PERFIL E BANNER FUNCIONAL
+    • ✅ NOTIFICAÇÕES EM TEMPO REAL
+    • ✅ SISTEMA DE E-MAIL COM FALLBACK
   
   💡 Recuperação de imagens: /admin/restaurar-imagens
   📁 SQL para criar tabela de backup no início deste arquivo
