@@ -333,7 +333,6 @@ if (emailUser && emailPass) {
 const googleClientID = process.env.GOOGLE_CLIENT_ID || '';
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
 
-// Validação das credenciais
 if (!googleClientID) {
     console.warn('⚠️ GOOGLE_CLIENT_ID não configurado no .env');
 } else {
@@ -346,8 +345,7 @@ if (!googleClientSecret) {
     console.log('✅ GOOGLE_CLIENT_SECRET carregado');
 }
 
-// Verificação se o Passport já tem a estratégia registrada
-// (evita erro de "Strategy already registered")
+// Verificação se o Passport já tem a estratégia registrada (evita erro de "Strategy already registered")
 if (passport._strategies && passport._strategies.google) {
     console.log('🔄 Google Strategy já registrada. Substituindo...');
     passport.unuse('google');
@@ -409,13 +407,6 @@ async (accessToken, refreshToken, profile, done) => {
         if (!email || email.trim() === '') {
             return done(new Error("Email inválido."), null);
         }
-
-        // Verifica se o email é do domínio permitido (opcional)
-        // const allowedDomains = ['gmail.com', 'kuandashop.com'];
-        // const emailDomain = email.split('@')[1];
-        // if (!allowedDomains.includes(emailDomain)) {
-        //     return done(new Error("Domínio de email não permitido."), null);
-        // }
 
         // ==================== 3. PROCURA POR GOOGLE_ID EXISTENTE ====================
 
@@ -559,7 +550,7 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// ==================== MIDDLEWARE DE AUTENTICAÇÃO ====================
+// ==================== MIDDLEWARES DE AUTENTICAÇÃO ====================
 
 // Middleware para verificar autenticação via Passport e Session
 const requireAuth = (req, res, next) => {
@@ -673,50 +664,6 @@ app.get('/auth/status', (req, res) => {
 });
 
 console.log('✅ Google Passport configurado com sucesso!');
-
-// ==================== MIDDLEWARE DE AUTENTICAÇÃO (VERSÃO ÚNICA E CORRIGIDA) ====================
-
-// Middleware para verificar autenticação via Passport e Session
-const requireAuth = (req, res, next) => {
-    // Verifica se o usuário está na sessão (seu sistema)
-    if (req.session.user) {
-        return next();
-    }
-    
-    // Verifica se o usuário está autenticado via Passport
-    if (req.isAuthenticated && req.isAuthenticated()) {
-        // Sincroniza com sua sessão personalizada
-        req.session.user = req.user;
-        return next();
-    }
-    
-    // Se não estiver autenticado, redireciona
-    req.flash('error', 'Você precisa fazer login para acessar esta página');
-    return res.redirect('/login');
-};
-
-const requireVendor = (req, res, next) => {
-    if (!req.session.user || req.session.user.tipo !== 'vendedor') {
-        req.flash('error', 'Acesso restrito a vendedores');
-        return res.redirect('/');
-    }
-    next();
-};
-
-const requireAdmin = (req, res, next) => {
-    if (!req.session.user || req.session.user.tipo !== 'admin') {
-        req.flash('error', 'Acesso restrito a administradores');
-        return res.redirect('/');
-    }
-    next();
-};
-
-// Exportar para uso em outras rotas (se necessário)
-module.exports = {
-    requireAuth,
-    requireVendor,
-    requireAdmin
-};
 
 
 // ==================== CONFIGURAÇÃO DE DIRETÓRIOS ====================
